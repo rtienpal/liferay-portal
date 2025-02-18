@@ -1,9 +1,15 @@
-.lfr__management-toolbar {
-	position: fixed;
-	width: 100%;
-	z-index: 2;
+.lfr-object__edit-object-definition {
+	.lfr__management-toolbar {
+		position: fixed;
+		width: 100%;
+		z-index: 2;
 
-	&--box-shadow {
-		box-shadow: 0 0.125rem 0.75rem rgb(0 0 0 / 8%);
+		&--box-shadow {
+			box-shadow: 0 0.125rem 0.75rem rgb(0 0 0 / 8%);
+		}
+
+		.container-fluid {
+			max-width: 1920px !important;
+		}
 	}
 }
