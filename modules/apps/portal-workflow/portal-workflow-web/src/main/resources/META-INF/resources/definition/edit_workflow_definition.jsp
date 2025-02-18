@@ -48,7 +48,7 @@ renderResponse.setTitle((workflowDefinition == null) ? LanguageUtil.get(request,
 
 <c:if test="<%= workflowDefinition != null %>">
 	<div class="management-bar management-bar-light navbar navbar-expand-md">
-		<clay:container-fluid>
+		<clay:container-fluid fullWidth="<%= true %>">
 			<ul class="m-auto navbar-nav"></ul>
 
 			<ul class="middle navbar-nav">

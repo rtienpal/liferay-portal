@@ -17,29 +17,34 @@ interface IProps {
 
 export function ManagementToolbarSearch({query, setQuery}: IProps) {
 	return (
-		<ManagementToolbar.Search onSubmit={(event) => event.preventDefault()}>
-			<ClayInput.Group>
-				<ClayInput.GroupItem>
-					<ClayInput
-						aria-label={Liferay.Language.get('search')}
-						className="form-control input-group-inset input-group-inset-after"
-						onChange={({target}) => {
-							setQuery(target.value);
-						}}
-						placeholder={Liferay.Language.get('search')}
-						sizing="sm"
-						type="text"
-						value={query}
-					/>
-
-					<ClayInput.GroupInsetItem after tag="span">
-						<ClayIcon
-							className="lfr-object__object-view-management-toolbar-search-icon"
-							symbol="search"
+		<>
+			<h1>hello management toolbar search</h1>
+			<ManagementToolbar.Search
+				onSubmit={(event) => event.preventDefault()}
+			>
+				<ClayInput.Group>
+					<ClayInput.GroupItem>
+						<ClayInput
+							aria-label={Liferay.Language.get('search')}
+							className="form-control input-group-inset input-group-inset-after"
+							onChange={({target}) => {
+								setQuery(target.value);
+							}}
+							placeholder={Liferay.Language.get('search')}
+							sizing="sm"
+							type="text"
+							value={query}
 						/>
-					</ClayInput.GroupInsetItem>
-				</ClayInput.GroupItem>
-			</ClayInput.Group>
-		</ManagementToolbar.Search>
+
+						<ClayInput.GroupInsetItem after tag="span">
+							<ClayIcon
+								className="lfr-object__object-view-management-toolbar-search-icon"
+								symbol="search"
+							/>
+						</ClayInput.GroupInsetItem>
+					</ClayInput.GroupItem>
+				</ClayInput.Group>
+			</ManagementToolbar.Search>
+		</>
 	);
 }

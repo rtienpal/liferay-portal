@@ -27,7 +27,7 @@ export default function Report() {
 	return (
 		<>
 			<div className="lfr-ddm__form-report__header" tabIndex={0}>
-				<div className="container-fluid container-fluid-max-xl">
+				<div className="container-fluid">
 					<h2 className="lfr-ddm__form-report__title text-truncate">
 						{Liferay.Util.sub(
 							totalItems === 1
@@ -47,6 +47,7 @@ export default function Report() {
 
 			<ClayNavigationBar
 				className="lfr-ddm__form-report__tabs"
+				fluidSize={false}
 				triggerLabel={Liferay.Language.get('summary')}
 			>
 				<ClayNavigationBar.Item active>
