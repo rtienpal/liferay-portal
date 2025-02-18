@@ -34,39 +34,42 @@ const InfoScreen: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	}
 
 	return (
-		<Card title={Liferay.Language.get('basic-info')}>
-			<Input
-				disabled={isViewOnly}
-				error={error}
-				label={Liferay.Language.get('name')}
-				name="name"
-				onChange={({target: {value}}) => {
-					dispatch({
-						payload: {name: {[defaultLanguageId]: value}},
-						type: TYPES.CHANGE_OBJECT_LAYOUT_NAME,
-					});
-				}}
-				required
-				value={stringUtils.getLocalizableLabel(
-					creationLanguageId as Liferay.Language.Locale,
-					objectLayout.name
-				)}
-			/>
-
-			<ClayForm.Group className="mb-0">
-				<ClayCheckbox
-					checked={objectLayout.defaultObjectLayout}
+		<>
+			<h1>Hello InfoScreen</h1>
+			<Card title={Liferay.Language.get('basic-info')}>
+				<Input
 					disabled={isViewOnly}
-					label={Liferay.Language.get('mark-as-default')}
-					onChange={({target: {checked}}) => {
+					error={error}
+					label={Liferay.Language.get('name')}
+					name="name"
+					onChange={({target: {value}}) => {
 						dispatch({
-							payload: {checked},
-							type: TYPES.SET_OBJECT_LAYOUT_AS_DEFAULT,
+							payload: {name: {[defaultLanguageId]: value}},
+							type: TYPES.CHANGE_OBJECT_LAYOUT_NAME,
 						});
 					}}
+					required
+					value={stringUtils.getLocalizableLabel(
+						creationLanguageId as Liferay.Language.Locale,
+						objectLayout.name
+					)}
 				/>
-			</ClayForm.Group>
-		</Card>
+
+				<ClayForm.Group className="mb-0">
+					<ClayCheckbox
+						checked={objectLayout.defaultObjectLayout}
+						disabled={isViewOnly}
+						label={Liferay.Language.get('mark-as-default')}
+						onChange={({target: {checked}}) => {
+							dispatch({
+								payload: {checked},
+								type: TYPES.SET_OBJECT_LAYOUT_AS_DEFAULT,
+							});
+						}}
+					/>
+				</ClayForm.Group>
+			</Card>
+		</>
 	);
 };
 

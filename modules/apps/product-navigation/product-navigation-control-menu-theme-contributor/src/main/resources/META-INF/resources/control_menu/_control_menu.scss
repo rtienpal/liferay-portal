@@ -23,6 +23,7 @@ html#{$cadmin-selector} {
 
 		.control-menu-level-1 {
 			> .container-fluid {
+				max-width: 1920px;
 				padding: 8px;
 
 				@include media-breakpoint-up(sm, $cadmin-grid-breakpoints) {

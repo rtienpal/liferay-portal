@@ -219,31 +219,34 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	};
 
 	return (
-		<SidePanelContent
-			onSave={saveObjectLayout}
-			readOnly={isViewOnly || loading}
-			title={Liferay.Language.get('layout')}
-		>
-			<ClayTabs className="side-panel-iframe__tabs">
-				{TABS.map(({label}, index) => (
-					<ClayTabs.Item
-						active={activeIndex === index}
-						key={index}
-						onClick={() => setActiveIndex(index)}
-					>
-						{label}
-					</ClayTabs.Item>
-				))}
-			</ClayTabs>
+		<>
+			<h1>Hello Layout Screen</h1>
+			<SidePanelContent
+				onSave={saveObjectLayout}
+				readOnly={isViewOnly || loading}
+				title={Liferay.Language.get('layout')}
+			>
+				<ClayTabs className="side-panel-iframe__tabs">
+					{TABS.map(({label}, index) => (
+						<ClayTabs.Item
+							active={activeIndex === index}
+							key={index}
+							onClick={() => setActiveIndex(index)}
+						>
+							{label}
+						</ClayTabs.Item>
+					))}
+				</ClayTabs>
 
-			<ClayTabs.Content activeIndex={activeIndex} fade>
-				{TABS.map(({Component}, index) => (
-					<ClayTabs.TabPane key={index}>
-						{!loading && <Component />}
-					</ClayTabs.TabPane>
-				))}
-			</ClayTabs.Content>
-		</SidePanelContent>
+				<ClayTabs.Content activeIndex={activeIndex} fade>
+					{TABS.map(({Component}, index) => (
+						<ClayTabs.TabPane key={index}>
+							{!loading && <Component />}
+						</ClayTabs.TabPane>
+					))}
+				</ClayTabs.Content>
+			</SidePanelContent>
+		</>
 	);
 };
 

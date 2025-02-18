@@ -44,39 +44,44 @@ export default function ObjectManagementToolbar({
 			: Liferay.Language.get('standard');
 
 	return (
-		<ManagementToolbar
-			backURL={backURL}
-			badgeClassName={system ? 'label-info' : 'label-warning'}
-			badgeLabel={
-				system
-					? Liferay.Language.get('system')
-					: Liferay.Language.get('custom')
-			}
-			className="border-bottom"
-			enableBoxShadow={false}
-			entityId={objectDefinitionId}
-			hasPublishPermission={hasPublishObjectPermission}
-			hasUpdatePermission={hasUpdateObjectDefinitionPermission}
-			helpMessage={Liferay.Language.get(
-				'unique-key-for-referencing-the-object-definition'
-			)}
-			inheritanceClassName={
-				isRootDescendantNode || isRootNode
-					? 'label-inverse-info'
-					: 'label-inverse-secondary'
-			}
-			inheritanceLabel={inheritanceLabel}
-			isApproved={isApproved}
-			isRootDescendantNode={isRootDescendantNode}
-			label={label}
-			objectDefinitionExternalReferenceCode={
-				objectDefinitionExternalReferenceCode
-			}
-			objectDefinitionExternalReferenceCodeSaveURL={`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}`}
-			onGetEntity={() => API.getObjectDefinitionById(objectDefinitionId)}
-			onSubmit={onSubmit}
-			portletNamespace={portletNamespace}
-			screenNavigationCategoryKey={screenNavigationCategoryKey}
-		/>
+		<>
+			<h1>Hello Management Toolbar</h1>
+			<ManagementToolbar
+				backURL={backURL}
+				badgeClassName={system ? 'label-info' : 'label-warning'}
+				badgeLabel={
+					system
+						? Liferay.Language.get('system')
+						: Liferay.Language.get('custom')
+				}
+				className="border-bottom"
+				enableBoxShadow={false}
+				entityId={objectDefinitionId}
+				hasPublishPermission={hasPublishObjectPermission}
+				hasUpdatePermission={hasUpdateObjectDefinitionPermission}
+				helpMessage={Liferay.Language.get(
+					'unique-key-for-referencing-the-object-definition'
+				)}
+				inheritanceClassName={
+					isRootDescendantNode || isRootNode
+						? 'label-inverse-info'
+						: 'label-inverse-secondary'
+				}
+				inheritanceLabel={inheritanceLabel}
+				isApproved={isApproved}
+				isRootDescendantNode={isRootDescendantNode}
+				label={label}
+				objectDefinitionExternalReferenceCode={
+					objectDefinitionExternalReferenceCode
+				}
+				objectDefinitionExternalReferenceCodeSaveURL={`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}`}
+				onGetEntity={() =>
+					API.getObjectDefinitionById(objectDefinitionId)
+				}
+				onSubmit={onSubmit}
+				portletNamespace={portletNamespace}
+				screenNavigationCategoryKey={screenNavigationCategoryKey}
+			/>
+		</>
 	);
 }

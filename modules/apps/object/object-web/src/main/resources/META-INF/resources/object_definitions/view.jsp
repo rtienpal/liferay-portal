@@ -1,11 +1,9 @@
-<%--
-/**
- * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
- */
---%>
+<%-- /** * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com *
+SPDX-License-Identifier: LGPL-2.1-or-later OR
+LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06 */ --%> <%@ include file="/init.jsp"
+%>
 
-<%@ include file="/init.jsp" %>
+<h1>Hello</h1>
 
 <liferay-frontend:screen-navigation
 	key="<%= ObjectDefinitionsScreenNavigationEntryConstants.SCREEN_NAVIGATION_KEY_OBJECTS %>"

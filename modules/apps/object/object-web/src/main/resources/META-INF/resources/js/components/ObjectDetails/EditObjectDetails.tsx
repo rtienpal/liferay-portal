@@ -200,6 +200,7 @@ export default function EditObjectDetails({
 
 	return (
 		<>
+			<h1>HelloEditObjectDetail</h1>
 			<div className="lfr-objects__object-definition-details-management-toolbar">
 				<ObjectManagementToolbar
 					backURL={backURL}

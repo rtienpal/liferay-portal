@@ -87,6 +87,7 @@ export function BasicInfoTab({
 
 	return (
 		<>
+			<h1>HelloBasicInfoTab</h1>
 			<ContainerWrapper
 				collapsable
 				defaultExpanded

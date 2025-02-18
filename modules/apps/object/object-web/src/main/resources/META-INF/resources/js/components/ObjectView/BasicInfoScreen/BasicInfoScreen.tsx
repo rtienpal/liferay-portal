@@ -43,33 +43,36 @@ export default function BasicInfoScreen() {
 	}
 
 	return (
-		<Card title={Liferay.Language.get('basic-info')}>
-			<ClayForm.Group>
-				<Input
-					disabled={false}
-					error={error}
-					label={Liferay.Language.get('name')}
-					name="name"
-					onChange={({target: {value}}) => {
-						handleChangeName(value);
-					}}
-					required
-					value={stringUtils.getLocalizableLabel(
-						creationLanguageId,
-						objectView.name
-					)}
-				/>
-			</ClayForm.Group>
+		<>
+			<h1>Hello Basic Info Screen</h1>
+			<Card title={Liferay.Language.get('basic-info')}>
+				<ClayForm.Group>
+					<Input
+						disabled={false}
+						error={error}
+						label={Liferay.Language.get('name')}
+						name="name"
+						onChange={({target: {value}}) => {
+							handleChangeName(value);
+						}}
+						required
+						value={stringUtils.getLocalizableLabel(
+							creationLanguageId,
+							objectView.name
+						)}
+					/>
+				</ClayForm.Group>
 
-			<ClayForm.Group className="mb-0">
-				<ClayCheckbox
-					checked={objectView.defaultObjectView}
-					label={Liferay.Language.get('mark-as-default')}
-					onChange={({target: {checked}}) => {
-						handleChangeChecked(checked);
-					}}
-				/>
-			</ClayForm.Group>
-		</Card>
+				<ClayForm.Group className="mb-0">
+					<ClayCheckbox
+						checked={objectView.defaultObjectView}
+						label={Liferay.Language.get('mark-as-default')}
+						onChange={({target: {checked}}) => {
+							handleChangeChecked(checked);
+						}}
+					/>
+				</ClayForm.Group>
+			</Card>
+		</>
 	);
 }

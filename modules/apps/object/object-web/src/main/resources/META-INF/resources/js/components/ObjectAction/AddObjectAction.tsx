@@ -36,34 +36,37 @@ export default function AddObjectAction({
 	validateExpressionURL,
 }: AddObjectActionProps) {
 	return (
-		<ObjectActionContainer
-			allowScriptContentToBeExecutedOrIncluded={
-				allowScriptContentToBeExecutedOrIncluded
-			}
-			objectAction={{active: true, system: false}}
-			objectActionCodeEditorElements={objectActionCodeEditorElements}
-			objectActionExecutors={objectActionExecutors}
-			objectActionTriggers={objectActionTriggers}
-			objectDefinitionExternalReferenceCode={
-				objectDefinitionExternalReferenceCode
-			}
-			objectDefinitionId={objectDefinitionId}
-			objectDefinitionsRelationshipsURL={
-				objectDefinitionsRelationshipsURL
-			}
-			requestParams={{
-				method: 'POST',
-				url: apiURL,
-			}}
-			scriptManagementConfigurationPortletURL={
-				scriptManagementConfigurationPortletURL
-			}
-			successMessage={Liferay.Language.get(
-				'the-object-action-was-created-successfully'
-			)}
-			systemObject={systemObject}
-			title={Liferay.Language.get('new-action')}
-			validateExpressionURL={validateExpressionURL}
-		/>
+		<>
+			<h1>Hello ObjectActionContainer</h1>
+			<ObjectActionContainer
+				allowScriptContentToBeExecutedOrIncluded={
+					allowScriptContentToBeExecutedOrIncluded
+				}
+				objectAction={{active: true, system: false}}
+				objectActionCodeEditorElements={objectActionCodeEditorElements}
+				objectActionExecutors={objectActionExecutors}
+				objectActionTriggers={objectActionTriggers}
+				objectDefinitionExternalReferenceCode={
+					objectDefinitionExternalReferenceCode
+				}
+				objectDefinitionId={objectDefinitionId}
+				objectDefinitionsRelationshipsURL={
+					objectDefinitionsRelationshipsURL
+				}
+				requestParams={{
+					method: 'POST',
+					url: apiURL,
+				}}
+				scriptManagementConfigurationPortletURL={
+					scriptManagementConfigurationPortletURL
+				}
+				successMessage={Liferay.Language.get(
+					'the-object-action-was-created-successfully'
+				)}
+				systemObject={systemObject}
+				title={Liferay.Language.get('new-action')}
+				validateExpressionURL={validateExpressionURL}
+			/>
+		</>
 	);
 }
