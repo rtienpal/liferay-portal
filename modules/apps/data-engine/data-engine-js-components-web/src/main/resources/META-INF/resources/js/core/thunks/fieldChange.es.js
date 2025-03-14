@@ -157,10 +157,10 @@ export default function fieldChange({
 					viewMode
 				);
 
-				dispatch({
-					payload: mergedPages,
-					type: EVENT_TYPES.PAGE.UPDATE,
-				});
+				// dispatch({
+				// 	payload: mergedPages,
+				// 	type: EVENT_TYPES.PAGE.UPDATE,
+				// });
 
 				dispatch({
 					payload: mergedPages,
