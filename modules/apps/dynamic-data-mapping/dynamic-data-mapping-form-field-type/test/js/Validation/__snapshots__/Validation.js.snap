@@ -18,6 +18,7 @@ exports[`Validation renders checkbox to enable Validation 1`] = `
         >
           <label
             class="toggle-switch"
+            id="enableValidation"
           >
             <label
               class="toggle-switch simple-toggle-switch"

@@ -14,6 +14,7 @@ exports[`Field Checkbox has a helptext 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
@@ -91,6 +92,7 @@ exports[`Field Checkbox has a key 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
@@ -157,6 +159,7 @@ exports[`Field Checkbox has a label 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
@@ -223,6 +226,7 @@ exports[`Field Checkbox has a predefined Value 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
@@ -288,6 +292,7 @@ exports[`Field Checkbox has a value 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
@@ -354,6 +359,7 @@ exports[`Field Checkbox has an id 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
@@ -419,6 +425,7 @@ exports[`Field Checkbox is not editable 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch disabled"
@@ -485,6 +492,7 @@ exports[`Field Checkbox is not required 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
@@ -550,6 +558,7 @@ exports[`Field Checkbox is shown as a switcher 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
@@ -667,6 +676,7 @@ exports[`Field Checkbox renders Label if showLabel is true 1`] = `
       >
         <label
           class="toggle-switch"
+          id="undefined"
         >
           <label
             class="toggle-switch simple-toggle-switch"
