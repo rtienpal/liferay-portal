@@ -1694,3 +1694,57 @@ test.describe('Manage object entries through Workflow', () => {
 		await expect(page.getByText(objectEntry.textField)).toBeVisible();
 	});
 });
+
+test.describe('Manage pagination through View Object Entries', () => {
+	test('table is updated when changing page number and page size on the Custom Object Portlet', async ({
+		apiHelpers,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const {objectFields} = await mockObjectFields({
+			apiHelpers,
+			objectEntryReturn: {format: 'API'},
+			objectFieldBusinessTypes: ['text'],
+		});
+
+		const objectFieldName = objectFields[0].name;
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFields,
+				objectFolderExternalReferenceCode: 'default',
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const applicationName =
+			'c/' + objectDefinition.name.toLowerCase() + 's';
+
+		for (let i = 1; i <= 21; i++) {
+			await apiHelpers.objectEntry.postObjectEntry(
+				{[objectFieldName]: `Entry ${i}`},
+				applicationName
+			);
+		}
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await expect(
+			page.getByRole('cell', {name: 'Entry 21'})
+		).not.toBeVisible();
+
+		await page.getByLabel('Go to page, 2').click();
+
+		expect(page.getByRole('cell', {name: 'Entry 21'})).toBeVisible();
+
+		await page.getByLabel('Items Per Page').click();
+
+		await page.getByRole('option', {name: '40 Items'}).click();
+
+		expect(page.getByRole('cell', {name: 'Entry 21'})).toBeVisible();
+	});
+});
