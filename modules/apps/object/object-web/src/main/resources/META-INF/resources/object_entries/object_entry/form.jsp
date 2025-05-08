@@ -71,6 +71,8 @@ portletDisplay.setURLBack(backURL);
 						props='<%=
 							HashMapBuilder.<String, Object>put(
 								"portletNamespace", portletDisplay.getNamespace()
+							).put(
+								"scheduleProperties", objectEntryDisplayContext.getScheduleProperties()
 							).build()
 						%>'
 					/>
@@ -207,7 +209,7 @@ portletDisplay.setURLBack(backURL);
 					);
 
 					const scheduleContainerInputValue = JSON.parse(
-						scheduleContainerInput
+						scheduleContainerInput.value
 					);
 
 					if (

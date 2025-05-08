@@ -129,6 +129,10 @@ import java.sql.Timestamp;
 
 import java.text.DecimalFormat;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -570,6 +574,53 @@ public class ObjectEntryDisplayContextImpl
 			}
 		).put(
 			"readOnly", String.valueOf(_readOnly || isGuestUser())
+		).build();
+	}
+
+	@Override
+	public Map<String, Object> getScheduleProperties() {
+		return HashMapBuilder.<String, Object>put(
+			"reviewDate",
+			() -> {
+				ObjectEntry objectEntry = _getObjectEntry();
+
+				if (objectEntry == null) {
+					return JSONUtil.put(
+						"checked", true
+					).put(
+						"value", (Date)null
+					);
+				}
+
+				Date rawDate = (Date)objectEntry.getPropertyValue("reviewDate");
+
+				if (rawDate == null) {
+					return JSONUtil.put(
+						"checked", true
+					).put(
+						"value", (Date)null
+					);
+				}
+
+				User user = _objectRequestHelper.getUser();
+
+				String formattedDate = DateTimeFormatter.ofPattern(
+					"yyyy-MM-dd HH:mm"
+				).withZone(
+					ZoneId.of(user.getTimeZoneId())
+				).format(
+					rawDate.toInstant(
+					).truncatedTo(
+						ChronoUnit.MINUTES
+					)
+				);
+
+				return JSONUtil.put(
+					"checked", false
+				).put(
+					"value", formattedDate
+				);
+			}
 		).build();
 	}
 
