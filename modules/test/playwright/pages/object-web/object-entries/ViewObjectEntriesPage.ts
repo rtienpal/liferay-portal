@@ -22,6 +22,7 @@ export class ViewObjectEntriesPage {
 	readonly neverReview: Locator;
 	readonly page: Page;
 	readonly reviewDateInput: Locator;
+	readonly reviewDateInput: Locator;
 	readonly saveObjectEntryButton: Locator;
 	readonly saveObjectEntryButtonArabic: Locator;
 	readonly searchBar: Locator;
@@ -60,6 +61,9 @@ export class ViewObjectEntriesPage {
 		});
 		this.neverReview = page.getByLabel('Never Review', {exact: true});
 		this.page = page;
+		this.reviewDateInput = page.getByLabel('Review Date' + 'Mandatory', {
+			exact: true,
+		});
 		this.reviewDateInput = page.getByLabel('Review Date' + 'Mandatory', {
 			exact: true,
 		});

@@ -40,9 +40,15 @@ import {
 	getObjectEntryUIDateTimeFormat,
 	getPageEditorDateFormat,
 } from './utils/dateFormat';
+import {
+	getFDSDateFormat,
+	getObjectEntryUIDateTimeFormat,
+	getPageEditorDateFormat,
+} from './utils/dateFormat';
 import evaluateKeepCheckingAfterFound from './utils/keepCheckingAfterFound';
 import {createObjectFields, mockObjectFields} from './utils/mockObjectFields';
 
+const test = mergeTests(
 const test = mergeTests(
 	accountSettingsPagesTest,
 	applicationsMenuPageTest,
