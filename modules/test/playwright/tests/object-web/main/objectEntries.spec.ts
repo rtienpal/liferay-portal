@@ -106,7 +106,7 @@ test.describe('Manage object entries through Friendly URL', () => {
 		const {objectFields} = await mockObjectFields({
 			apiHelpers,
 			localizeAllLocalizable: true,
-			objectFieldBusinessTypes: ['text'],
+			objectFieldBusinessTypes: ['Text'],
 		});
 
 		_objectField = objectFields[0];
@@ -493,21 +493,21 @@ test.describe('Manage object entries through Page Templates', () => {
 			apiHelpers,
 			objectEntryReturn: {format: 'API'},
 			objectFieldBusinessTypes: [
-				'autoIncrement',
-				'boolean',
-				'date',
-				'decimal',
-				'encrypted',
-				'integer',
-				'longInteger',
-				'longText',
-				'multiselectPicklist',
-				'picklist',
-				'precisionDecimal',
-				'richText',
-				'text',
+				'AutoIncrement',
+				'Boolean',
+				'Date',
+				'Decimal',
+				'Encrypted',
+				'Integer',
+				'LongInteger',
+				'LongText',
+				'MultiselectPicklist',
+				'Picklist',
+				'PrecisionDecimal',
+				'RichText',
+				'Text',
 			],
-			titleObjectFieldName: 'text',
+			titleObjectFieldName: 'Text',
 		});
 
 		apiHelpers.data.push({
@@ -650,17 +650,17 @@ test.describe('Manage object entries through View Object Entries', () => {
 			apiHelpers,
 			objectEntryReturn: {format: 'UI'},
 			objectFieldBusinessTypes: [
-				'attachment',
-				'boolean',
-				'date',
-				'decimal',
-				'integer',
-				'longInteger',
-				'longText',
-				'picklist',
-				'precisionDecimal',
-				'richText',
-				'text',
+				'Attachment',
+				'Boolean',
+				'Date',
+				'Decimal',
+				'Integer',
+				'LongInteger',
+				'LongText',
+				'Picklist',
+				'PrecisionDecimal',
+				'RichText',
+				'Text',
 			],
 		});
 
@@ -722,7 +722,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		}
 
 		const objectPicklistEntry = objectEntries.find(
-			(objectEntry) => objectEntry.businessType === 'picklist'
+			(objectEntry) => objectEntry.businessType === 'Picklist'
 		).entry;
 
 		const objectPicklistIndex =
@@ -780,7 +780,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		const {listTypeDefinitionItems, objectFields, titleObjectFieldName} =
 			await mockObjectFields({
 				apiHelpers,
-				objectFieldBusinessTypes: ['multiselectPicklist'],
+				objectFieldBusinessTypes: ['MultiselectPicklist'],
 			});
 
 		const objectDefinitionAPIClient =
@@ -991,7 +991,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		const ATTACHMENT_FILE_NAME = 'astronaut.png';
 		const {objectFields} = await mockObjectFields({
 			apiHelpers,
-			objectFieldBusinessTypes: ['attachment'],
+			objectFieldBusinessTypes: ['Attachment'],
 		});
 
 		const objectDefinitionAPIClient =
@@ -1341,7 +1341,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		page,
 		viewObjectEntriesPage,
 	}) => {
-		const objectFields = createObjectFields('text', [
+		const objectFields = createObjectFields('Text', [
 			{
 				label: 'Custom Field',
 				name: 'customField',
