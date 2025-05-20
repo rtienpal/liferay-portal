@@ -595,8 +595,6 @@ public class ObjectEntryLocalServiceImpl
 
 		_checkObjectEntriesByReviewDate(companyId, date);
 
-		_checkObjectEntriesByExpirationDate(companyId, date);
-
 		_companyPreviousCheckDate.put(companyId, date);
 	}
 
@@ -2509,7 +2507,7 @@ public class ObjectEntryLocalServiceImpl
 			});
 	}
 
-	private void _checkObjectEntriesByExpirationDate(
+	private void _checkObjectEntriesByReviewDate(
 			long companyId, Date currentDate)
 		throws PortalException {
 
@@ -2522,46 +2520,10 @@ public class ObjectEntryLocalServiceImpl
 				ObjectEntryTable.INSTANCE.companyId.eq(
 					companyId
 				).and(
-					ObjectEntryTable.INSTANCE.expirationDate.gte(
+					ObjectEntryTable.INSTANCE.reviewDate.gte(
 						_companyPreviousCheckDate.get(companyId))
 				).and(
-					ObjectEntryTable.INSTANCE.expirationDate.lte(currentDate)
-				).and(
-					ObjectEntryTable.INSTANCE.status.notIn(
-						new Integer[] {
-							WorkflowConstants.STATUS_DRAFT,
-							WorkflowConstants.STATUS_PENDING
-						})
-				)
-			));
-
-		if (!objectEntries.isEmpty()) {
-			for (ObjectEntry objectEntry : objectEntries) {
-				expireObjectEntry(
-					objectEntry.getUserId(), objectEntry.getObjectEntryId(),
-					new ServiceContext());
-			}
-		}
-	}
-
-	private void _checkObjectEntriesByReviewDate(
-			long companyId, Date currentCheckDate)
-		throws PortalException {
-
-		Date previousCheckDate = _companyPreviousCheckDate.get(companyId);
-
-		List<ObjectEntry> objectEntries = objectEntryPersistence.dslQuery(
-			DSLQueryFactoryUtil.select(
-				ObjectEntryTable.INSTANCE
-			).from(
-				ObjectEntryTable.INSTANCE
-			).where(
-				ObjectEntryTable.INSTANCE.companyId.eq(
-					companyId
-				).and(
-					ObjectEntryTable.INSTANCE.reviewDate.gte(previousCheckDate)
-				).and(
-					ObjectEntryTable.INSTANCE.reviewDate.lte(currentCheckDate)
+					ObjectEntryTable.INSTANCE.reviewDate.lte(currentDate)
 				)
 			));
 
