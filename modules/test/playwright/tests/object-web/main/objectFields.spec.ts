@@ -403,7 +403,7 @@ test.describe('Manage object fields through Model Builder', () => {
 		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			objectDefinition.externalReferenceCode,
 			createObjectFields(
-				'picklist',
+				'Picklist',
 				[{label: 'picklistField', name: 'picklistField'}],
 				{
 					listTypeDefinitionExternalReferenceCode:
@@ -454,17 +454,17 @@ test.describe('Manage object fields through Model Builder', () => {
 		const {listTypeDefinition, objectFields} = await mockObjectFields({
 			apiHelpers,
 			objectFieldBusinessTypes: [
-				'attachment',
-				'boolean',
-				'date',
-				'decimal',
-				'integer',
-				'longInteger',
-				'longText',
-				'picklist',
-				'precisionDecimal',
-				'richText',
-				'text',
+				'Attachment',
+				'Boolean',
+				'Date',
+				'Decimal',
+				'Integer',
+				'LongInteger',
+				'LongText',
+				'Picklist',
+				'PrecisionDecimal',
+				'RichText',
+				'Text',
 			],
 		});
 
@@ -764,7 +764,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	}) => {
 		const {objectFields} = await mockObjectFields({
 			apiHelpers,
-			objectFieldBusinessTypes: ['encrypted'],
+			objectFieldBusinessTypes: ['Encrypted'],
 		});
 
 		const objectDefinition =
@@ -1330,7 +1330,7 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 	}) => {
 		const {objectFields} = await mockObjectFields({
 			apiHelpers,
-			objectFieldBusinessTypes: ['encrypted'],
+			objectFieldBusinessTypes: ['Encrypted'],
 		});
 
 		const objectDefinition =
