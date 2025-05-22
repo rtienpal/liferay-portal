@@ -51,6 +51,7 @@ import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryDefaultLanguageIdException;
+import com.liferay.object.exception.ObjectEntryExpirationDateException;
 import com.liferay.object.exception.ObjectEntryFolderScopeException;
 import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.exception.ObjectEntryValidationException;
@@ -140,6 +141,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.dao.jdbc.postgresql.PostgreSQLJDBCUtil;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
@@ -173,6 +175,7 @@ import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.model.Users_OrgsTable;
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.model.role.RoleConstants;
@@ -200,6 +203,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -262,7 +266,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -276,6 +282,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -583,6 +590,17 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	@Override
+	public void checkObjectEntries(long companyId) throws PortalException {
+		Date date = new Date();
+
+		_checkObjectEntriesByReviewDate(companyId, date);
+
+		_checkObjectEntriesByExpirationDate(companyId, date);
+
+		_companyPreviousCheckDate.put(companyId, date);
+	}
+
+	@Override
 	public void deleteExtensionDynamicObjectDefinitionTableValues(
 			ObjectDefinition objectDefinition, long primaryKey)
 		throws PortalException {
@@ -778,6 +796,30 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public ObjectEntry expireObjectEntry(
+			long userId, long objectEntryId, ServiceContext serviceContext)
+		throws PortalException {
+
+		ObjectEntry objectEntry = objectEntryPersistence.findByPrimaryKey(
+			objectEntryId);
+
+		objectEntry = updateStatus(
+			userId, objectEntry, WorkflowConstants.STATUS_EXPIRED,
+			serviceContext);
+
+		int versions = objectEntry.getVersion();
+
+		if (versions != 0) {
+			for (int version = versions; version >= 0; version--) {
+				_objectEntryVersionLocalService.expireObjectEntryVersion(
+					userId, objectEntryId, version);
+			}
+		}
+
+		return objectEntry;
+	}
+
+	@Override
+	public ObjectEntry expireObjectEntryVersion(
 			long userId, long objectEntryId, int version,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -2079,6 +2121,9 @@ public class ObjectEntryLocalServiceImpl
 			ObjectConfiguration.class, properties);
 	}
 
+	@Reference
+	protected ConfigurationProvider configurationProvider;
+
 	private void _addDLFileEntries(
 			Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap,
 			ObjectDefinition objectDefinition, long objectEntryId,
@@ -2461,6 +2506,79 @@ public class ObjectEntryLocalServiceImpl
 					setStrictAdd(true);
 				}
 			});
+	}
+
+	private void _checkObjectEntriesByExpirationDate(
+			long companyId, Date currentCheckDate)
+		throws PortalException {
+
+		List<ObjectEntry> objectEntries = objectEntryPersistence.dslQuery(
+			DSLQueryFactoryUtil.select(
+				ObjectEntryTable.INSTANCE
+			).from(
+				ObjectEntryTable.INSTANCE
+			).where(
+				ObjectEntryTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					ObjectEntryTable.INSTANCE.expirationDate.gte(
+						_companyPreviousCheckDate.get(companyId))
+				).and(
+					ObjectEntryTable.INSTANCE.expirationDate.lte(
+						currentCheckDate)
+				).and(
+					ObjectEntryTable.INSTANCE.status.notIn(
+						new Integer[] {
+							WorkflowConstants.STATUS_DRAFT,
+							WorkflowConstants.STATUS_PENDING
+						})
+				)
+			));
+
+		if (!objectEntries.isEmpty()) {
+			for (ObjectEntry objectEntry : objectEntries) {
+				expireObjectEntry(
+					objectEntry.getUserId(), objectEntry.getObjectEntryId(),
+					new ServiceContext());
+			}
+		}
+	}
+
+	private void _checkObjectEntriesByReviewDate(
+			long companyId, Date currentCheckDate)
+		throws PortalException {
+
+		Date previousCheckDate = _companyPreviousCheckDate.get(companyId);
+
+		List<ObjectEntry> objectEntries = objectEntryPersistence.dslQuery(
+			DSLQueryFactoryUtil.select(
+				ObjectEntryTable.INSTANCE
+			).from(
+				ObjectEntryTable.INSTANCE
+			).where(
+				ObjectEntryTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					ObjectEntryTable.INSTANCE.reviewDate.gte(previousCheckDate)
+				).and(
+					ObjectEntryTable.INSTANCE.reviewDate.lte(currentCheckDate)
+				)
+			));
+
+		for (ObjectEntry objectEntry : objectEntries) {
+			ObjectDefinition objectDefinition =
+				_objectDefinitionPersistence.fetchByPrimaryKey(
+					objectEntry.getObjectDefinitionId());
+
+			_userNotificationEventLocalService.sendUserNotificationEvents(
+				objectEntry.getUserId(), objectDefinition.getPortletId(),
+				UserNotificationDeliveryConstants.TYPE_WEBSITE, false,
+				JSONUtil.put(
+					"notificationMessage",
+					StringBundler.concat(
+						"The review date of object entry ",
+						objectEntry.getTitleValue(), " has been reached.")));
+		}
 	}
 
 	private void _contributeValues(
@@ -4655,6 +4773,24 @@ public class ObjectEntryLocalServiceImpl
 		return staticValues;
 	}
 
+	private boolean _isDateInPast(Date inputDate) {
+		if (inputDate == null) {
+			return false;
+		}
+
+		Instant nowInstant = Instant.now(
+		).truncatedTo(
+			ChronoUnit.MINUTES
+		);
+
+		Instant inputInstant = inputDate.toInstant(
+		).truncatedTo(
+			ChronoUnit.MINUTES
+		);
+
+		return inputInstant.isBefore(nowInstant);
+	}
+
 	private List<Object[]> _list(
 			DSLQuery dslQuery, long objectDefinitionId,
 			Expression<?>[] selectExpressions)
@@ -5122,10 +5258,17 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _setExpirationDate(
-		long companyId, ObjectEntry objectEntry,
-		Map<String, Serializable> values) {
+			long companyId, ObjectEntry objectEntry,
+			Map<String, Serializable> values)
+		throws PortalException {
 
 		if (FeatureFlagManagerUtil.isEnabled(companyId, "LPD-17564")) {
+			if (_isDateInPast((Date)values.get("expirationDate"))) {
+				throw new ObjectEntryExpirationDateException(
+					"Invalid date input. The expiration date cannot be a " +
+						"past date.");
+			}
+
 			objectEntry.setExpirationDate((Date)values.get("expirationDate"));
 		}
 	}
@@ -6658,6 +6801,9 @@ public class ObjectEntryLocalServiceImpl
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
+	private final Map<Long, Date> _companyPreviousCheckDate =
+		new ConcurrentHashMap<>();
+
 	@Reference
 	private CurrentConnection _currentConnection;
 
@@ -6792,6 +6938,10 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private UserLocalService _userLocalService;
+
+	@Reference
+	private UserNotificationEventLocalService
+		_userNotificationEventLocalService;
 
 	@Reference
 	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
