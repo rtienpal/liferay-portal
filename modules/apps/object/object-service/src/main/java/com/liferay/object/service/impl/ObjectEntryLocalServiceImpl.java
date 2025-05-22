@@ -52,6 +52,7 @@ import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryDefaultLanguageIdException;
+import com.liferay.object.exception.ObjectEntryExpirationDateException;
 import com.liferay.object.exception.ObjectEntryFolderScopeException;
 import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.exception.ObjectEntryValidationException;
@@ -267,7 +268,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -802,6 +805,30 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public ObjectEntry expireObjectEntry(
+			long userId, long objectEntryId, ServiceContext serviceContext)
+		throws PortalException {
+
+		ObjectEntry objectEntry = objectEntryPersistence.findByPrimaryKey(
+			objectEntryId);
+
+		objectEntry = updateStatus(
+			userId, objectEntry, WorkflowConstants.STATUS_EXPIRED,
+			serviceContext);
+
+		int versions = objectEntry.getVersion();
+
+		if (versions != 0) {
+			for (int version = versions; version >= 0; version--) {
+				_objectEntryVersionLocalService.expireObjectEntryVersion(
+					userId, objectEntryId, version);
+			}
+		}
+
+		return objectEntry;
+	}
+
+	@Override
+	public ObjectEntry expireObjectEntryVersion(
 			long userId, long objectEntryId, int version,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -2490,8 +2517,8 @@ public class ObjectEntryLocalServiceImpl
 			});
 	}
 
-	private void _checkObjectEntriesByReviewDate(
-			long companyId, Date currentDate)
+	private void _checkObjectEntriesByExpirationDate(
+			long companyId, Date currentCheckDate)
 		throws PortalException {
 
 		List<ObjectEntry> objectEntries = objectEntryPersistence.dslQuery(
@@ -2503,10 +2530,47 @@ public class ObjectEntryLocalServiceImpl
 				ObjectEntryTable.INSTANCE.companyId.eq(
 					companyId
 				).and(
-					ObjectEntryTable.INSTANCE.reviewDate.gte(
+					ObjectEntryTable.INSTANCE.expirationDate.gte(
 						_companyPreviousCheckDate.get(companyId))
 				).and(
-					ObjectEntryTable.INSTANCE.reviewDate.lte(currentDate)
+					ObjectEntryTable.INSTANCE.expirationDate.lte(
+						currentCheckDate)
+				).and(
+					ObjectEntryTable.INSTANCE.status.notIn(
+						new Integer[] {
+							WorkflowConstants.STATUS_DRAFT,
+							WorkflowConstants.STATUS_PENDING
+						})
+				)
+			));
+
+		if (!objectEntries.isEmpty()) {
+			for (ObjectEntry objectEntry : objectEntries) {
+				expireObjectEntry(
+					objectEntry.getUserId(), objectEntry.getObjectEntryId(),
+					new ServiceContext());
+			}
+		}
+	}
+
+	private void _checkObjectEntriesByReviewDate(
+			long companyId, Date currentCheckDate)
+		throws PortalException {
+
+		Date previousCheckDate = _companyPreviousCheckDate.get(companyId);
+
+		List<ObjectEntry> objectEntries = objectEntryPersistence.dslQuery(
+			DSLQueryFactoryUtil.select(
+				ObjectEntryTable.INSTANCE
+			).from(
+				ObjectEntryTable.INSTANCE
+			).where(
+				ObjectEntryTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					ObjectEntryTable.INSTANCE.reviewDate.gte(previousCheckDate)
+				).and(
+					ObjectEntryTable.INSTANCE.reviewDate.lte(currentCheckDate)
 				)
 			));
 
@@ -4732,6 +4796,24 @@ public class ObjectEntryLocalServiceImpl
 		return staticValues;
 	}
 
+	private boolean _isDateInPast(Date inputDate) {
+		if (inputDate == null) {
+			return false;
+		}
+
+		Instant nowInstant = Instant.now(
+		).truncatedTo(
+			ChronoUnit.MINUTES
+		);
+
+		Instant inputInstant = inputDate.toInstant(
+		).truncatedTo(
+			ChronoUnit.MINUTES
+		);
+
+		return inputInstant.isBefore(nowInstant);
+	}
+
 	private List<Object[]> _list(
 			DSLQuery dslQuery, long objectDefinitionId,
 			Expression<?>[] selectExpressions)
@@ -5199,10 +5281,17 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _setExpirationDate(
-		long companyId, ObjectEntry objectEntry,
-		Map<String, Serializable> values) {
+			long companyId, ObjectEntry objectEntry,
+			Map<String, Serializable> values)
+		throws PortalException {
 
 		if (FeatureFlagManagerUtil.isEnabled(companyId, "LPD-17564")) {
+			if (_isDateInPast((Date)values.get("expirationDate"))) {
+				throw new ObjectEntryExpirationDateException(
+					"Invalid date input. The expiration date cannot be a " +
+						"past date.");
+			}
+
 			objectEntry.setExpirationDate((Date)values.get("expirationDate"));
 		}
 	}
