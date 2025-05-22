@@ -20,6 +20,7 @@ interface SchedulePropertyValues {
 interface ScheduleContainerProps {
 	portletNamespace: string;
 	scheduleProperties: {[key in SchedulePropertyKey]: SchedulePropertyValues};
+	systemCurrentTimeMillis: number;
 }
 
 type HiddenValue = {[key in SchedulePropertyKey]: string | null};
@@ -27,6 +28,7 @@ type HiddenValue = {[key in SchedulePropertyKey]: string | null};
 export default function ScheduleContainer({
 	portletNamespace,
 	scheduleProperties,
+	systemCurrentTimeMillis,
 }: ScheduleContainerProps) {
 	const [displayedScheduleValues, setDisplayedScheduleValues] = useState<{
 		[key in SchedulePropertyKey]: SchedulePropertyValues;
@@ -76,10 +78,10 @@ export default function ScheduleContainer({
 					<ScheduleField
 						checkboxLabel={Liferay.Language.get('never-expire')}
 						customValidation={(value) => {
-							const dateValue = new Date(Date.parse(value));
-							const currentDate = new Date();
+							const systemTime = new Date(systemCurrentTimeMillis + 5000);
+							const dateTime = new Date(value);
 
-							if (currentDate > dateValue) {
+							if (systemTime > dateTime) {
 								return Liferay.Language.get(
 									'please-enter-a-valid-expiration-date'
 								);

@@ -73,6 +73,8 @@ portletDisplay.setURLBack(backURL);
 								"portletNamespace", portletDisplay.getNamespace()
 							).put(
 								"scheduleProperties", objectEntryDisplayContext.getScheduleProperties()
+							).put(
+								"systemCurrentTimeMillis", System.currentTimeMillis()
 							).build()
 						%>'
 					/>
@@ -160,6 +162,20 @@ portletDisplay.setURLBack(backURL);
 			return Object.values(object).some((value) => value === '');
 		}
 
+		function isPastDate(date) {
+			const systemTime = new Date(<%= System.currentTimeMillis() %> + 5000);
+
+			console.log('systemTime: ' + systemTime);
+
+			const dateTime = new Date(date);
+
+			console.log('dateTime: ' + dateTime);
+
+			console.log('isPastDate: ' + (systemTime > dateTime));
+
+			return true;
+		}
+
 		Liferay.provide(window, '<portlet:namespace />submitObjectEntry', () => {
 			const form = document.getElementById('<portlet:namespace />fm');
 
@@ -211,6 +227,16 @@ portletDisplay.setURLBack(backURL);
 					const scheduleContainerInputValue = JSON.parse(
 						scheduleContainerInput.value
 					);
+
+					if (scheduleContainerInputValue.expirationDate && 
+						isPastDate(scheduleContainerInputValue.expirationDate)
+					) {
+						shouldSubmitForm = false;
+
+						loadingElement.remove();
+
+						return false;
+					}
 
 					if (
 						scheduleContainerInput &&
