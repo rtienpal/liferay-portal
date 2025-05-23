@@ -4,8 +4,7 @@
  */
 
 import {ObjectField} from '@liferay/object-admin-rest-client-js';
-
-import {ObjectFieldBusinessTypes} from './mockObjectFields';
+import {getRandomInt} from '../../../../utils/getRandomInt';
 
 function getObjectFieldBaseProperties() {
 	return {
@@ -21,8 +20,11 @@ function getObjectFieldBaseProperties() {
 	};
 }
 
+type SupportedObjectFieldBusinessType = Exclude<ObjectField['businessType'], 'Aggregation' | 'Formula'>;
+
 function getObjectFieldSpecificProperties(
-	businessType: ObjectFieldBusinessTypes
+	objectFieldBusinessType: SupportedObjectFieldBusinessType,
+	listTypeDefinitionExternalReferenceCode: string
 ): {
 	['DBType']: ObjectField['DBType'];
 	['businessType']: ObjectField['businessType'];
@@ -30,7 +32,7 @@ function getObjectFieldSpecificProperties(
 	['objectFieldSettings']?: any;
 	['type']: ObjectField['type'];
 } {
-	switch (businessType) {
+	switch (objectFieldBusinessType) {
 		case 'Attachment':
 			return {
 				DBType: 'Long',
@@ -46,30 +48,22 @@ function getObjectFieldSpecificProperties(
 					},
 					{
 						name: 'maximumFileSize',
-						value: '100',
+						value: '0',
 					},
 				],
 				type: 'Long',
 			};
 		case 'AutoIncrement':
 			return {
-				DBType: 'Long',
-				businessType: 'Attachment',
+				DBType: 'String',
+				businessType: 'AutoIncrement',
 				objectFieldSettings: [
 					{
-						name: 'acceptedFileExtensions',
-						value: 'jpeg, jpg, pdf, png',
-					},
-					{
-						name: 'fileSource',
-						value: 'documentsAndMedia',
-					},
-					{
-						name: 'maximumFileSize',
-						value: '100',
-					},
+						name: 'initialValue',
+						value: '1',
+					} as any,
 				],
-				type: 'Long',
+				type: 'String',
 			};
 		case 'Boolean':
 			return {
@@ -135,14 +129,14 @@ function getObjectFieldSpecificProperties(
 			return {
 				DBType: 'String',
 				businessType: 'MultiselectPicklist',
-				listTypeDefinitionExternalReferenceCode: '',
+				listTypeDefinitionExternalReferenceCode: listTypeDefinitionExternalReferenceCode,
 				type: 'String',
 			};
 		case 'Picklist':
 			return {
 				DBType: 'String',
 				businessType: 'Picklist',
-				listTypeDefinitionExternalReferenceCode: '',
+				listTypeDefinitionExternalReferenceCode: listTypeDefinitionExternalReferenceCode,
 				type: 'String',
 			};
 		case 'PrecisionDecimal':
@@ -166,19 +160,43 @@ function getObjectFieldSpecificProperties(
 	}
 }
 
-export function generateObjectFieldStructure(
-	businessType: ObjectFieldBusinessTypes,
-	label: string,
-	name: string
-): Partial<ObjectField> {
+function generateObjectField({
+	listTypeDefinitionExternalReferenceCode,
+	objectFieldBusinessType
+}: {
+	listTypeDefinitionExternalReferenceCode?: string,
+	objectFieldBusinessType: SupportedObjectFieldBusinessType
+}): Partial<ObjectField> {
 	const objectFieldBaseProperties = getObjectFieldBaseProperties();
+	const objectFieldLabel = `${objectFieldBusinessType}${getRandomInt()}`
 	const objectFieldSpecificProperties =
-		getObjectFieldSpecificProperties(businessType);
+		getObjectFieldSpecificProperties(objectFieldBusinessType, listTypeDefinitionExternalReferenceCode);
 
 	return {
 		...objectFieldBaseProperties,
 		...objectFieldSpecificProperties,
-		label: {en_US: label},
-		name,
+		label: {en_US: objectFieldLabel},
+		name: objectFieldLabel.toLocaleLowerCase(),
 	};
+}
+
+export function generateObjectFields({
+	listTypeDefinitionExternalReferenceCode,
+	objectFieldBusinessTypes,
+}: {
+	listTypeDefinitionExternalReferenceCode?: string;
+	objectFieldBusinessTypes: SupportedObjectFieldBusinessType[];
+}) {
+	const objectFields: Partial<ObjectField>[] = [];
+
+	for (const objectFieldBusinessType of objectFieldBusinessTypes) {
+		const objectField = generateObjectField({
+			listTypeDefinitionExternalReferenceCode,
+			objectFieldBusinessType
+		});
+
+		objectFields.push(objectField);
+	}
+
+	return objectFields;
 }

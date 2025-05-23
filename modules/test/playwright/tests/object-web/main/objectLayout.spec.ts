@@ -18,7 +18,7 @@ import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
 import getRandomObjectFieldText from './utils/getRandomObjectFieldText';
-import {mockObjectFields} from './utils/mockObjectFields';
+import {mockObjectFields} from './utils/generateObjectFieldsObjectEntryValues';
 
 export const test = mergeTests(
 	apiHelpersTest,
