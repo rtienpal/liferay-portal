@@ -50,10 +50,11 @@ test(
 			const specification =
 				await apiHelpers.headlessCommerceAdminCatalog.postSpecification();
 
-			await apiHelpers.listTypeAdmin.postListTypeEntry(
-				picklist.externalReferenceCode,
-				'item1'
-			);
+			await apiHelpers.listTypeAdmin.postListTypeEntry({
+				key: 'item1',
+				listTypeDefinitionExternalReferenceCode: picklist.externalReferenceCode,
+				name_i18n: {en_US: 'item1'}
+			});
 
 			await apiHelpers.headlessCommerceAdminCatalog.patchSpecification(
 				specification.id,
@@ -72,10 +73,11 @@ test(
 				page.getByText(specification.title.en_US)
 			).toBeVisible();
 
-			await apiHelpers.listTypeAdmin.postListTypeEntry(
-				picklist.externalReferenceCode,
-				'item2'
-			);
+			await apiHelpers.listTypeAdmin.postListTypeEntry({
+				key: 'item2',
+				listTypeDefinitionExternalReferenceCode: picklist.externalReferenceCode,
+				name_i18n: {en_US: 'item2'}
+			});
 
 			await commerceAdminProductDetailsPage.editOrDeleteProductSpecification(
 				'Edit',
@@ -148,15 +150,17 @@ test(
 			const specification =
 				await apiHelpers.headlessCommerceAdminCatalog.postSpecification();
 
-			await apiHelpers.listTypeAdmin.postListTypeEntry(
-				picklist1.externalReferenceCode,
-				'item1'
-			);
+			await apiHelpers.listTypeAdmin.postListTypeEntry({
+				key: 'item1',
+				listTypeDefinitionExternalReferenceCode: picklist1.externalReferenceCode,
+				name_i18n: {en_US: 'item1'}
+			});
 
-			await apiHelpers.listTypeAdmin.postListTypeEntry(
-				picklist2.externalReferenceCode,
-				'item2'
-			);
+			await apiHelpers.listTypeAdmin.postListTypeEntry({
+				key: 'item2',
+				listTypeDefinitionExternalReferenceCode: picklist2.externalReferenceCode,
+				name_i18n: {en_US: 'item2'}
+			});
 
 			await apiHelpers.headlessCommerceAdminCatalog.patchSpecification(
 				specification.id,
@@ -232,10 +236,11 @@ test(
 			const specification =
 				await apiHelpers.headlessCommerceAdminCatalog.postSpecification();
 
-			await apiHelpers.listTypeAdmin.postListTypeEntry(
-				picklist.externalReferenceCode,
-				'item1'
-			);
+			await apiHelpers.listTypeAdmin.postListTypeEntry({
+				key: 'item1',
+				listTypeDefinitionExternalReferenceCode: picklist.externalReferenceCode,
+				name_i18n: {en_US: 'item1'}
+			});
 
 			await apiHelpers.headlessCommerceAdminCatalog.patchSpecification(
 				specification.id,

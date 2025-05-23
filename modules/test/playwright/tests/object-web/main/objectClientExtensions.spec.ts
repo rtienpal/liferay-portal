@@ -18,7 +18,8 @@ import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
-import {createObjectFields, mockObjectFields} from './utils/mockObjectFields';
+import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFieldsObjectEntryValues';
+import {generateObjectFieldStructure} from './utils/generateObjectFields';
 
 export const test = mergeTests(
 	apiHelpersTest,
@@ -53,12 +54,7 @@ test.afterEach(async ({apiHelpers}) => {
 });
 
 test.beforeEach(async ({apiHelpers}) => {
-	const objectFields = createObjectFields('Text', [
-		{
-			label: 'Name',
-			name: 'name',
-		},
-	]);
+	const objectField = generateObjectFieldStructure({objectFieldBusinessType: 'Text'});
 
 	const objectDefinitionAPIClient =
 		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
@@ -71,7 +67,7 @@ test.beforeEach(async ({apiHelpers}) => {
 				en_US: 'Employee',
 			},
 			name: 'Employee',
-			objectFields,
+			objectFields: [objectField],
 			objectFolderExternalReferenceCode: 'default',
 			panelCategoryKey: 'control_panel.object',
 			pluralLabel: {
@@ -125,9 +121,8 @@ test('Can create, read, update, and delete object entries that use the client ex
 
 	await objectFieldsPage.goto(objectDefinition.label['en_US']);
 
-	const {objectEntry, objectFields} = await mockObjectFields({
-		apiHelpers,
-		objectEntryReturn: {format: 'UI'},
+	const {objectFieldsObjectEntryValues, objectFields} = await generateObjectFieldsObjectEntryValues({
+		objectEntryFormat: 'UI',
 		objectFieldBusinessTypes: ['Text'],
 	});
 
@@ -155,7 +150,7 @@ test('Can create, read, update, and delete object entries that use the client ex
 	await viewObjectEntriesPage.fillObjectEntry({
 		objectFieldBusinessType: businessType,
 		objectFieldLabel: label['en_US'],
-		objectFieldValue: objectEntry[name].toString(),
+		objectFieldValue: objectFieldsObjectEntryValues[name].toString(),
 	});
 
 	await viewObjectEntriesPage.saveObjectEntryButton.click();
@@ -170,7 +165,7 @@ test('Can create, read, update, and delete object entries that use the client ex
 		page
 			.locator(`.cell-${label['en_US']}`)
 			.nth(1)
-			.getByText(objectEntry[name].toString())
+			.getByText(objectFieldsObjectEntryValues[name].toString())
 	).toBeVisible();
 
 	// Update

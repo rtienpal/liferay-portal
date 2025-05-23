@@ -22,7 +22,7 @@ import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
 import {AsyncArray} from './utils/AsyncArray';
-import {createObjectFields, mockObjectFields} from './utils/mockObjectFields';
+import {createObjectFields, mockObjectFields} from './utils/generateObjectFieldsObjectEntryValues';
 
 export const test = mergeTests(
 	apiHelpersTest,

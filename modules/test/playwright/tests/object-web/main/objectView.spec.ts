@@ -15,7 +15,7 @@ import {loginTest} from '../../../fixtures/loginTest';
 import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
-import {mockObjectFields} from './utils/mockObjectFields';
+import {mockObjectFields} from './utils/generateObjectFieldsObjectEntryValues';
 
 export const test = mergeTests(
 	dataApiHelpersTest,

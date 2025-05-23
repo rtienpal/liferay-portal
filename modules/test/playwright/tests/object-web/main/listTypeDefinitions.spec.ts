@@ -19,7 +19,8 @@ import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {siteSettingsPagesTest} from '../../../fixtures/siteSettingsPagesTest';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import {waitForAlert} from '../../../utils/waitForAlert';
-import {mockObjectFields} from './utils/mockObjectFields';
+import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFieldsObjectEntryValues';
+import {postListTypeDefinitionListTypeEntries} from './utils/postListTypeDefinitionListTypeEntries';
 
 export const test = mergeTests(
 	accountSettingsPagesTest,
@@ -252,13 +253,10 @@ test.describe('ensure picklist translation', () => {
 		page,
 		viewObjectEntriesPage,
 	}) => {
-		const {
-			objectFields,
-			titleObjectFieldName,
-			translatedListTypeDefinitionItems,
-		} = await mockObjectFields({
-			apiHelpers,
-			localeToTranslateListTypeItems: 'pt_BR',
+		const {listTypeDefinition} = await postListTypeDefinitionListTypeEntries({apiHelpers, listTypeDefinitionEntriesLength: 4, locale: 'pt_BR'});
+
+		const {objectFields} = await generateObjectFieldsObjectEntryValues({
+			listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
 			objectFieldBusinessTypes: ['MultiselectPicklist'],
 		});
 
@@ -282,7 +280,7 @@ test.describe('ensure picklist translation', () => {
 				status: {
 					code: 0,
 				},
-				titleObjectFieldName,
+				titleObjectFieldName: objectFields[0].name,
 			});
 
 		apiHelpers.data.push({
@@ -295,7 +293,7 @@ test.describe('ensure picklist translation', () => {
 		await viewObjectEntriesPage.addObjectEntryButton.click();
 
 		await formFieldsPage.addSelectItem(
-			translatedListTypeDefinitionItems[0]
+			listTypeDefinition.listTypeEntries[0].name_i18n.pt_BR
 		);
 
 		await expect(page.getByTitle('Remover Tudo')).toBeVisible();
@@ -410,10 +408,11 @@ test.describe('ensure picklist translation', () => {
 
 		const listTypeEntryName: string = 'picklistItem' + getRandomInt();
 
-		await apiHelpers.listTypeAdmin.postListTypeEntry(
-			listTypeDefinition.externalReferenceCode,
-			listTypeEntryName
-		);
+		await apiHelpers.listTypeAdmin.postListTypeEntry({
+			key: listTypeEntryName,
+			listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
+			name_i18n: {en_US: listTypeEntryName}
+		});
 
 		// Translate picklist item
 

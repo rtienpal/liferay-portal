@@ -23,7 +23,7 @@ import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
 import getFragmentDefinition from '../../layout-content-page-editor-web/main/utils/getFragmentDefinition';
 import getPageDefinition from '../../layout-content-page-editor-web/main/utils/getPageDefinition';
-import {createObjectFields} from './utils/mockObjectFields';
+import {createObjectFields} from './utils/generateObjectFieldsObjectEntryValues';
 
 export const test = mergeTests(
 	collectionsPagesTest,
