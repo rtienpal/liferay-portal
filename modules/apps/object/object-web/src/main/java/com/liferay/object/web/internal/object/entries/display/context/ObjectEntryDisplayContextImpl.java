@@ -574,18 +574,12 @@ public class ObjectEntryDisplayContextImpl
 	}
 
 	@Override
-	public Map<String, Object> getScheduleProperties() {
+	public Map<String, Object> getScheduleProperties() throws PortalException {
+		ObjectEntry objectEntry = _getObjectEntry();
+
 		return HashMapBuilder.<String, Object>put(
 			"expirationDate",
-			JSONUtil.put(
-				"checked", true
-			).put(
-				"value", () -> null
-			)
-		).put("reviewDate",
 			() -> {
-				ObjectEntry objectEntry = _getObjectEntry();
-
 				if (objectEntry == null) {
 					return JSONUtil.put(
 						"checked", true
@@ -595,7 +589,7 @@ public class ObjectEntryDisplayContextImpl
 				}
 
 				String rawDate = (String)objectEntry.getPropertyValue(
-					"reviewDate");
+					"expirationDate");
 
 				if (rawDate == null) {
 					return JSONUtil.put(
@@ -605,16 +599,39 @@ public class ObjectEntryDisplayContextImpl
 					);
 				}
 
-				String formattedDate = StringUtil.replace(
-					rawDate, 'T', ' '
-				).substring(
-					0, 16
+				return JSONUtil.put(
+					"checked", false
+				).put(
+					"value",
+					_getFormattedDate("expirationDate", objectEntry, rawDate)
 				);
+			}
+		).put(
+			"reviewDate",
+			() -> {
+				if (objectEntry == null) {
+					return JSONUtil.put(
+						"checked", true
+					).put(
+						"value", (String)null
+					);
+				}
+
+				Object rawDate = objectEntry.getPropertyValue("reviewDate");
+
+				if (rawDate == null) {
+					return JSONUtil.put(
+						"checked", true
+					).put(
+						"value", (String)null
+					);
+				}
 
 				return JSONUtil.put(
 					"checked", false
 				).put(
-					"value", formattedDate
+					"value",
+					_getFormattedDate("reviewDate", objectEntry, rawDate)
 				);
 			}
 		).build();
@@ -1260,6 +1277,21 @@ public class ObjectEntryDisplayContextImpl
 			false, null, null, _objectRequestHelper.getRequest(), null,
 			_themeDisplay.getSiteDefaultLocale(), null,
 			_themeDisplay.getUser());
+	}
+
+	private Object _getFormattedDate(
+			String fieldName, ObjectEntry objectEntry, Object rawDate)
+		throws PortalException {
+
+		return _getValue(
+			_getDDMFormField(
+				objectEntry,
+				_objectFieldLocalService.getObjectField(
+					getObjectEntry().getObjectDefinitionId(), fieldName),
+				false),
+			HashMapBuilder.put(
+				fieldName, rawDate
+			).build());
 	}
 
 	private long _getGroupId() {
