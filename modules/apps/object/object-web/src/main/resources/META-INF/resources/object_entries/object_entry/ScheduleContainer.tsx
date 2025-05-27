@@ -80,10 +80,10 @@ export default function ScheduleContainer({
 					<ScheduleField
 						checkboxLabel={Liferay.Language.get('never-expire')}
 						customValidation={(value) => {
-							const currentDate = new Date().setSeconds(0, 0);
-							const dateTime = new Date(value).setSeconds(0, 0);
+							const currentDate = new Date();
+							const dateTime = new Date(value);
 
-							if (currentDate > dateTime) {
+							if (currentDate >= dateTime) {
 								return Liferay.Language.get(
 									'the-date-entered-is-in-the-past'
 								);
