@@ -7,7 +7,11 @@ import {ObjectField} from '@liferay/object-admin-rest-client-js';
 import {FrameLocator, Locator, Page, expect} from '@playwright/test';
 import path from 'path';
 
+import {getObjectEntryUIDateTimeFormat} from '../../../tests/object-web/main/utils/dateFormat';
 import {PORTLET_URLS} from '../../../utils/portletUrls';
+import {waitForAlert} from '../../../utils/waitForAlert';
+
+type ScheduleProperty = 'Expiration' | 'Review';
 
 export class ViewObjectEntriesPage {
 	readonly addObjectEntryButton: Locator;
@@ -16,12 +20,13 @@ export class ViewObjectEntriesPage {
 	readonly deleteFileButton: Locator;
 	readonly duplicateEntryErrorMessage: Locator;
 	readonly editObjectEntryForm: Locator;
+	readonly expirationDateInput: Locator;
 	readonly frameSelect: FrameLocator;
 	readonly frontendDatasetActions: Locator;
 	readonly frontendDatasetDeleteAction: Locator;
+	readonly neverExpire: Locator;
 	readonly neverReview: Locator;
 	readonly page: Page;
-	readonly reviewDateInput: Locator;
 	readonly reviewDateInput: Locator;
 	readonly saveObjectEntryButton: Locator;
 	readonly saveObjectEntryButtonArabic: Locator;
@@ -50,6 +55,12 @@ export class ViewObjectEntriesPage {
 			'Error:The field values are already in use. Please choose unique values.'
 		);
 		this.editObjectEntryForm = page.locator('[id="editObjectEntry"]');
+		this.expirationDateInput = page.getByLabel(
+			'Expiration DateMandatory',
+			{
+				exact: true,
+			}
+		);
 		this.frameSelect = page
 			.locator('iframe[title="Select"]')
 			.contentFrame();
@@ -59,6 +70,7 @@ export class ViewObjectEntriesPage {
 		this.frontendDatasetDeleteAction = page.getByRole('menuitem', {
 			name: 'Delete',
 		});
+		this.neverExpire = page.getByLabel('Never Expire', {exact: true});
 		this.neverReview = page.getByLabel('Never Review', {exact: true});
 		this.page = page;
 		this.reviewDateInput = page.getByLabel('Review Date' + 'Mandatory', {
@@ -232,5 +244,82 @@ export class ViewObjectEntriesPage {
 	async goToObjectDefinitionEntry(objectDefinition: string) {
 		await this.goto(objectDefinition);
 		await this.objectEntryButton.click();
+	}
+
+	async schedulePropertiesCrud(scheduleProperties: ScheduleProperty[]) {
+		for (const scheduleProperty of scheduleProperties) {
+			await this.page
+				.getByLabel(
+					`Never ${scheduleProperty === 'Expiration' ? 'Expire' : 'Review'}`,
+					{exact: true}
+				)
+				.uncheck();
+
+			await this.page
+				.locator(
+					`label:has-text("${scheduleProperty} Date") + div .date-picker-dropdown-toggle`
+				)
+				.click();
+
+			await this.page
+				.getByRole('button', {
+					disabled: false,
+					name: 'Select current date',
+				})
+				.click();
+
+			await this.page.keyboard.press('Escape');
+
+			await this.saveObjectEntryButton.click();
+
+			await waitForAlert(this.page);
+
+			const date = new Date();
+
+			const today = getObjectEntryUIDateTimeFormat(date);
+
+			await expect(
+				this.page.getByLabel(`${scheduleProperty} DateMandatory`, {
+					exact: true,
+				})
+			).toHaveValue(today);
+
+			date.setDate(date.getDate() + 1);
+
+			const tomorrow = getObjectEntryUIDateTimeFormat(date);
+
+			await this.page
+				.getByLabel(`${scheduleProperty} DateMandatory`, {
+					exact: true,
+				})
+				.fill(tomorrow);
+
+			await this.page.getByRole('button', {name: 'Save'}).click();
+
+			await waitForAlert(this.page);
+
+			await expect(
+				this.page.getByLabel(`${scheduleProperty} DateMandatory`, {
+					exact: true,
+				})
+			).toHaveValue(tomorrow);
+
+			await this.page
+				.getByLabel(
+					`Never ${scheduleProperty === 'Expiration' ? 'Expire' : 'Review'}`,
+					{exact: true}
+				)
+				.check();
+
+			await this.saveObjectEntryButton.click();
+
+			await waitForAlert(this.page);
+
+			await expect(
+				this.page.getByLabel(`${scheduleProperty} DateMandatory`, {
+					exact: true,
+				})
+			).toHaveValue('');
+		}
 	}
 }
