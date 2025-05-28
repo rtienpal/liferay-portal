@@ -13,12 +13,11 @@ import './ScheduleContainer.scss';
 type SchedulePropertyKey = 'expirationDate' | 'reviewDate';
 
 interface SchedulePropertyValues {
-	checked: boolean;
 	value: string;
 }
 
 export type ScheduleProperties = {
-	[key in SchedulePropertyKey]: SchedulePropertyValues;
+	[key in SchedulePropertyKey]?: SchedulePropertyValues;
 };
 
 interface ScheduleContainerProps {
@@ -33,22 +32,20 @@ export default function ScheduleContainer({
 	scheduleProperties,
 }: ScheduleContainerProps) {
 	const [displayedScheduleValues, setDisplayedScheduleValues] = useState<{
-		[key in SchedulePropertyKey]: SchedulePropertyValues;
+		[key in SchedulePropertyKey]?: SchedulePropertyValues;
 	}>({
 		expirationDate: {
-			checked: scheduleProperties.expirationDate.checked,
-			value: scheduleProperties.expirationDate.value ?? '',
+			value: scheduleProperties.expirationDate?.value ?? '',
 		},
 		reviewDate: {
-			checked: scheduleProperties.reviewDate.checked,
-			value: scheduleProperties.reviewDate.value ?? '',
+			value: scheduleProperties.reviewDate?.value ?? '',
 		},
 	});
 
 	const [hiddenScheduleValues, setHiddenScheduleValues] =
 		useState<HiddenValue>({
-			expirationDate: scheduleProperties.expirationDate.value ?? null,
-			reviewDate: scheduleProperties.reviewDate.value ?? null,
+			expirationDate: scheduleProperties.expirationDate?.value ?? '',
+			reviewDate: scheduleProperties.reviewDate?.value ?? '',
 		});
 
 	const handleCheckboxChange = ({
@@ -64,9 +61,11 @@ export default function ScheduleContainer({
 			...prev,
 			[property]: checked
 				? null
-				: displayedScheduleValues[property].value,
+				: displayedScheduleValues[property]?.value ?? '',
 		}));
 	};
+
+	console.log('hiddenScheduleValues: ', hiddenScheduleValues);
 
 	return (
 		<ClayPanel
@@ -79,11 +78,11 @@ export default function ScheduleContainer({
 				<div className="row">
 					<ScheduleField
 						checkboxLabel={Liferay.Language.get('never-expire')}
-						customValidation={(value) => {
-							const currentDate = new Date();
-							const dateTime = new Date(value);
+						customValidation={(date) => {
+							const currentDateTime = new Date();
+							const dateTime = new Date(date);
 
-							if (currentDate >= dateTime) {
+							if (currentDateTime >= dateTime) {
 								return Liferay.Language.get(
 									'the-date-entered-is-in-the-past'
 								);
@@ -93,9 +92,6 @@ export default function ScheduleContainer({
 						}}
 						dateLabel={Liferay.Language.get('expiration-date')}
 						id={portletNamespace + 'expirationDate'}
-						isChecked={
-							displayedScheduleValues.expirationDate.checked
-						}
 						onCheckboxChange={(event) => {
 							handleCheckboxChange({
 								event,
@@ -106,7 +102,6 @@ export default function ScheduleContainer({
 							setDisplayedScheduleValues({
 								...displayedScheduleValues,
 								expirationDate: {
-									...scheduleProperties.expirationDate,
 									value,
 								},
 							});
@@ -116,14 +111,15 @@ export default function ScheduleContainer({
 							}));
 						}}
 						portletNamespace={portletNamespace}
-						value={displayedScheduleValues.expirationDate.value}
+						value={
+							displayedScheduleValues.expirationDate?.value ?? ''
+						}
 					/>
 
 					<ScheduleField
 						checkboxLabel={Liferay.Language.get('never-review')}
 						dateLabel={Liferay.Language.get('review-date')}
 						id={portletNamespace + 'reviewDate'}
-						isChecked={displayedScheduleValues.reviewDate.checked}
 						onCheckboxChange={(event) => {
 							handleCheckboxChange({
 								event,
@@ -134,7 +130,6 @@ export default function ScheduleContainer({
 							setDisplayedScheduleValues({
 								...displayedScheduleValues,
 								reviewDate: {
-									...scheduleProperties.reviewDate,
 									value,
 								},
 							});
@@ -144,7 +139,7 @@ export default function ScheduleContainer({
 							}));
 						}}
 						portletNamespace={portletNamespace}
-						value={displayedScheduleValues.reviewDate.value}
+						value={displayedScheduleValues.reviewDate?.value ?? ''}
 					/>
 
 					<input

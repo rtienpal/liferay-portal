@@ -161,10 +161,10 @@ portletDisplay.setURLBack(backURL);
 		}
 
 		function isPastDate(date) {
-			const currentDate = new Date();
+			const currentDateTime = new Date();
 			const dateTime = new Date(date);
 
-			return currentDate >= dateTime;
+			return currentDateTime >= dateTime;
 		}
 
 		Liferay.provide(window, '<portlet:namespace />submitObjectEntry', () => {

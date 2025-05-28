@@ -78,15 +78,11 @@ describe('ScheduleContainer component', () => {
 		});
 	});
 
-	it('shows invalid date error when date from the past is provided', async () => {
+	it('shows error message when expiration date from the past is provided', async () => {
 		const {container} = renderScheduleContainer({
 			expirationDate: {
 				checked: false,
 				value: '05/13/2020 02:38 PM',
-			},
-			reviewDate: {
-				checked: true,
-				value: '',
 			},
 		});
 
