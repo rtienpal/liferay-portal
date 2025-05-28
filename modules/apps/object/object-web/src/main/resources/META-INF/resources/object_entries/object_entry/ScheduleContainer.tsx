@@ -9,6 +9,7 @@ import React, {useState} from 'react';
 import ScheduleField from './ScheduleField';
 
 import './ScheduleContainer.scss';
+import ModalSchedulePublication from './ModalSchedulePublication';
 
 import {Text} from '@clayui/core';
 
@@ -17,6 +18,7 @@ type HiddenValue = {[key in SchedulePropertyKey]: string | null};
 interface ScheduleContainerProps {
 	portletNamespace: string;
 	scheduleProperties: ScheduleProperties;
+	submitRef: string;
 }
 
 interface ScheduleFieldProps {
@@ -40,6 +42,7 @@ interface SchedulePropertyValues {
 export default function ScheduleContainer({
 	portletNamespace,
 	scheduleProperties,
+	submitRef,
 }: ScheduleContainerProps) {
 	const [displayedScheduleValues, setDisplayedScheduleValues] = useState<{
 		[key in SchedulePropertyKey]: SchedulePropertyValues;
@@ -168,13 +171,21 @@ export default function ScheduleContainer({
 						)
 					)}
 
-					<input
-						id={portletNamespace + 'scheduleContainer'}
-						type="hidden"
-						value={JSON.stringify(hiddenScheduleValues)}
-					/>
-				</div>
-			</ClayPanel.Body>
-		</ClayPanel>
+						<input
+							id={portletNamespace + 'scheduleContainer'}
+							type="hidden"
+							value={JSON.stringify(hiddenScheduleValues)}
+						/>
+					</div>
+				</ClayPanel.Body>
+			</ClayPanel>
+
+			<ModalSchedulePublication
+				hiddenScheduleValues={hiddenScheduleValues}
+				portletNamespace={portletNamespace}
+				submitRef={submitRef}
+				value={scheduleProperties.displayDate.value}
+			/>
+		</>
 	);
 }
