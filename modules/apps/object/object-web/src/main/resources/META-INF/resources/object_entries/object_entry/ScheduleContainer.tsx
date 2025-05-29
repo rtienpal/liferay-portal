@@ -170,7 +170,6 @@ export default function ScheduleContainer({
 											[schedulePropertyKey]: value,
 										}));
 									}}
-									portletNamespace={portletNamespace}
 									value={
 										displayedScheduleValues[
 											schedulePropertyKey

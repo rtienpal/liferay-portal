@@ -94,8 +94,6 @@ portletDisplay.setURLBack(backURL);
 							HashMapBuilder.<String, Object>put(
 								"backURL", backURL
 							).put(
-								"portletNamespace", portletNamespace
-							).put(
 								"submitRef", portletNamespace + "submitObjectEntry"
 							).build()
 						%>'
