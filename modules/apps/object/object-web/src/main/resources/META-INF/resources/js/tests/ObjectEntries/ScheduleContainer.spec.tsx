@@ -78,11 +78,15 @@ describe('ScheduleContainer component', () => {
 		});
 	});
 
-	it('shows error message when expiration date from the past is provided', async () => {
+	it('displays error for past expiration date', async () => {
 		const {container} = renderScheduleContainer({
 			expirationDate: {
 				checked: false,
 				value: '05/13/2020 02:38 PM',
+			},
+			reviewDate: {
+				checked: true,
+				value: '',
 			},
 		});
 
@@ -102,19 +106,11 @@ describe('ScheduleContainer component', () => {
 	});
 
 	it('shows required error on blur when no value is provided', async () => {
-		const scheduledProperties: ScheduleProperties = {
-			expirationDate: {
-				checked: false,
-				value: '',
-			},
-			reviewDate: {
-				checked: false,
-				value: '',
-			},
-		};
-		const {container} = renderScheduleContainer(scheduledProperties);
+		const {container} = renderScheduleContainer();
 
-		for (const scheduledProperty in scheduledProperties) {
+		const scheduleProperties = ['expirationDate', 'reviewDate'];
+
+		for (const scheduledProperty of scheduleProperties) {
 			const dateInput = container.querySelector(
 				`input[id$="${scheduledProperty}"]`
 			) as HTMLElement;
@@ -126,7 +122,7 @@ describe('ScheduleContainer component', () => {
 
 		await waitFor(() =>
 			expect(screen.getAllByText('this-field-is-required').length).toBe(
-				Object.keys(scheduledProperties).length
+				Object.keys(scheduleProperties).length
 			)
 		);
 	});

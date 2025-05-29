@@ -9,10 +9,11 @@ import React, {useCallback, useEffect, useState} from 'react';
 
 interface ScheduleFieldProps {
 	checkboxLabel: string;
-	customValidation?: (customValidationError: string) => string;
+	customValidation?: (date: string) => string;
 	dateLabel: string;
 	error?: string;
 	id: string;
+	isChecked: boolean;
 	onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	onDateChange: (value: string) => void;
 	portletNamespace: string;
@@ -24,6 +25,7 @@ export default function ScheduleField({
 	customValidation,
 	dateLabel,
 	id,
+	isChecked,
 	onCheckboxChange,
 	onDateChange,
 	portletNamespace,
@@ -31,7 +33,7 @@ export default function ScheduleField({
 }: ScheduleFieldProps) {
 	const [dateError, setDateError] = useState<string>('');
 
-	const [checked, setChecked] = useState<boolean>(true);
+	const [checked, setChecked] = useState<boolean>(isChecked);
 
 	const handleError = useCallback(
 		(value: string) => {

@@ -18,7 +18,7 @@ interface SchedulePropertyValues {
 }
 
 export type ScheduleProperties = {
-	[key in SchedulePropertyKey]?: SchedulePropertyValues;
+	[key in SchedulePropertyKey]: SchedulePropertyValues;
 };
 
 interface ScheduleContainerProps {
@@ -36,19 +36,19 @@ export default function ScheduleContainer({
 		[key in SchedulePropertyKey]: SchedulePropertyValues;
 	}>({
 		expirationDate: {
-			checked: scheduleProperties.expirationDate?.checked ?? true,
-			value: scheduleProperties.expirationDate?.value ?? '',
+			...scheduleProperties.expirationDate,
+			value: scheduleProperties.expirationDate.value ?? '',
 		},
 		reviewDate: {
-			checked: scheduleProperties.reviewDate?.checked ?? true,
-			value: scheduleProperties.reviewDate?.value ?? '',
+			...scheduleProperties.reviewDate,
+			value: scheduleProperties.reviewDate.value ?? '',
 		},
 	});
 
 	const [hiddenScheduleValues, setHiddenScheduleValues] =
 		useState<HiddenValue>({
-			expirationDate: scheduleProperties.expirationDate?.value ?? null,
-			reviewDate: scheduleProperties.reviewDate?.value ?? null,
+			expirationDate: scheduleProperties.expirationDate.value ?? null,
+			reviewDate: scheduleProperties.reviewDate.value ?? null,
 		});
 
 	const handleCheckboxChange = ({
@@ -120,7 +120,11 @@ export default function ScheduleContainer({
 								checkboxLabel={checkboxLabel}
 								customValidation={customValidation}
 								dateLabel={dateLabel}
-								id={`portletNamespace + ${schedulePropertyKey}`}
+								id={`${portletNamespace}${schedulePropertyKey}`}
+								isChecked={
+									displayedScheduleValues[schedulePropertyKey]
+										.checked
+								}
 								key={schedulePropertyKey}
 								onCheckboxChange={(
 									event: React.ChangeEvent<HTMLInputElement>
@@ -134,10 +138,9 @@ export default function ScheduleContainer({
 									setDisplayedScheduleValues({
 										...displayedScheduleValues,
 										[schedulePropertyKey]: {
-											checked:
-												displayedScheduleValues[
-													schedulePropertyKey
-												].checked,
+											...scheduleProperties[
+												schedulePropertyKey
+											],
 											value,
 										},
 									});
@@ -149,7 +152,7 @@ export default function ScheduleContainer({
 								portletNamespace={portletNamespace}
 								value={
 									displayedScheduleValues[schedulePropertyKey]
-										?.value ?? ''
+										.value
 								}
 							/>
 						)
