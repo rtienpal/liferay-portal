@@ -10,23 +10,30 @@ import ScheduleField from './ScheduleField';
 
 import './ScheduleContainer.scss';
 
-type SchedulePropertyKey = 'expirationDate' | 'reviewDate';
-
-interface SchedulePropertyValues {
-	checked: boolean;
-	value: string;
-}
-
-export type ScheduleProperties = {
-	[key in SchedulePropertyKey]: SchedulePropertyValues;
-};
+type HiddenValue = {[key in SchedulePropertyKey]: string | null};
 
 interface ScheduleContainerProps {
 	portletNamespace: string;
 	scheduleProperties: ScheduleProperties;
 }
 
-type HiddenValue = {[key in SchedulePropertyKey]: string | null};
+interface ScheduleFieldProps {
+	checkboxLabel: string;
+	customValidation?: (date: string) => string;
+	dateLabel: string;
+	schedulePropertyKey: SchedulePropertyKey;
+}
+
+export type ScheduleProperties = {
+	[key in SchedulePropertyKey]: SchedulePropertyValues;
+};
+
+type SchedulePropertyKey = 'expirationDate' | 'reviewDate';
+
+interface SchedulePropertyValues {
+	checked: boolean;
+	value: string;
+}
 
 export default function ScheduleContainer({
 	portletNamespace,
@@ -68,14 +75,7 @@ export default function ScheduleContainer({
 		}));
 	};
 
-	interface ScheduleFieldProps {
-		checkboxLabel: string;
-		customValidation?: (date: string) => string;
-		dateLabel: string;
-		schedulePropertyKey: SchedulePropertyKey;
-	}
-
-	const SchedulePropertiesProps: ScheduleFieldProps[] = [
+	const scheduleFieldProps: ScheduleFieldProps[] = [
 		{
 			checkboxLabel: Liferay.Language.get('never-expire'),
 			customValidation: (date: string) => {
@@ -109,7 +109,7 @@ export default function ScheduleContainer({
 		>
 			<ClayPanel.Body className="lfr-object__entries-schedule-panel">
 				<div className="row">
-					{SchedulePropertiesProps.map(
+					{scheduleFieldProps.map(
 						({
 							checkboxLabel,
 							customValidation,

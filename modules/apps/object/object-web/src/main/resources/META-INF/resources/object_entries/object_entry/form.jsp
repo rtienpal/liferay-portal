@@ -161,6 +161,10 @@ portletDisplay.setURLBack(backURL);
 		}
 
 		function isPastDate(date) {
+			if (!date) {
+				return false;
+			}
+
 			const currentDateTime = new Date();
 			const dateTime = new Date(date);
 
@@ -211,33 +215,27 @@ portletDisplay.setURLBack(backURL);
 						}
 					});
 
-					const scheduleContainerInput = document.getElementById(
-						'<portlet:namespace />scheduleContainer'
-					);
+					let scheduleContainerInputValue;
 
-					const scheduleContainerInputValue = JSON.parse(
-						scheduleContainerInput.value
-					);
+					if (Liferay.FeatureFlags['LPD-17564']) {
+						const scheduleContainerInput = document.getElementById(
+							'<portlet:namespace />scheduleContainer'
+						);
 
-					if (
-						scheduleContainerInput &&
-						hasEmptyString(scheduleContainerInputValue)
-					) {
-						shouldSubmitForm = false;
+						scheduleContainerInputValue = JSON.parse(
+							scheduleContainerInput.value
+						);
 
-						loadingElement.remove();
+						if (
+							hasEmptyString(scheduleContainerInputValue) ||
+							isPastDate(scheduleContainerInputValue.expirationDate)
+						) {
+							shouldSubmitForm = false;
 
-						return false;
-					}
+							loadingElement.remove();
 
-					if (scheduleContainerInputValue.expirationDate &&
-						isPastDate(scheduleContainerInputValue.expirationDate)
-					) {
-						shouldSubmitForm = false;
-
-						loadingElement.remove();
-
-						return false;
+							return false;
+						}
 					}
 
 					if (shouldSubmitForm) {
@@ -302,7 +300,10 @@ portletDisplay.setURLBack(backURL);
 							});
 						}
 
-						if (scheduleContainerInput) {
+						if (
+							Liferay.FeatureFlags['LPD-17564'] &&
+							scheduleContainerInputValue
+						) {
 							values = {
 								...values,
 								...scheduleContainerInputValue,
