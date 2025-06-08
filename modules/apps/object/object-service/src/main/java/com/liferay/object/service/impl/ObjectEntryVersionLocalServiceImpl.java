@@ -97,26 +97,15 @@ public class ObjectEntryVersionLocalServiceImpl
 		ObjectEntryVersion objectEntryVersion =
 			objectEntryVersionPersistence.findByOEI_V(objectEntryId, version);
 
-		if (objectEntryVersion.isDraft() || objectEntryVersion.isExpired() ||
-			objectEntryVersion.isPending()) {
+		return _expireObjectEntryVersion(userId, objectEntryVersion);
+	}
 
-			return objectEntryVersion;
-		}
+	@Override
+	public ObjectEntryVersion expireObjectEntryVersion(
+			long userId, ObjectEntryVersion objectEntryVersion)
+		throws PortalException {
 
-		Date date = new Date();
-
-		objectEntryVersion.setExpirationDate(date);
-
-		objectEntryVersion.setStatus(WorkflowConstants.STATUS_EXPIRED);
-
-		User user = _userLocalService.getUser(userId);
-
-		objectEntryVersion.setStatusByUserId(user.getUserId());
-		objectEntryVersion.setStatusByUserName(user.getFullName());
-
-		objectEntryVersion.setStatusDate(date);
-
-		return objectEntryVersionPersistence.update(objectEntryVersion);
+		return _expireObjectEntryVersion(userId, objectEntryVersion);
 	}
 
 	@Override
@@ -158,6 +147,32 @@ public class ObjectEntryVersionLocalServiceImpl
 				objectEntry.getObjectEntryId(),
 				ObjectEntryVersionVersionComparator.getInstance(false)),
 			objectEntry.getVersion());
+	}
+
+	private ObjectEntryVersion _expireObjectEntryVersion(
+			long userId, ObjectEntryVersion objectEntryVersion)
+		throws PortalException {
+
+		if (objectEntryVersion.isDraft() || objectEntryVersion.isExpired() ||
+			objectEntryVersion.isPending()) {
+
+			return objectEntryVersion;
+		}
+
+		Date date = new Date();
+
+		objectEntryVersion.setExpirationDate(date);
+
+		objectEntryVersion.setStatus(WorkflowConstants.STATUS_EXPIRED);
+
+		User user = _userLocalService.getUser(userId);
+
+		objectEntryVersion.setStatusByUserId(user.getUserId());
+		objectEntryVersion.setStatusByUserName(user.getFullName());
+
+		objectEntryVersion.setStatusDate(date);
+
+		return objectEntryVersionPersistence.update(objectEntryVersion);
 	}
 
 	private ObjectEntryVersion _updateObjectEntryVersion(
