@@ -97,6 +97,12 @@ public class ObjectEntryLocalServiceUtil {
 			objectEntryFolderId, values, serviceContext);
 	}
 
+	public static void checkObjectEntries(long companyId)
+		throws PortalException {
+
+		getService().checkObjectEntries(companyId);
+	}
+
 	/**
 	 * Creates a new object entry with the primary key. Does not add the object entry to the database.
 	 *
@@ -272,11 +278,20 @@ public class ObjectEntryLocalServiceUtil {
 	}
 
 	public static ObjectEntry expireObjectEntry(
-			long userId, long objectEntryId, int version,
+			long userId, long objectEntryId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().expireObjectEntry(
+			userId, objectEntryId, serviceContext);
+	}
+
+	public static ObjectEntry expireObjectEntryVersion(
+			long userId, long objectEntryId, int version,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().expireObjectEntryVersion(
 			userId, objectEntryId, version, serviceContext);
 	}
 
