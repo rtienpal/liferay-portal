@@ -10,6 +10,8 @@ import ScheduleField from './ScheduleField';
 
 import './ScheduleContainer.scss';
 
+import {Text} from '@clayui/core';
+
 type HiddenValue = {[key in SchedulePropertyKey]: string | null};
 
 interface ScheduleContainerProps {
@@ -107,6 +109,14 @@ export default function ScheduleContainer({
 			displayTitle={Liferay.Language.get('schedule')}
 			displayType="secondary"
 		>
+			<div className="mb-3 text-justify">
+				<Text size={3}>
+					{Liferay.Language.get(
+						'set-expiration-and-review-dates-for-the-object-entry'
+					)}
+				</Text>
+			</div>
+
 			<ClayPanel.Body className="lfr-object__entries-schedule-panel">
 				<div className="row">
 					{scheduleFieldProps.map(
