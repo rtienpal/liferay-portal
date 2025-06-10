@@ -50,9 +50,9 @@ public class IndexEntryTest {
 		List<String> missingIndexForFinderNames = new ArrayList<>();
 
 		try (Connection connection = DataAccess.getConnection()) {
-			DB db = DBManagerUtil.getDB();
-
 			DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+			DB db = DBManagerUtil.getDB();
 
 			List<IndexMetadata> indexMetadatas = db.getIndexMetadatas(
 				connection, "IndexEntry", null, false);
