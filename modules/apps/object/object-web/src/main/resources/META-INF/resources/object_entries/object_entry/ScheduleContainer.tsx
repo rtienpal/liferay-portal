@@ -9,6 +9,7 @@ import React, {useState} from 'react';
 import ScheduleField from './ScheduleField';
 
 import './ScheduleContainer.scss';
+import {convertToUTC} from '../../js/utils/convertToUTC';
 import ModalSchedulePublication from './ModalSchedulePublication';
 
 type DateProperties = {
@@ -21,7 +22,6 @@ type DateProperties = {
 		value: string;
 	};
 };
-import {convertToUTC} from '../../js/utils/convertToUTC';
 
 type HiddenValue = {
 	[key in 'expirationDate' | 'reviewDate' | 'displayDate']: string | null;
@@ -65,6 +65,7 @@ export default function ScheduleContainer({
 
 	const [hiddenScheduleValues, setHiddenScheduleValues] =
 		useState<HiddenValue>({
+			displayDate: convertToUTC(scheduleProperties.displayDate.value),
 			expirationDate: convertToUTC(
 				scheduleProperties.expirationDate.value
 			),
@@ -114,63 +115,65 @@ export default function ScheduleContainer({
 	];
 
 	return (
-		<ClayPanel
-			collapsable
-			defaultExpanded
-			displayTitle={Liferay.Language.get('schedule')}
-			displayType="secondary"
-		>
-			<ClayPanel.Body className="lfr-object__entries-schedule-panel">
-				<div className="row">
-					{scheduleFieldProps.map(
-						({
-							checkboxLabel,
-							customValidation,
-							dateLabel,
-							schedulePropertyKey,
-						}) => (
-							<ScheduleField
-								checkboxLabel={checkboxLabel}
-								customValidation={customValidation}
-								dateLabel={dateLabel}
-								id={`${portletNamespace}${schedulePropertyKey}`}
-								isChecked={
-									displayedScheduleValues[schedulePropertyKey]
-										.checked
-								}
-								key={schedulePropertyKey}
-								onCheckboxChange={(
-									event: React.ChangeEvent<HTMLInputElement>
-								) => {
-									handleCheckboxChange({
-										event,
-										property: schedulePropertyKey,
-									});
-								}}
-								onDateChange={(value: string) => {
-									setDisplayedScheduleValues({
-										...displayedScheduleValues,
-										[schedulePropertyKey]: {
-											...scheduleProperties[
-												schedulePropertyKey
-											],
-											value,
-										},
-									});
-									setHiddenScheduleValues((prev) => ({
-										...prev,
-										[schedulePropertyKey]:
-											convertToUTC(value),
-									}));
-								}}
-								portletNamespace={portletNamespace}
-								value={
-									displayedScheduleValues[schedulePropertyKey]
-										.value
-								}
-							/>
-						)
-					)}
+		<>
+			<ClayPanel
+				collapsable
+				defaultExpanded
+				displayTitle={Liferay.Language.get('schedule')}
+				displayType="secondary"
+			>
+				<ClayPanel.Body className="lfr-object__entries-schedule-panel">
+					<div className="row">
+						{scheduleFieldProps.map(
+							({
+								checkboxLabel,
+								customValidation,
+								dateLabel,
+								schedulePropertyKey,
+							}) => (
+								<ScheduleField
+									checkboxLabel={checkboxLabel}
+									customValidation={customValidation}
+									dateLabel={dateLabel}
+									id={`${portletNamespace}${schedulePropertyKey}`}
+									isChecked={
+										displayedScheduleValues[
+											schedulePropertyKey
+										].checked
+									}
+									key={schedulePropertyKey}
+									onCheckboxChange={(
+										event: React.ChangeEvent<HTMLInputElement>
+									) => {
+										handleCheckboxChange({
+											event,
+											property: schedulePropertyKey,
+										});
+									}}
+									onDateChange={(value: string) => {
+										setDisplayedScheduleValues({
+											...displayedScheduleValues,
+											[schedulePropertyKey]: {
+												...scheduleProperties[
+													schedulePropertyKey
+												],
+												value,
+											},
+										});
+										setHiddenScheduleValues((prev) => ({
+											...prev,
+											[schedulePropertyKey]:
+												convertToUTC(value),
+										}));
+									}}
+									value={
+										displayedScheduleValues[
+											schedulePropertyKey
+										].value
+									}
+								/>
+							)
+						)}
 
 						<input
 							id={portletNamespace + 'scheduleContainer'}
