@@ -8287,7 +8287,7 @@ public class ObjectEntryResourceTest {
 
 	@FeatureFlag("LPD-17564")
 	@Test
-	public void testPatchPutCustomObjectEntryWithScheduleObjectFields()
+	public void testPatchPutCustomObjectEntryWithScheduleProperties()
 		throws Exception {
 
 		ObjectDefinition objectDefinition = _publishLocalizedObjectDefinition(
