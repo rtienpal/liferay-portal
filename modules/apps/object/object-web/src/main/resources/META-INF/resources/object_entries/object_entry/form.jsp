@@ -104,6 +104,7 @@ portletDisplay.setURLBack(backURL);
 				<liferay-frontend:edit-form-footer>
 					<liferay-frontend:edit-form-buttons
 						redirect="<%= backURL %>"
+						submitId="saveObjectEntryButton"
 						submitOnClick='<%= "event.preventDefault(); " + portletNamespace + "submitObjectEntry();" %>'
 					/>
 				</liferay-frontend:edit-form-footer>
@@ -114,9 +115,6 @@ portletDisplay.setURLBack(backURL);
 
 <c:if test="<%= !objectEntryDisplayContext.isReadOnly() %>">
 	<aui:script sandbox="<%= true %>">
-		const isDefaultLayout =
-			<%= objectEntryDisplayContext.getObjectLayoutTab() == null %>;
-
 		function <portlet:namespace />getExternalReferenceCode() {
 			return String(
 				'<%= (objectEntry == null) ? "" : objectEntry.getExternalReferenceCode() %>'
@@ -136,23 +134,16 @@ portletDisplay.setURLBack(backURL);
 				`/scopes/\${themeDisplay.getSiteGroupId()}`
 			);
 
-			if (!externalReferenceCode) {
-				return scope === 'site' ? pathScopedBySite : contextPath;
-			}
-
-			let putPath = scope === 'site' ? pathScopedBySite : contextPath;
-			putPath = putPath.concat(
-				'/by-external-reference-code/',
-				`\${externalReferenceCode}`
-			);
+			const postPath = scope === 'site' ? pathScopedBySite : contextPath;
 
 			let patchPath = scope === 'site' ? pathScopedBySite : contextPath;
+
 			patchPath = patchPath.concat(
 				'/by-external-reference-code/',
 				`\${externalReferenceCode}`
 			);
 
-			return isDefaultLayout ? putPath : patchPath;
+			return externalReferenceCode ? patchPath : postPath;
 		}
 
 		function <portlet:namespace />getValues(fields) {
@@ -245,7 +236,7 @@ portletDisplay.setURLBack(backURL);
 
 					let scheduleContainerInputValue;
 
-					if (Liferay.FeatureFlags['LPD-17564'] && isDefaultLayout) {
+					if (Liferay.FeatureFlags['LPD-17564']) {
 						const scheduleContainerInput = document.getElementById(
 							'<portlet:namespace />scheduleContainer'
 						);
@@ -338,12 +329,6 @@ portletDisplay.setURLBack(backURL);
 							};
 						}
 
-						const method = !externalReferenceCode
-							? 'POST'
-							: isDefaultLayout
-								? 'PUT'
-								: 'PATCH';
-
 						Liferay.Util.fetch(path, {
 							body: JSON.stringify(values),
 							headers: new Headers({
@@ -352,7 +337,7 @@ portletDisplay.setURLBack(backURL);
 									'<%= LanguageUtil.getBCP47LanguageId(request) %>',
 								'Content-Type': 'application/json',
 							}),
-							method: method,
+							method: externalReferenceCode ? 'PATCH' : 'POST',
 						})
 							.then((response) => {
 								Liferay.fire('submitButtonClicked');
@@ -364,8 +349,8 @@ portletDisplay.setURLBack(backURL);
 									Liferay.Util.openToast({
 										message:
 											'<%=
-													HtmlUtil.escapeJS(LanguageUtil.get(
-														LocaleUtil.fromLanguageId(LanguageUtil.getBCP47LanguageId(request)), "your-request-completed-successfully")) %>',
+												HtmlUtil.escapeJS(LanguageUtil.get(
+													LocaleUtil.fromLanguageId(LanguageUtil.getBCP47LanguageId(request)), "your-request-completed-successfully")) %>',
 										type: 'success',
 									});
 
