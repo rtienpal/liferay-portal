@@ -217,7 +217,6 @@ export default function FieldBase({
 	});
 
 	const fieldDetailsId = `${id ?? name}_fieldDetails`;
-	const fieldLabelId = `${id ?? name}_fieldLabel`;
 
 	const hiddenTranslations = useMemo(() => {
 		if (!localizedValue) {
@@ -288,15 +287,15 @@ export default function FieldBase({
 		accessible && fieldDetails && readFieldDetails && type !== 'select';
 
 	const accessiblePropsGroup = {
-		...(!renderLabel &&
-			hasFieldDetails && {'aria-labelledby': fieldDetailsId}),
-		...(type === 'fieldset' && {role: 'group'}),
+		...(!renderLabel && {
+			'aria-labelledby': hasFieldDetails ? fieldDetailsId : id ?? name,
+		}),
+		role: 'group',
 	};
 
 	const accessiblePropsFields = {
 		...(hasFieldDetails && {'aria-labelledby': fieldDetailsId}),
 		...(showFor && {htmlFor: id ?? name}),
-		...readFieldDetails,
 	};
 
 	const defaultRows = nestedFields?.map((field) => ({
@@ -546,7 +545,6 @@ export default function FieldBase({
 
 	return (
 		<ClayForm.Group
-			{...accessiblePropsGroup}
 			className={classNames({
 				'has-error': hasError,
 				'has-warning': warningMessage && !hasError,
@@ -556,6 +554,7 @@ export default function FieldBase({
 			data-field-reference={fieldReference}
 			onClick={onClick}
 			style={style}
+			{...accessiblePropsGroup}
 		>
 			{repeatable && (
 				<div className="lfr-ddm-form-field-repeatable-toolbar">
@@ -634,13 +633,13 @@ export default function FieldBase({
 			{renderLabel && (
 				<>
 					{showGroup ? (
-						<div aria-labelledby={fieldLabelId} role="group">
+						<>
 							<label
 								{...accessiblePropsFields}
 								className={classNames('lfr-ddm-legend', {
 									'text-muted': showDisabledFieldIcon,
 								})}
-								id={fieldLabelId}
+								id={fieldDetailsId}
 							>
 								{showLabel && label}
 
@@ -661,7 +660,7 @@ export default function FieldBase({
 							)}
 
 							{children}
-						</div>
+						</>
 					) : (
 						<>
 							<label

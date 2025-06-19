@@ -104,7 +104,9 @@ const FieldSet = ({
 			<div className="ddm-field-types-fieldset__nested">
 				{showLabel && !collapsible && (
 					<>
-						<label className="text-uppercase">{label}</label>
+						<label className="text-uppercase" id={name}>
+							{label}
+						</label>
 						<div className="ddm-field-types-fieldset__nested-separator">
 							<hr className="mt-1 separator" />
 						</div>
