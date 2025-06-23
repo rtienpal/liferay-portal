@@ -3,8 +3,10 @@
 exports[`Options shows the options 1`] = `
 <div>
   <div
+    aria-labelledby="options"
     class="form-group hide"
     data-field-name="options"
+    role="group"
   >
     <div
       class="ddm-field-options-container"
@@ -85,12 +87,16 @@ exports[`Options shows the options 1`] = `
                   display-name
                 </label>
                 <div
+                  aria-labelledby="option0"
                   class="form-group hide"
                   data-field-name="option0"
+                  role="group"
                 >
                   <div
+                    aria-labelledby="keyValueDisplayNameoption0"
                     class="form-group hide"
                     data-field-name="keyValueDisplayNameoption0"
+                    role="group"
                   >
                     <div
                       data-tooltip-align="top"
@@ -157,12 +163,16 @@ exports[`Options shows the options 1`] = `
                   option-reference
                 </label>
                 <div
+                  aria-labelledby="Option1"
                   class="form-group hide"
                   data-field-name="Option1"
+                  role="group"
                 >
                   <div
+                    aria-labelledby="keyValueReferenceOption1"
                     class="form-group hide"
                     data-field-name="keyValueReferenceOption1"
+                    role="group"
                   >
                     <div
                       data-tooltip-align="top"
@@ -228,12 +238,16 @@ exports[`Options shows the options 1`] = `
                   </svg>
                 </span>
                 <div
+                  aria-labelledby="Option1"
                   class="form-group hide"
                   data-field-name="Option1"
+                  role="group"
                 >
                   <div
+                    aria-labelledby="keyValueNameOption1"
                     class="form-group hide"
                     data-field-name="keyValueNameOption1"
+                    role="group"
                   >
                     <div
                       data-tooltip-align="top"
@@ -359,12 +373,16 @@ exports[`Options shows the options 1`] = `
                   display-name
                 </label>
                 <div
+                  aria-labelledby="option1"
                   class="form-group hide"
                   data-field-name="option1"
+                  role="group"
                 >
                   <div
+                    aria-labelledby="keyValueDisplayNameoption1"
                     class="form-group hide"
                     data-field-name="keyValueDisplayNameoption1"
+                    role="group"
                   >
                     <div
                       data-tooltip-align="top"
@@ -431,12 +449,16 @@ exports[`Options shows the options 1`] = `
                   option-reference
                 </label>
                 <div
+                  aria-labelledby="Option2"
                   class="form-group hide"
                   data-field-name="Option2"
+                  role="group"
                 >
                   <div
+                    aria-labelledby="keyValueReferenceOption2"
                     class="form-group hide"
                     data-field-name="keyValueReferenceOption2"
+                    role="group"
                   >
                     <div
                       data-tooltip-align="top"
@@ -502,12 +524,16 @@ exports[`Options shows the options 1`] = `
                   </svg>
                 </span>
                 <div
+                  aria-labelledby="Option2"
                   class="form-group hide"
                   data-field-name="Option2"
+                  role="group"
                 >
                   <div
+                    aria-labelledby="keyValueNameOption2"
                     class="form-group hide"
                     data-field-name="keyValueNameOption2"
+                    role="group"
                   >
                     <div
                       data-tooltip-align="top"

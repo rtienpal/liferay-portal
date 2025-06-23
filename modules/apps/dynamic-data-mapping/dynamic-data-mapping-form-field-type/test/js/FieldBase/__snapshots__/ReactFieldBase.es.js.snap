@@ -4,6 +4,7 @@ exports[`ReactFieldBase does not render the add button when repeatable is true a
 <div>
   <div
     class="form-group hide"
+    role="group"
   >
     <div
       class="lfr-ddm-form-field-repeatable-toolbar"
@@ -57,6 +58,7 @@ exports[`ReactFieldBase does not render the label if showLabel is false 1`] = `
   <div
     aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
+    role="group"
   >
     <input
       name="undefined_edited"
@@ -86,6 +88,7 @@ exports[`ReactFieldBase renders the FieldBase with contentRenderer 1`] = `
 <div>
   <div
     class="form-group hide"
+    role="group"
   >
     <div>
       <h1>
@@ -115,6 +118,7 @@ exports[`ReactFieldBase renders the FieldBase with help text 1`] = `
   <div
     aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
+    role="group"
   >
     <input
       name="undefined_edited"
@@ -146,7 +150,9 @@ exports[`ReactFieldBase renders the FieldBase with help text 1`] = `
 exports[`ReactFieldBase renders the FieldBase with id 1`] = `
 <div>
   <div
+    aria-labelledby="Id"
     class="form-group hide"
+    role="group"
   >
     <input
       name="undefined_edited"
@@ -170,6 +176,7 @@ exports[`ReactFieldBase renders the FieldBase with label 1`] = `
 <div>
   <div
     class="form-group hide"
+    role="group"
   >
     <label
       aria-labelledby="undefined_fieldDetails"
@@ -205,6 +212,7 @@ exports[`ReactFieldBase renders the FieldBase with required 1`] = `
 <div>
   <div
     class="form-group hide"
+    role="group"
   >
     <label
       aria-labelledby="undefined_fieldDetails"
@@ -251,6 +259,7 @@ exports[`ReactFieldBase renders the add button when repeatable is true 1`] = `
 <div>
   <div
     class="form-group hide"
+    role="group"
   >
     <div
       class="lfr-ddm-form-field-repeatable-toolbar"
@@ -303,6 +312,7 @@ exports[`ReactFieldBase renders the default markup 1`] = `
 <div>
   <div
     class="form-group hide"
+    role="group"
   >
     <input
       name="undefined_edited"

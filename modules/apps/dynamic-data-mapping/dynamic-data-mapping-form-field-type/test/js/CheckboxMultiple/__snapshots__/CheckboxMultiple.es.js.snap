@@ -3,8 +3,10 @@
 exports[`Smoke test field Checkbox Multiple renders the expected structure with default props 1`] = `
 <div>
   <div
+    aria-labelledby="namePropertyValue"
     class="form-group hide"
     data-field-name="namePropertyValue"
+    role="group"
   >
     <div
       class="lfr-ddm-checkbox-multiple"

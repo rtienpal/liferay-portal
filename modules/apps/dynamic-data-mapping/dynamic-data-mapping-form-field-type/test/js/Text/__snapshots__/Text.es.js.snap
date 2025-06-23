@@ -6,6 +6,7 @@ exports[`Field Text has a helptext 1`] = `
     aria-labelledby="textField_fieldDetails"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       data-tooltip-align="top"
@@ -52,6 +53,7 @@ exports[`Field Text has a label 1`] = `
   <div
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <label
       aria-labelledby="textField_fieldDetails"
@@ -98,8 +100,10 @@ exports[`Field Text has a label 1`] = `
 exports[`Field Text has a placeholder 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       data-tooltip-align="top"
@@ -136,8 +140,10 @@ exports[`Field Text has a placeholder 1`] = `
 exports[`Field Text has a value 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       data-tooltip-align="top"
@@ -173,8 +179,10 @@ exports[`Field Text has a value 1`] = `
 exports[`Field Text has an id 1`] = `
 <div>
   <div
+    aria-labelledby="Id"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       data-tooltip-align="top"
@@ -209,8 +217,10 @@ exports[`Field Text has an id 1`] = `
 exports[`Field Text is not readOnly 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       data-tooltip-align="top"
@@ -245,8 +255,10 @@ exports[`Field Text is not readOnly 1`] = `
 exports[`Field Text is not required 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       data-tooltip-align="top"
@@ -282,8 +294,10 @@ exports[`Field Text is not required 1`] = `
 exports[`Field Text is readOnly 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       data-tooltip-align="top"
@@ -321,6 +335,7 @@ exports[`Field Text renders Label if showLabel is true 1`] = `
   <div
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <label
       aria-labelledby="textField_fieldDetails"

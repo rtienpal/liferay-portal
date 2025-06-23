@@ -6,6 +6,7 @@ exports[`Field DocumentLibrary has a helptext 1`] = `
     aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
+    role="group"
   >
     <div
       class="liferay-ddm-form-field-document-library"
@@ -99,6 +100,7 @@ exports[`Field DocumentLibrary has a label 1`] = `
   <div
     class="form-group has-error hide"
     data-field-name="uploadField"
+    role="group"
   >
     <label
       aria-labelledby="uploadField_fieldDetails"
@@ -196,6 +198,7 @@ exports[`Field DocumentLibrary has a placeholder 1`] = `
     aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
+    role="group"
   >
     <div
       class="liferay-ddm-form-field-document-library"
@@ -286,6 +289,7 @@ exports[`Field DocumentLibrary has a spritemap 1`] = `
     aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
+    role="group"
   >
     <div
       class="liferay-ddm-form-field-document-library"
@@ -375,6 +379,7 @@ exports[`Field DocumentLibrary has a value 1`] = `
     aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
+    role="group"
   >
     <div
       class="liferay-ddm-form-field-document-library"
@@ -464,6 +469,7 @@ exports[`Field DocumentLibrary has an id 1`] = `
     aria-labelledby="ID_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
+    role="group"
   >
     <div
       class="liferay-ddm-form-field-document-library"
@@ -551,8 +557,10 @@ exports[`Field DocumentLibrary has an id 1`] = `
 exports[`Field DocumentLibrary is not readOnly 1`] = `
 <div>
   <div
+    aria-labelledby="uploadField"
     class="form-group hide"
     data-field-name="uploadField"
+    role="group"
   >
     <div
       class="liferay-ddm-form-field-document-library"
@@ -619,6 +627,7 @@ exports[`Field DocumentLibrary is not required 1`] = `
     aria-labelledby="uploadField_fieldDetails"
     class="form-group has-error hide"
     data-field-name="uploadField"
+    role="group"
   >
     <div
       class="liferay-ddm-form-field-document-library"
@@ -708,6 +717,7 @@ exports[`Field DocumentLibrary renders Label if showLabel is true 1`] = `
   <div
     class="form-group has-error hide"
     data-field-name="uploadField"
+    role="group"
   >
     <label
       aria-labelledby="uploadField_fieldDetails"

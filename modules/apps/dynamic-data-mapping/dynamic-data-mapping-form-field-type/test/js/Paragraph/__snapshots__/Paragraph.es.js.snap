@@ -3,8 +3,10 @@
 exports[`Field Paragraph has a key 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       class="form-group liferay-ddm-form-field-paragraph"
@@ -37,6 +39,7 @@ exports[`Field Paragraph has a label 1`] = `
   <div
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <label
       aria-labelledby="textField_fieldDetails"
@@ -79,8 +82,10 @@ exports[`Field Paragraph has a label 1`] = `
 exports[`Field Paragraph has a placeholder 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       class="form-group liferay-ddm-form-field-paragraph"
@@ -111,8 +116,10 @@ exports[`Field Paragraph has a placeholder 1`] = `
 exports[`Field Paragraph has a value 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       class="form-group liferay-ddm-form-field-paragraph"
@@ -143,8 +150,10 @@ exports[`Field Paragraph has a value 1`] = `
 exports[`Field Paragraph has an id 1`] = `
 <div>
   <div
+    aria-labelledby="Id"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       class="form-group liferay-ddm-form-field-paragraph"
@@ -175,8 +184,10 @@ exports[`Field Paragraph has an id 1`] = `
 exports[`Field Paragraph is not required 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       class="form-group liferay-ddm-form-field-paragraph"
@@ -207,8 +218,10 @@ exports[`Field Paragraph is not required 1`] = `
 exports[`Field Paragraph is readOnly 1`] = `
 <div>
   <div
+    aria-labelledby="textField"
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <div
       class="form-group liferay-ddm-form-field-paragraph"
@@ -241,6 +254,7 @@ exports[`Field Paragraph renders Label if showLabel is true 1`] = `
   <div
     class="form-group hide"
     data-field-name="textField"
+    role="group"
   >
     <label
       aria-labelledby="textField_fieldDetails"

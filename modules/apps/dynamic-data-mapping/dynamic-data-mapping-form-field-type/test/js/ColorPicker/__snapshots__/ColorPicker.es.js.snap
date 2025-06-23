@@ -3,8 +3,10 @@
 exports[`Field Color Picker renders field disabled 1`] = `
 <div>
   <div
+    aria-labelledby="colorPicker"
     class="form-group hide"
     data-field-name="colorPicker"
+    role="group"
   >
     <input
       name="colorPicker"
@@ -75,6 +77,7 @@ exports[`Field Color Picker renders field with helptext 1`] = `
     aria-labelledby="colorPicker_fieldDetails"
     class="form-group hide"
     data-field-name="colorPicker"
+    role="group"
   >
     <input
       name="colorPicker"
@@ -151,6 +154,7 @@ exports[`Field Color Picker renders field with label 1`] = `
   <div
     class="form-group hide"
     data-field-name="colorPicker"
+    role="group"
   >
     <label
       aria-labelledby="colorPicker_fieldDetails"
