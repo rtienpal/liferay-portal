@@ -4,6 +4,7 @@
  */
 
 import {ObjectField} from '@liferay/object-admin-rest-client-js';
+
 import {getRandomInt} from '../../../../utils/getRandomInt';
 
 function getObjectFieldBaseProperties() {
@@ -20,7 +21,10 @@ function getObjectFieldBaseProperties() {
 	};
 }
 
-type SupportedObjectFieldBusinessType = Exclude<ObjectField['businessType'], 'Aggregation' | 'Formula'>;
+type SupportedObjectFieldBusinessType = Exclude<
+	ObjectField['businessType'],
+	'Aggregation' | 'Formula'
+>;
 
 function getObjectFieldSpecificProperties(
 	objectFieldBusinessType: SupportedObjectFieldBusinessType,
@@ -129,14 +133,14 @@ function getObjectFieldSpecificProperties(
 			return {
 				DBType: 'String',
 				businessType: 'MultiselectPicklist',
-				listTypeDefinitionExternalReferenceCode: listTypeDefinitionExternalReferenceCode,
+				listTypeDefinitionExternalReferenceCode,
 				type: 'String',
 			};
 		case 'Picklist':
 			return {
 				DBType: 'String',
 				businessType: 'Picklist',
-				listTypeDefinitionExternalReferenceCode: listTypeDefinitionExternalReferenceCode,
+				listTypeDefinitionExternalReferenceCode,
 				type: 'String',
 			};
 		case 'PrecisionDecimal':
@@ -157,20 +161,26 @@ function getObjectFieldSpecificProperties(
 				businessType: 'Text',
 				type: 'String',
 			};
+		default:
+			throw new Error(
+				`Unsupported object field business type: ${objectFieldBusinessType}`
+			);
 	}
 }
 
 function generateObjectField({
 	listTypeDefinitionExternalReferenceCode,
-	objectFieldBusinessType
+	objectFieldBusinessType,
 }: {
-	listTypeDefinitionExternalReferenceCode?: string,
-	objectFieldBusinessType: SupportedObjectFieldBusinessType
+	listTypeDefinitionExternalReferenceCode?: string;
+	objectFieldBusinessType: SupportedObjectFieldBusinessType;
 }): Partial<ObjectField> {
 	const objectFieldBaseProperties = getObjectFieldBaseProperties();
-	const objectFieldLabel = `${objectFieldBusinessType}${getRandomInt()}`
-	const objectFieldSpecificProperties =
-		getObjectFieldSpecificProperties(objectFieldBusinessType, listTypeDefinitionExternalReferenceCode);
+	const objectFieldLabel = `${objectFieldBusinessType}${getRandomInt()}`;
+	const objectFieldSpecificProperties = getObjectFieldSpecificProperties(
+		objectFieldBusinessType,
+		listTypeDefinitionExternalReferenceCode
+	);
 
 	return {
 		...objectFieldBaseProperties,
@@ -180,7 +190,7 @@ function generateObjectField({
 	};
 }
 
-export function generateObjectFields({
+export function generateObjectFieldsObjectEntryValues({
 	listTypeDefinitionExternalReferenceCode,
 	objectFieldBusinessTypes,
 }: {
@@ -192,7 +202,7 @@ export function generateObjectFields({
 	for (const objectFieldBusinessType of objectFieldBusinessTypes) {
 		const objectField = generateObjectField({
 			listTypeDefinitionExternalReferenceCode,
-			objectFieldBusinessType
+			objectFieldBusinessType,
 		});
 
 		objectFields.push(objectField);

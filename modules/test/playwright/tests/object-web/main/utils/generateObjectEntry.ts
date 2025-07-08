@@ -4,6 +4,7 @@
  */
 
 import {ObjectField} from '@liferay/object-admin-rest-client-js';
+
 import {getRandomInt} from '../../../../utils/getRandomInt';
 import getRandomString from '../../../../utils/getRandomString';
 import {
@@ -27,11 +28,11 @@ function getRandomDate(format: 'API' | 'UI'): string {
 function generateObjectEntryValue({
 	listTypeEntriesName,
 	objectEntryFormat,
-	objectFieldBusinessType
+	objectFieldBusinessType,
 }: {
-	objectEntryFormat: 'API' | 'UI',
-	listTypeEntriesName: string[],
-	objectFieldBusinessType: Partial<ObjectField['businessType']>
+	listTypeEntriesName: string[];
+	objectEntryFormat: 'API' | 'UI';
+	objectFieldBusinessType: Partial<ObjectField['businessType']>;
 }) {
 	const listTypeEntriesRandomLength1 = Math.floor(
 		Math.random() * listTypeEntriesName.length
@@ -62,9 +63,7 @@ function generateObjectEntryValue({
 			];
 		case 'Picklist':
 			return {
-				key: listTypeEntriesName[
-					listTypeEntriesRandomLength1
-				],
+				key: listTypeEntriesName[listTypeEntriesRandomLength1],
 			};
 		case 'PrecisionDecimal':
 			return parseFloat(Math.random().toFixed(15)).toString();
@@ -77,12 +76,20 @@ function generateObjectEntryValue({
 	}
 }
 
-type UnsupportedBusinessTypes = 'Aggregation' | 'Attachment' | 'AutoIncrement' | 'Formula' | 'Relationship';
+type UnsupportedBusinessTypes =
+	| 'Aggregation'
+	| 'Attachment'
+	| 'AutoIncrement'
+	| 'Formula'
+	| 'Relationship';
 
-type SupportedBusinessType = Exclude<ObjectField['businessType'], UnsupportedBusinessTypes>;
+export type SupportedBusinessType = Exclude<
+	ObjectField['businessType'],
+	UnsupportedBusinessTypes
+>;
 
-type SupportedObjectField = Partial<ObjectField> & {
-    businessType: SupportedBusinessType;
+export type SupportedObjectField = Partial<ObjectField> & {
+	businessType: SupportedBusinessType;
 };
 
 export async function generateObjectEntryValues({
@@ -92,17 +99,18 @@ export async function generateObjectEntryValues({
 }: {
 	listTypeEntries?: string[];
 	objectEntryFormat?: 'API' | 'UI';
-	objectFields: SupportedObjectField[];
+	objectFields: ObjectField[];
 }) {
-	const objectEntry: {[objectFieldName: string]: boolean | string | string[] | {key: string}} = {};
+	const objectEntry: {
+		[objectFieldName: string]: boolean | string | string[] | {key: string};
+	} = {};
 
 	for (const objectField of objectFields) {
-		objectEntry[objectField.name] =
-			generateObjectEntryValue({
-				listTypeEntriesName: listTypeEntries,
-				objectEntryFormat,
-				objectFieldBusinessType: objectField.businessType
-			});
+		objectEntry[objectField.name] = generateObjectEntryValue({
+			listTypeEntriesName: listTypeEntries,
+			objectEntryFormat,
+			objectFieldBusinessType: objectField.businessType,
+		});
 	}
 
 	return {objectEntry};
