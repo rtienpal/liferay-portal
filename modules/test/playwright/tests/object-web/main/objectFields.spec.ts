@@ -6,6 +6,7 @@
 import {
 	ObjectDefinition,
 	ObjectDefinitionAPI,
+	ObjectField,
 	ObjectFieldAPI,
 	ObjectFolder,
 	ObjectFolderAPI,
@@ -23,7 +24,8 @@ import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
 import {AsyncArray} from './utils/AsyncArray';
-import {createObjectFields, mockObjectFields} from './utils/generateObjectFieldsObjectEntryValues';
+import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFields';
+import {postListTypeDefinitionListTypeEntries} from './utils/postListTypeDefinitionListTypeEntries';
 
 export const test = mergeTests(
 	apiHelpersTest,
@@ -400,17 +402,16 @@ test.describe('Manage object fields through Model Builder', () => {
 		const objectFieldAPIClient =
 			await apiHelpers.buildRestClient(ObjectFieldAPI);
 
+		const objectFields: Partial<ObjectField>[] =
+			generateObjectFieldsObjectEntryValues({
+				listTypeDefinitionExternalReferenceCode:
+					listTypeDefinition.externalReferenceCode,
+				objectFieldBusinessTypes: ['Picklist'],
+			});
+
 		await objectFieldAPIClient.postObjectDefinitionByExternalReferenceCodeObjectField(
 			objectDefinition.externalReferenceCode,
-			createObjectFields(
-				'Picklist',
-				[{label: 'picklistField', name: 'picklistField'}],
-				{
-					listTypeDefinitionExternalReferenceCode:
-						listTypeDefinition.externalReferenceCode,
-					listTypeDefinitionId: listTypeDefinition.id,
-				}
-			)[0]
+			objectFields[0]
 		);
 
 		await modelBuilderDiagramPage.goto({objectFolderName: 'Default'});
@@ -424,7 +425,7 @@ test.describe('Manage object fields through Model Builder', () => {
 			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
-		await page.getByText('picklistField').click();
+		await page.getByText(objectFields[0].name).click();
 
 		const newTabPagePromise = new Promise<Page>((resolve) =>
 			page.once('popup', resolve)
@@ -446,27 +447,35 @@ test.describe('Manage object fields through Model Builder', () => {
 	}) => {
 		const {listTypeDefinitionIds, objectDefinitions, objectFolders} =
 			createdEntities;
+
 		const objectFolder =
 			await apiHelpers.objectAdmin.postRandomObjectFolder();
 
 		objectFolders.push(objectFolder);
 
-		const {listTypeDefinition, objectFields} = await mockObjectFields({
-			apiHelpers,
-			objectFieldBusinessTypes: [
-				'Attachment',
-				'Boolean',
-				'Date',
-				'Decimal',
-				'Integer',
-				'LongInteger',
-				'LongText',
-				'Picklist',
-				'PrecisionDecimal',
-				'RichText',
-				'Text',
-			],
-		});
+		const {listTypeDefinition} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+			});
+
+		const objectFields: Partial<ObjectField>[] =
+			generateObjectFieldsObjectEntryValues({
+				listTypeDefinitionExternalReferenceCode:
+					listTypeDefinition.externalReferenceCode,
+				objectFieldBusinessTypes: [
+					'Attachment',
+					'Boolean',
+					'Date',
+					'Decimal',
+					'Integer',
+					'LongInteger',
+					'LongText',
+					'Picklist',
+					'PrecisionDecimal',
+					'RichText',
+					'Text',
+				],
+			});
 
 		listTypeDefinitionIds.push(listTypeDefinition.id);
 
@@ -762,10 +771,10 @@ test.describe('Manage object fields through Model Builder', () => {
 		modelBuilderObjectDefinitionNodePage,
 		page,
 	}) => {
-		const {objectFields} = await mockObjectFields({
-			apiHelpers,
-			objectFieldBusinessTypes: ['Encrypted'],
-		});
+		const objectFields: Partial<ObjectField>[] =
+			generateObjectFieldsObjectEntryValues({
+				objectFieldBusinessTypes: ['Encrypted'],
+			});
 
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({

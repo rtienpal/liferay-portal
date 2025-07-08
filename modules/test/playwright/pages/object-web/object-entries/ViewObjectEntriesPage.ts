@@ -11,6 +11,8 @@ import {getFDSDateFormat} from '../../../tests/object-web/main/utils/dateFormat'
 import {PORTLET_URLS} from '../../../utils/portletUrls';
 import {ObjectFieldBusinessType} from '../../../tests/object-web/main/utils/generateObjectFieldsObjectEntryValues';
 
+import type {SupportedBusinessType} from '../../../tests/object-web/main/utils/generateObjectEntry';
+
 export class ViewObjectEntriesPage {
 	readonly addObjectEntryButton: Locator;
 	readonly backButton: Locator;
@@ -301,7 +303,6 @@ export class ViewObjectEntriesPage {
 		);
 	}
 
-
 	getMaximumFileSizeErrorMessage({
 		maximumFileSizeAllowed,
 	}: {
@@ -315,7 +316,7 @@ export class ViewObjectEntriesPage {
 
 	async fillObjectFields({attachmentFileName, objectEntry, objectFields}) {
 		const objectEntries: {
-			businessType: ObjectFieldBusinessTypes;
+			businessType: SupportedBusinessType;
 			entry: string;
 			name: string;
 		}[] = [];
@@ -340,7 +341,7 @@ export class ViewObjectEntriesPage {
 					break;
 				}
 				case 'Boolean': {
-					objectEntry[objectField.name]
+					objectEntry.objectEntry[objectField.name]
 						? await this.page
 								.getByLabel(objectField.label['en_US'])
 								.check()
@@ -350,7 +351,9 @@ export class ViewObjectEntriesPage {
 
 					objectEntries.push({
 						businessType: objectField.businessType,
-						entry: objectEntry[objectField.name] ? 'Yes' : 'No',
+						entry: objectEntry.objectEntry[objectField.name]
+							? 'Yes'
+							: 'No',
 						name: objectField.name,
 					});
 
@@ -360,12 +363,14 @@ export class ViewObjectEntriesPage {
 				case 'Picklist': {
 					await this.selectDropdownItem(
 						objectField.label['en_US'],
-						objectEntry[objectField.name].key.toString()
+						objectEntry.objectEntry[objectField.name].key.toString()
 					);
 
 					objectEntries.push({
 						businessType: objectField.businessType,
-						entry: objectEntry[objectField.name].key.toString(),
+						entry: objectEntry.objectEntry[
+							objectField.name
+						].key.toString(),
 						name: objectField.name,
 					});
 
@@ -375,14 +380,16 @@ export class ViewObjectEntriesPage {
 					await this.fillObjectEntry({
 						objectFieldBusinessType: objectField.businessType,
 						objectFieldLabel: objectField.label['en_US'],
-						objectFieldValue: objectEntry[objectField.name]
+						objectFieldValue: objectEntry.objectEntry[
+							objectField.name
+						]
 							.toString()
 							.substring(0, 35),
 					});
 
 					objectEntries.push({
 						businessType: objectField.businessType,
-						entry: objectEntry[objectField.name]
+						entry: objectEntry.objectEntry[objectField.name]
 							.toString()
 							.substring(0, 34),
 						name: objectField.name,
@@ -395,7 +402,9 @@ export class ViewObjectEntriesPage {
 						objectFieldBusinessType: objectField.businessType,
 						objectFieldLabel: objectField.label['en_US'],
 						objectFieldValue:
-							objectEntry[objectField.name].toString(),
+							objectEntry.objectEntry[
+								objectField.name
+							].toString(),
 					});
 
 					if (
@@ -405,7 +414,9 @@ export class ViewObjectEntriesPage {
 						objectEntries.push({
 							businessType: objectField.businessType,
 							entry: getFDSDateFormat(
-								new Date(objectEntry[objectField.name])
+								new Date(
+									objectEntry.objectEntry[objectField.name]
+								)
 							),
 							name: objectField.name,
 						});
@@ -413,111 +424,12 @@ export class ViewObjectEntriesPage {
 					else {
 						objectEntries.push({
 							businessType: objectField.businessType,
-							entry: objectEntry[objectField.name].toString(),
+							entry: objectEntry.objectEntry[
+								objectField.name
+							].toString(),
 							name: objectField.name,
 						});
 					}
-				}
-			}
-		}
-
-		return objectEntries;
-	}
-
-	async fillObjectFields({attachmentFileName, objectFieldsObjectEntryValues, objectFields}) {
-		const objectEntries: {
-			businessType: ObjectFieldBusinessType;
-			name: string;
-			value: string;
-		}[] = [];
-
-		for (const objectField of objectFields) {
-			switch (objectField.businessType) {
-				case 'Attachment': {
-					await this.selectFileButton.click();
-
-					await this.selectFileFromDocumentsAndMedia(
-						attachmentFileName
-							? attachmentFileName
-							: 'astronaut.png'
-					);
-
-					objectEntries.push({
-						businessType: objectField.businessType,
-						name: objectField.name,
-						value: attachmentFileName,
-					});
-
-					break;
-				}
-				case 'Boolean': {
-					objectFieldsObjectEntryValues[objectField.name]
-						? await this.page
-								.getByLabel(objectField.label['en_US'])
-								.check()
-						: await this.page
-								.getByLabel(objectField.label['en_US'])
-								.uncheck();
-
-					objectEntries.push({
-						businessType: objectField.businessType,
-						name: objectField.name,
-						value: objectFieldsObjectEntryValues[objectField.name] ? 'Yes' : 'No',
-					});
-
-					break;
-				}
-
-				case 'Picklist': {
-					await this.selectDropdownItem(
-						objectField.label['en_US'],
-						objectFieldsObjectEntryValues[objectField.name].key.toString()
-					);
-
-					objectEntries.push({
-						businessType: objectField.businessType,
-						name: objectField.name,
-						value: objectFieldsObjectEntryValues[objectField.name].key.toString(),
-					});
-
-					break;
-				}
-				case 'RichText': {
-					await this.fillObjectEntry({
-						objectFieldBusinessType: objectField.businessType,
-						objectFieldLabel: objectField.label['en_US'],
-						objectFieldValue: objectFieldsObjectEntryValues[objectField.name]
-							.toString()
-							.substring(0, 35),
-					});
-
-					objectEntries.push({
-						businessType: objectField.businessType,
-						name: objectField.name,
-						value: objectFieldsObjectEntryValues[objectField.name]
-						.toString()
-						.substring(0, 34),
-					});
-
-					break;
-				}
-				default: {
-					await this.fillObjectEntry({
-						objectFieldBusinessType: objectField.businessType,
-						objectFieldLabel: objectField.label['en_US'],
-						objectFieldValue:
-							objectFieldsObjectEntryValues[objectField.name].toString(),
-					});
-
-					objectEntries.push({
-						businessType: objectField.businessType,
-						name: objectField.name,
-						value: objectField.businessType.includes('Date')
-						? getFDSDateFormat(
-								new Date(objectFieldsObjectEntryValues[objectField.name])
-							)
-						: objectFieldsObjectEntryValues[objectField.name].toString(),
-					});
 				}
 			}
 		}

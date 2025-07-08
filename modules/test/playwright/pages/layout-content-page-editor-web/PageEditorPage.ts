@@ -1400,6 +1400,10 @@ export class PageEditorPage {
 			await this.selectItemMappingButton.click();
 		}
 
+		console.log('entry', entry);
+
+		console.log('field', field);
+
 		const recentItem = this.page.getByRole('menuitem', {name: entry});
 
 		if (await recentItem.isVisible()) {

@@ -5,6 +5,7 @@
 
 import {
 	ObjectDefinitionAPI,
+	ObjectField,
 	ObjectRelationshipAPI,
 	ObjectViewAPI,
 } from '@liferay/object-admin-rest-client-js';
@@ -15,7 +16,8 @@ import {loginTest} from '../../../fixtures/loginTest';
 import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
-import {mockObjectFields} from './utils/generateObjectFieldsObjectEntryValues';
+import {generateObjectEntryValues} from './utils/generateObjectEntry';
+import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFields';
 
 export const test = mergeTests(
 	dataApiHelpersTest,
@@ -242,12 +244,9 @@ test('assert that the user is able to use the ERC field in Sort, on the Custom V
 	const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 	const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-	const {objectEntry, objectFields, titleObjectFieldName} =
-		await mockObjectFields({
-			apiHelpers,
-			objectEntryReturn: {format: 'API'},
+	const objectFields: Partial<ObjectField>[] =
+		generateObjectFieldsObjectEntryValues({
 			objectFieldBusinessTypes: ['Text'],
-			titleObjectFieldName: 'Text',
 		});
 
 	const objectDefinitionAPIClient =
@@ -270,7 +269,6 @@ test('assert that the user is able to use the ERC field in Sort, on the Custom V
 			status: {
 				code: 0,
 			},
-			titleObjectFieldName,
 		});
 
 	apiHelpers.data.push({
@@ -287,7 +285,7 @@ test('assert that the user is able to use the ERC field in Sort, on the Custom V
 			name: {en_US: getRandomString()},
 			objectViewColumns: [
 				{
-					objectFieldName: titleObjectFieldName,
+					objectFieldName: objectFields[0].label['en_US'],
 					priority: 0,
 				},
 				{
@@ -304,6 +302,11 @@ test('assert that the user is able to use the ERC field in Sort, on the Custom V
 			],
 		}
 	);
+
+	const objectEntry = await generateObjectEntryValues({
+		objectEntryFormat: 'UI',
+		objectFields,
+	});
 
 	const applicationName = 'c/' + objectDefinition.name.toLowerCase() + 's';
 	const entry1 = 'Entry A';
