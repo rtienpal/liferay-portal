@@ -805,9 +805,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await viewObjectEntriesPage.clickAddObjectEntry(
-			objectDefinition.label['en_US']
-		);
+		await viewObjectEntriesPage.frontendDatasetItems.first().click();
 
 		const newObjectFieldObjectEntryValues =
 			await viewObjectEntriesPage.fillObjectFields({
