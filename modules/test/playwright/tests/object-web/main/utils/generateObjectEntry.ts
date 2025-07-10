@@ -30,16 +30,16 @@ function generateObjectEntryValue({
 	objectEntryFormat,
 	objectFieldBusinessType,
 }: {
-	listTypeEntriesName: string[];
+	listTypeEntriesName?: string[];
 	objectEntryFormat: 'API' | 'UI';
 	objectFieldBusinessType: Partial<ObjectField['businessType']>;
 }) {
-	const listTypeEntriesRandomLength1 = Math.floor(
-		Math.random() * listTypeEntriesName.length
-	);
-	const listTypeEntriesRandomLength2 = Math.floor(
-		Math.random() * listTypeEntriesName.length
-	);
+	const listTypeEntriesRandomLength1 = listTypeEntriesName
+		? Math.floor(Math.random() * listTypeEntriesName.length)
+		: '';
+	const listTypeEntriesRandomLength2 = listTypeEntriesName
+		? Math.floor(Math.random() * listTypeEntriesName.length)
+		: '';
 
 	switch (objectFieldBusinessType) {
 		case 'Boolean':

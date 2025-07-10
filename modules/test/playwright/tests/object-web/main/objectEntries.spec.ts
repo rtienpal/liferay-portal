@@ -543,27 +543,31 @@ test.describe('Manage object entries through Page Templates', () => {
 		const listTypeDefinition =
 			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
-		const {objectEntry, objectFields} = await generateObjectFieldsObjectEntryValues({
-			listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
-			objectEntryFormat: 'API',
-			objectFieldBusinessTypes: [
-				'AutoIncrement',
-				'Boolean',
-				'Date',
-				'Decimal',
-				'Encrypted',
-				'Integer',
-				'LongInteger',
-				'LongText',
-				'MultiselectPicklist',
-				'Picklist',
-				'PrecisionDecimal',
-				'RichText',
-				'Text',
-			],
-		});
+		const {objectEntry, objectFields} =
+			await generateObjectFieldsObjectEntryValues({
+				listTypeDefinitionExternalReferenceCode:
+					listTypeDefinition.externalReferenceCode,
+				objectEntryFormat: 'API',
+				objectFieldBusinessTypes: [
+					'AutoIncrement',
+					'Boolean',
+					'Date',
+					'Decimal',
+					'Encrypted',
+					'Integer',
+					'LongInteger',
+					'LongText',
+					'MultiselectPicklist',
+					'Picklist',
+					'PrecisionDecimal',
+					'RichText',
+					'Text',
+				],
+			});
 
-		const textObjectField = objectFields.find((objectField) => objectField.businessType === 'Text')
+		const textObjectField = objectFields.find(
+			(objectField) => objectField.businessType === 'Text'
+		);
 
 		apiHelpers.data.push({
 			id: listTypeDefinition.id,
@@ -1396,7 +1400,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 		page,
 		viewObjectEntriesPage,
 	}) => {
-		const objectField = generateObjectFieldStructure({objectFieldBusinessType: 'Text'});
+		const objectField = generateObjectFieldStructure({
+			objectFieldBusinessType: 'Text',
+		});
 
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
