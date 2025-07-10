@@ -882,14 +882,15 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
-			objectFieldBusinessTypes: [
-				'Decimal',
-				'Integer',
-				'LongInteger',
-				'PrecisionDecimal',
-			],
-		});
+		const objectFields: Partial<ObjectField>[] =
+			generateObjectFieldsObjectEntryValues({
+				objectFieldBusinessTypes: [
+					'Decimal',
+					'Integer',
+					'LongInteger',
+					'PrecisionDecimal',
+				],
+			});
 
 		const localizedObjectFields = objectFields.map((objectField) => {
 			return {
@@ -1056,7 +1057,7 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {listTypeDefinition} =
+		const {listTypeDefinition, listTypeDefinitionListTypeEntries} =
 			await postListTypeDefinitionListTypeEntries({
 				apiHelpers,
 				locale: 'ca_ES',
@@ -1107,11 +1108,11 @@ test.describe('Localized object entries are saved correctly', () => {
 		await viewObjectEntriesPage.addObjectEntryButton.click();
 
 		await formFieldsPage.addSelectItem(
-			listTypeDefinition.listTypeEntries[0].name_i18n['en_US'],
+			listTypeDefinitionListTypeEntries[0].name_i18n['en-US'],
 			0
 		);
 		await formFieldsPage.addSelectItem(
-			listTypeDefinition.listTypeEntries[1].name_i18n['en_US'],
+			listTypeDefinitionListTypeEntries[1].name_i18n['en-US'],
 			1
 		);
 
@@ -1139,11 +1140,11 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		// expect saved entry to have all added items
 
-		const englishItemLocators = listTypeDefinition.listTypeEntries.map(
+		const englishItemLocators = listTypeDefinitionListTypeEntries.map(
 			(item) =>
 				page
 					.getByRole('combobox')
-					.filter({hasText: item.name_i18n['en_US']})
+					.filter({hasText: item.name_i18n['en-US']})
 		);
 
 		async function expectFinalEnglishState() {
@@ -1176,10 +1177,10 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		await catalanOption.first().click();
 
-		const catalanItemLocators = listTypeDefinition.listTypeEntries.map(
+		const catalanItemLocators = listTypeDefinitionListTypeEntries.map(
 			(listTypeEntry) =>
 				page.getByRole('combobox').filter({
-					hasText: listTypeEntry.name_i18n['ca_ES'],
+					hasText: listTypeEntry.name_i18n['ca-ES'],
 				})
 		);
 
