@@ -6,7 +6,6 @@
 import {
 	ObjectDefinitionAPI,
 	ObjectField,
-	ObjectFieldAPI,
 	ObjectRelationshipAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
@@ -1598,50 +1597,10 @@ test.describe('Required localized object fields', () => {
 		page,
 		viewObjectEntriesPage,
 	}) => {
-		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
-		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
-
 		const {listTypeDefinition, listTypeDefinitionListTypeEntries} =
 			await postListTypeDefinitionListTypeEntries({
 				apiHelpers,
 			});
-
-		console.log('listTypeDefinition', listTypeDefinition);
-
-		console.log(
-			'listTypeDefinitionListTypeEntries',
-			listTypeDefinitionListTypeEntries
-		);
-
-		// const {listTypeDefinitionItems, objectFields, titleObjectFieldName} =
-		// 	await mockObjectFields({
-		// 		apiHelpers,
-		// 		localizeAllLocalizable: true,
-		// 		objectFieldBusinessTypes: ['Picklist', 'MultiselectPicklist'],
-		// 	});
-
-		// const objectDefinitionAPIClient =
-		// 	await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		// const {body: objectDefinition} =
-		// 	await objectDefinitionAPIClient.postObjectDefinition({
-		// 		active: true,
-		// 		enableLocalization: true,
-		// 		label: {
-		// 			en_US: objectDefinitionLabel,
-		// 		},
-		// 		name: objectDefinitionName,
-		// 		objectFields,
-		// 		pluralLabel: {
-		// 			en_US: objectDefinitionLabel,
-		// 		},
-		// 		portlet: true,
-		// 		scope: 'company',
-		// 		status: {
-		// 			code: 0,
-		// 		},
-		// 		titleObjectFieldName,
-		// 	});
 
 		const objectFields: Partial<ObjectField>[] = generateObjectFields({
 			listTypeDefinitionExternalReferenceCode:
@@ -1659,8 +1618,6 @@ test.describe('Required localized object fields', () => {
 				},
 			],
 		});
-
-		console.log('objectFields', objectFields);
 
 		const objectDefinitionAPIClient =
 			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
@@ -1704,7 +1661,7 @@ test.describe('Required localized object fields', () => {
 		);
 
 		await formFieldsPage.addSelectItem(
-			listTypeDefinitionListTypeEntries[1].name,
+			listTypeDefinitionListTypeEntries[0].name,
 			1
 		);
 
@@ -1715,13 +1672,11 @@ test.describe('Required localized object fields', () => {
 		await expect(
 			page.getByRole('gridcell', {
 				exact: true,
-				name: listTypeDefinition[0],
+				name: listTypeDefinitionListTypeEntries[0].name,
 			})
 		).toBeVisible();
 
-		await page.getByLabel(objectFields[0].name, {exact: true}).click();
-
-		// await page.getByRole('combobox').nth(1).click();
+		await page.getByRole('combobox').nth(1).click();
 
 		listTypeDefinitionListTypeEntries.forEach((item) => {
 			expect(page.getByRole('option', {name: item.name})).toBeVisible();
