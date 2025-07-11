@@ -27,7 +27,10 @@ import {getRandomDouble} from '../../../utils/getRandomDouble';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
 import {journalPagesTest} from '../../journal-web/main/fixtures/journalPagesTest';
-import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFields';
+import {
+	generateObjectField,
+	generateObjectFieldsObjectEntryValues,
+} from './utils/generateObjectFields';
 import {postListTypeDefinitionListTypeEntries} from './utils/postListTypeDefinitionListTypeEntries';
 
 export const test = mergeTests(
@@ -1398,17 +1401,17 @@ test.describe('Required localized object fields', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const objectFields = createObjectFields(
-			'Boolean',
-			[
-				{
-					label: 'booleanField',
+		const objectFields = [
+			generateObjectField({
+				additionalSettings: {
+					label: {en_US: 'booleanField'},
+					localized: true,
 					name: 'booleanField',
+					required: true,
 				},
-			],
-			{required: true},
-			true
-		);
+				objectFieldBusinessType: 'Boolean',
+			}),
+		];
 
 		const objectDefinitionAPIClient =
 			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
@@ -1489,17 +1492,17 @@ test.describe('Required localized object fields', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const objectFields = createObjectFields(
-			'Text',
-			[
-				{
-					label: 'textField',
+		const objectFields = [
+			generateObjectField({
+				additionalSettings: {
+					label: {en_US: 'textField'},
+					localized: true,
 					name: 'textField',
+					required: true,
 				},
-			],
-			{required: true},
-			true
-		);
+				objectFieldBusinessType: 'Text',
+			}),
+		];
 
 		const objectDefinitionAPIClient =
 			await apiHelpers.buildRestClient(ObjectDefinitionAPI);

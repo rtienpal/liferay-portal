@@ -7,7 +7,19 @@ import {ObjectField} from '@liferay/object-admin-rest-client-js';
 
 import {getRandomInt} from '../../../../utils/getRandomInt';
 
-function getObjectFieldBaseProperties() {
+type objectFieldBaseProperties = {
+	indexedAsKeyword: boolean;
+	indexedLanguageId: string;
+	localized: boolean;
+	readOnly: ObjectField['readOnly'];
+	readOnlyConditionExpression: string;
+	required: boolean;
+	state: boolean;
+	system: boolean;
+	unique: boolean;
+};
+
+function getObjectFieldBaseProperties(): objectFieldBaseProperties {
 	return {
 		indexedAsKeyword: false,
 		indexedLanguageId: '',
@@ -168,10 +180,12 @@ function getObjectFieldSpecificProperties(
 	}
 }
 
-function generateObjectField({
+export function generateObjectField({
+	additionalSettings = {},
 	listTypeDefinitionExternalReferenceCode,
 	objectFieldBusinessType,
 }: {
+	additionalSettings?: Partial<ObjectField>;
 	listTypeDefinitionExternalReferenceCode?: string;
 	objectFieldBusinessType: SupportedObjectFieldBusinessType;
 }): Partial<ObjectField> {
@@ -187,26 +201,43 @@ function generateObjectField({
 		...objectFieldSpecificProperties,
 		label: {en_US: objectFieldLabel},
 		name: objectFieldLabel.toLocaleLowerCase(),
+		...additionalSettings,
 	};
 }
 
-export function generateObjectFieldsObjectEntryValues({
+export function generateObjectFields({
 	listTypeDefinitionExternalReferenceCode,
 	objectFieldBusinessTypes,
 }: {
 	listTypeDefinitionExternalReferenceCode?: string;
-	objectFieldBusinessTypes: SupportedObjectFieldBusinessType[];
+	objectFieldBusinessTypes: (
+		| SupportedObjectFieldBusinessType
+		| (Partial<objectFieldBaseProperties> & {
+				businessType: SupportedObjectFieldBusinessType;
+		  })
+	)[];
 }) {
-	const objectFields: Partial<ObjectField>[] = [];
+	const newObjectFields: Partial<ObjectField>[] = [];
 
-	for (const objectFieldBusinessType of objectFieldBusinessTypes) {
-		const objectField = generateObjectField({
-			listTypeDefinitionExternalReferenceCode,
-			objectFieldBusinessType,
-		});
+	for (const elem of objectFieldBusinessTypes) {
+		let objectField: Partial<ObjectField> = {};
+		if (typeof elem === 'string') {
+			objectField = generateObjectField({
+				listTypeDefinitionExternalReferenceCode,
+				objectFieldBusinessType:
+					elem,
+			});
+		}
+		else {
+			objectField = generateObjectField({
+				additionalSettings: elem,
+				listTypeDefinitionExternalReferenceCode,
+				objectFieldBusinessType: elem.businessType,
+			});
+		}
 
-		objectFields.push(objectField);
+		newObjectFields.push(objectField);
 	}
 
-	return objectFields;
+	return newObjectFields;
 }

@@ -42,7 +42,7 @@ import {
 } from './utils/dateFormat';
 import {createFile, deleteFile} from './utils/fileHelpers';
 import {generateObjectEntryValues} from './utils/generateObjectEntry';
-import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFields';
+import {generateObjectFields} from './utils/generateObjectFields';
 import evaluateKeepCheckingAfterFound from './utils/keepCheckingAfterFound';
 import {postListTypeDefinitionListTypeEntries} from './utils/postListTypeDefinitionListTypeEntries';
 
@@ -78,23 +78,23 @@ const scheduleTest = mergeTests(
 let displayPageId: string;
 let siteLanguage = 'en';
 
-test.afterEach(async ({apiHelpers, page}) => {
-	if (siteLanguage !== 'en') {
-		await page.goto('en');
+// test.afterEach(async ({apiHelpers, page}) => {
+// 	if (siteLanguage !== 'en') {
+// 		await page.goto('en');
 
-		siteLanguage = 'en';
-	}
+// 		siteLanguage = 'en';
+// 	}
 
-	if (displayPageId) {
-		await apiHelpers.jsonWebServicesLayoutPageTemplateEntry.deleteLayoutPageTemplateEntry(
-			{
-				layoutPageTemplateEntryId: displayPageId,
-			}
-		);
+// 	if (displayPageId) {
+// 		await apiHelpers.jsonWebServicesLayoutPageTemplateEntry.deleteLayoutPageTemplateEntry(
+// 			{
+// 				layoutPageTemplateEntryId: displayPageId,
+// 			}
+// 		);
 
-		displayPageId = '';
-	}
-});
+// 		displayPageId = '';
+// 	}
+// });
 
 test.describe('Manage object entries through Friendly URL', () => {
 	let _objectDefinition: ObjectDefinition;
@@ -543,27 +543,25 @@ test.describe('Manage object entries through Page Templates', () => {
 		const listTypeDefinition =
 			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
-		const {objectEntry, objectFields} =
-			await generateObjectFieldsObjectEntryValues({
-				listTypeDefinitionExternalReferenceCode:
-					listTypeDefinition.externalReferenceCode,
-				objectEntryFormat: 'API',
-				objectFieldBusinessTypes: [
-					'AutoIncrement',
-					'Boolean',
-					'Date',
-					'Decimal',
-					'Encrypted',
-					'Integer',
-					'LongInteger',
-					'LongText',
-					'MultiselectPicklist',
-					'Picklist',
-					'PrecisionDecimal',
-					'RichText',
-					'Text',
-				],
-			});
+		const {objectFields} = generateObjectFieldsObjectEntryValues({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			objectFieldBusinessTypes: [
+				'AutoIncrement',
+				'Boolean',
+				'Date',
+				'Decimal',
+				'Encrypted',
+				'Integer',
+				'LongInteger',
+				'LongText',
+				'MultiselectPicklist',
+				'Picklist',
+				'PrecisionDecimal',
+				'RichText',
+				'Text',
+			],
+		});
 
 		const textObjectField = objectFields.find(
 			(objectField) => objectField.businessType === 'Text'
@@ -705,24 +703,23 @@ test.describe('Manage object entries through View Object Entries', () => {
 				apiHelpers,
 			});
 
-		const objectFields: Partial<ObjectField>[] =
-			generateObjectFieldsObjectEntryValues({
-				listTypeDefinitionExternalReferenceCode:
-					listTypeDefinition.externalReferenceCode,
-				objectFieldBusinessTypes: [
-					'Attachment',
-					'Boolean',
-					'Date',
-					'Decimal',
-					'Integer',
-					'LongInteger',
-					'LongText',
-					'Picklist',
-					'PrecisionDecimal',
-					'RichText',
-					'Text',
-				] as SupportedBusinessType[],
-			});
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			objectFieldBusinessTypes: [
+				'Attachment',
+				'Boolean',
+				'Date',
+				'Decimal',
+				'Integer',
+				'LongInteger',
+				'LongText',
+				'Picklist',
+				'PrecisionDecimal',
+				'RichText',
+				'Text',
+			],
+		});
 
 		apiHelpers.data.push({
 			id: listTypeDefinition.id,
