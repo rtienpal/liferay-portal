@@ -581,7 +581,7 @@ export class ObjectDefinitionAPI {
 		return this.postObjectDefinitionWithContentType(
 			{
 				parameters: {
-					objectDefinition: objectDefinition,
+					objectDefinition,
 				},
 				type: 'application/json',
 			},

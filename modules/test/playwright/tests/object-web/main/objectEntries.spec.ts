@@ -46,8 +46,6 @@ import {generateObjectFields} from './utils/generateObjectFields';
 import evaluateKeepCheckingAfterFound from './utils/keepCheckingAfterFound';
 import {postListTypeDefinitionListTypeEntries} from './utils/postListTypeDefinitionListTypeEntries';
 
-import type {SupportedBusinessType} from './utils/generateObjectEntry';
-
 const test = mergeTests(
 	accountSettingsPagesTest,
 	applicationsMenuPageTest,
@@ -78,23 +76,23 @@ const scheduleTest = mergeTests(
 let displayPageId: string;
 let siteLanguage = 'en';
 
-// test.afterEach(async ({apiHelpers, page}) => {
-// 	if (siteLanguage !== 'en') {
-// 		await page.goto('en');
+test.afterEach(async ({apiHelpers, page}) => {
+	if (siteLanguage !== 'en') {
+		await page.goto('en');
 
-// 		siteLanguage = 'en';
-// 	}
+		siteLanguage = 'en';
+	}
 
-// 	if (displayPageId) {
-// 		await apiHelpers.jsonWebServicesLayoutPageTemplateEntry.deleteLayoutPageTemplateEntry(
-// 			{
-// 				layoutPageTemplateEntryId: displayPageId,
-// 			}
-// 		);
+	if (displayPageId) {
+		await apiHelpers.jsonWebServicesLayoutPageTemplateEntry.deleteLayoutPageTemplateEntry(
+			{
+				layoutPageTemplateEntryId: displayPageId,
+			}
+		);
 
-// 		displayPageId = '';
-// 	}
-// });
+		displayPageId = '';
+	}
+});
 
 test.describe('Manage object entries through Friendly URL', () => {
 	let _objectDefinition: ObjectDefinition;
@@ -707,7 +705,11 @@ test.describe('Manage object entries through View Object Entries', () => {
 			listTypeDefinitionExternalReferenceCode:
 				listTypeDefinition.externalReferenceCode,
 			objectFieldBusinessTypes: [
-				'Attachment',
+
+				{
+					businessType: 'Attachment',
+					required: true,
+				},
 				'Boolean',
 				'Date',
 				'Decimal',

@@ -11,6 +11,7 @@ type objectFieldBaseProperties = {
 	indexedAsKeyword: boolean;
 	indexedLanguageId: string;
 	localized: boolean;
+	name?: string;
 	readOnly: ObjectField['readOnly'];
 	readOnlyConditionExpression: string;
 	required: boolean;
@@ -180,7 +181,7 @@ function getObjectFieldSpecificProperties(
 	}
 }
 
-export function generateObjectField({
+function generateObjectFieldProperties({
 	additionalSettings = {},
 	listTypeDefinitionExternalReferenceCode,
 	objectFieldBusinessType,
@@ -217,27 +218,22 @@ export function generateObjectFields({
 		  })
 	)[];
 }) {
-	const newObjectFields: Partial<ObjectField>[] = [];
+	const objectFields: Partial<ObjectField>[] = [];
 
-	for (const elem of objectFieldBusinessTypes) {
-		let objectField: Partial<ObjectField> = {};
-		if (typeof elem === 'string') {
-			objectField = generateObjectField({
-				listTypeDefinitionExternalReferenceCode,
-				objectFieldBusinessType:
-					elem,
-			});
-		}
-		else {
-			objectField = generateObjectField({
-				additionalSettings: elem,
-				listTypeDefinitionExternalReferenceCode,
-				objectFieldBusinessType: elem.businessType,
-			});
-		}
-
-		newObjectFields.push(objectField);
+	for (const objectField of objectFieldBusinessTypes) {
+		const objectFieldProperties =
+			typeof objectField === 'string'
+				? generateObjectFieldProperties({
+						listTypeDefinitionExternalReferenceCode,
+						objectFieldBusinessType: objectField,
+					})
+				: generateObjectFieldProperties({
+						additionalSettings: objectField,
+						listTypeDefinitionExternalReferenceCode,
+						objectFieldBusinessType: objectField.businessType,
+					});
+		objectFields.push(objectFieldProperties);
 	}
 
-	return newObjectFields;
+	return objectFields;
 }

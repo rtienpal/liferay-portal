@@ -31,6 +31,7 @@ export class FormFieldsPage {
 	}
 
 	async addSelectItem(optionName: string, nth?: number) {
+		console.log('optionName:', optionName);
 		const inputFieldLocator = this.page.getByRole('combobox');
 
 		if (nth !== null && nth !== undefined) {
