@@ -100,10 +100,9 @@ test.describe('Manage object entries through Friendly URL', () => {
 	let _objectField: ObjectField;
 
 	test.beforeEach(async ({apiHelpers, site, viewObjectEntriesPage}) => {
-		const objectFields: Partial<ObjectField>[] =
-			generateObjectFieldsObjectEntryValues({
-				objectFieldBusinessTypes: ['Text'],
-			});
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			objectFieldBusinessTypes: ['Text'],
+		});
 
 		_objectField = objectFields[0];
 

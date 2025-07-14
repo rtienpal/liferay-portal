@@ -6,6 +6,7 @@
 import {
 	ObjectDefinition,
 	ObjectDefinitionAPI,
+	ObjectField,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -18,8 +19,8 @@ import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
-import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFieldsObjectEntryValues';
-import {generateObjectFieldStructure} from './utils/generateObjectFields';
+import {generateObjectEntryValues} from './utils/generateObjectEntry';
+import {generateObjectFields} from './utils/generateObjectFields';
 
 export const test = mergeTests(
 	apiHelpersTest,
@@ -54,7 +55,9 @@ test.afterEach(async ({apiHelpers}) => {
 });
 
 test.beforeEach(async ({apiHelpers}) => {
-	const objectField = generateObjectFieldStructure({objectFieldBusinessType: 'Text'});
+	const objectFields = generateObjectFields({
+		objectFieldBusinessTypes: ['Text'],
+	});
 
 	const objectDefinitionAPIClient =
 		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
@@ -67,7 +70,7 @@ test.beforeEach(async ({apiHelpers}) => {
 				en_US: 'Employee',
 			},
 			name: 'Employee',
-			objectFields: [objectField],
+			objectFields,
 			objectFolderExternalReferenceCode: 'default',
 			panelCategoryKey: 'control_panel.object',
 			pluralLabel: {
@@ -118,11 +121,15 @@ test('Can create, read, update, and delete object entries that use the client ex
 
 	createdEntities.objectDefinitions.push(objectDefinition);
 
+	const objectFields: Partial<ObjectField>[] = generateObjectFields({
+		objectFieldBusinessTypes: ['Text'],
+	});
+
 	await objectFieldsPage.goto(objectDefinition.label['en_US']);
 
-	const {objectFieldsObjectEntryValues, objectFields} = await generateObjectFieldsObjectEntryValues({
+	const objectFieldsObjectEntryValues = await generateObjectEntryValues({
 		objectEntryFormat: 'UI',
-		objectFieldBusinessTypes: ['Text'],
+		objectFields,
 	});
 
 	const [{businessType, label, name}] = objectFields;
@@ -149,7 +156,8 @@ test('Can create, read, update, and delete object entries that use the client ex
 	await viewObjectEntriesPage.fillObjectEntry({
 		objectFieldBusinessType: businessType,
 		objectFieldLabel: label['en_US'],
-		objectFieldValue: objectFieldsObjectEntryValues[name].toString(),
+		objectFieldValue:
+			objectFieldsObjectEntryValues.objectEntry[name].toString(),
 	});
 
 	await viewObjectEntriesPage.saveObjectEntryButton.click();
