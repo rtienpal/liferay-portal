@@ -23,7 +23,7 @@ import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
 import getFragmentDefinition from '../../layout-content-page-editor-web/main/utils/getFragmentDefinition';
 import getPageDefinition from '../../layout-content-page-editor-web/main/utils/getPageDefinition';
-import {createObjectFields} from './utils/generateObjectFieldsObjectEntryValues';
+import {generateObjectFields} from './utils/generateObjectFields';
 
 export const test = mergeTests(
 	collectionsPagesTest,
@@ -538,12 +538,14 @@ test.describe('Manage object definitions through Model Builder', () => {
 					pt_BR: 'Departamento',
 				},
 				name: 'Department',
-				objectFields: createObjectFields('Text', [
-					{
-						label: 'Name',
-						name: 'name',
-					},
-				]),
+				objectFields: generateObjectFields({
+					objectFieldBusinessTypes: [
+						{
+							businessType: 'Text',
+							name: 'name',
+						},
+					],
+				}),
 				objectFolderExternalReferenceCode:
 					objectFolder.externalReferenceCode,
 				panelCategoryKey: 'control_panel.object',
@@ -635,6 +637,8 @@ test.describe('Manage object definitions through Model Builder', () => {
 			await expect(
 				modelBuilderRightSidebarPage.objectDefinitionActivateObject
 			).toBeChecked({checked: objectDefinition.active});
+
+			console.log('objectDefinition', objectDefinition);
 
 			// Entry Display Container
 

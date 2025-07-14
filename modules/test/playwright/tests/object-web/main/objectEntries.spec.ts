@@ -705,7 +705,6 @@ test.describe('Manage object entries through View Object Entries', () => {
 			listTypeDefinitionExternalReferenceCode:
 				listTypeDefinition.externalReferenceCode,
 			objectFieldBusinessTypes: [
-
 				{
 					businessType: 'Attachment',
 					required: true,
@@ -841,7 +840,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
+		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['MultiselectPicklist'],
 		});
 
