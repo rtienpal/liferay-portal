@@ -5,6 +5,7 @@
 
 import {
 	ObjectDefinitionAPI,
+	ObjectField,
 	ObjectFolderAPI,
 	ObjectRelationshipAPI,
 } from '@liferay/object-admin-rest-client-js';
@@ -521,6 +522,10 @@ test.describe('Manage object definitions through Model Builder', () => {
 		modelBuilderRightSidebarPage,
 		page,
 	}) => {
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			objectFieldBusinessTypes: ['Text'],
+		});
+
 		const objectFolder =
 			await apiHelpers.objectAdmin.postRandomObjectFolder();
 
@@ -538,14 +543,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 					pt_BR: 'Departamento',
 				},
 				name: 'Department',
-				objectFields: generateObjectFields({
-					objectFieldBusinessTypes: [
-						{
-							businessType: 'Text',
-							name: 'name',
-						},
-					],
-				}),
+				objectFields,
 				objectFolderExternalReferenceCode:
 					objectFolder.externalReferenceCode,
 				panelCategoryKey: 'control_panel.object',
@@ -555,7 +553,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 				},
 				scope: 'company',
 				status: {code: 0},
-				titleObjectFieldName: 'name',
+				titleObjectFieldName: 'id',
 			});
 
 		apiHelpers.data.push({id: department.id, type: 'objectDefinition'});
@@ -637,8 +635,6 @@ test.describe('Manage object definitions through Model Builder', () => {
 			await expect(
 				modelBuilderRightSidebarPage.objectDefinitionActivateObject
 			).toBeChecked({checked: objectDefinition.active});
-
-			console.log('objectDefinition', objectDefinition);
 
 			// Entry Display Container
 
