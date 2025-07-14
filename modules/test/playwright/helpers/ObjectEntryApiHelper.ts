@@ -80,6 +80,8 @@ export class ObjectEntryApiHelper {
 			);
 		}
 
+		console.log('data', data);
+
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${applicationName}/`,
 			{data}

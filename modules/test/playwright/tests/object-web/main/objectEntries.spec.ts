@@ -534,35 +534,19 @@ test.describe('Manage object entries through Page Templates', () => {
 		pageEditorPage,
 	}) => {
 		test.slow();
-		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
+		const objectDefinitionLabel = 'ObjLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const listTypeDefinition =
-			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
+		const {listTypeDefinition, listTypeDefinitionListTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+			});
 
-		const {objectFields} = generateObjectFieldsObjectEntryValues({
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
 			listTypeDefinitionExternalReferenceCode:
 				listTypeDefinition.externalReferenceCode,
-			objectFieldBusinessTypes: [
-				'AutoIncrement',
-				'Boolean',
-				'Date',
-				'Decimal',
-				'Encrypted',
-				'Integer',
-				'LongInteger',
-				'LongText',
-				'MultiselectPicklist',
-				'Picklist',
-				'PrecisionDecimal',
-				'RichText',
-				'Text',
-			],
+			objectFieldBusinessTypes: ['Picklist'],
 		});
-
-		const textObjectField = objectFields.find(
-			(objectField) => objectField.businessType === 'Text'
-		);
 
 		apiHelpers.data.push({
 			id: listTypeDefinition.id,
@@ -575,11 +559,13 @@ test.describe('Manage object entries through Page Templates', () => {
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
 				active: true,
+				externalReferenceCode: getRandomString(),
 				label: {
-					en_US: objectDefinitionLabel,
+					en_US: getRandomString(),
 				},
-				name: objectDefinitionName,
+				name: 'ObjectDefinitionName' + getRandomInt(),
 				objectFields,
+				panelCategoryKey: 'control_panel.object',
 				pluralLabel: {
 					en_US: objectDefinitionLabel,
 				},
@@ -588,19 +574,29 @@ test.describe('Manage object entries through Page Templates', () => {
 				status: {
 					code: 0,
 				},
-				titleObjectFieldName: textObjectField.name,
+				titleObjectFieldName: objectDefinitionName,
 			});
+
+		console.log('objectDefinition', objectDefinition);
 
 		apiHelpers.data.push({
 			id: objectDefinition.id,
 			type: 'objectDefinition',
 		});
 
+		const objectEntryValues = await generateObjectEntryValues({
+			listTypeEntries: listTypeDefinitionListTypeEntries.map(
+				(listTypeEntry) => listTypeEntry.name
+			),
+			objectEntryFormat: 'UI',
+			objectFields,
+		});
+
 		const applicationName =
 			'c/' + objectDefinition.name.toLowerCase() + 's';
 
 		await apiHelpers.objectEntry.postObjectEntry(
-			objectEntry,
+			objectEntryValues.objectEntry,
 			applicationName
 		);
 
@@ -625,7 +621,9 @@ test.describe('Manage object entries through Page Templates', () => {
 			await pageEditorPage.setMappingConfiguration({
 				mapping: {
 					entity: objectDefinitionLabel,
-					entry: objectEntry[textObjectField.name] as string,
+					entry: objectEntryValues.objectEntry[
+						objectDefinitionName
+					] as string,
 					field: objectField.label.en_US,
 				},
 				source: 'content',
@@ -641,7 +639,11 @@ test.describe('Manage object entries through Page Templates', () => {
 				}
 				case 'Date': {
 					const date = new Date(
-						Date.parse(objectEntry[objectField.name] as string)
+						Date.parse(
+							objectEntryValues.objectEntry[
+								objectField.name
+							] as string
+						)
 					);
 
 					matchString = getPageEditorDateFormat(date);
@@ -652,24 +654,31 @@ test.describe('Manage object entries through Page Templates', () => {
 				}
 				case 'Picklist': {
 					matchString = (
-						objectEntry[objectField.name] as {key: string}
+						objectEntryValues.objectEntry[objectField.name] as {
+							key: string;
+						}
 					).key;
 
 					break;
 				}
 				case 'MultiselectPicklist': {
-					(objectEntry[objectField.name] as string[]).forEach(
-						(listTypeEntry, index) => {
-							index < 1
-								? (matchString = `${listTypeEntry}`)
-								: (matchString += `, ${listTypeEntry}`);
-						}
-					);
+					(
+						objectEntryValues.objectEntry[
+							objectField.name
+						] as string[]
+					).forEach((listTypeEntry, index) => {
+						index < 1
+							? (matchString = `${listTypeEntry}`)
+							: (matchString += `, ${listTypeEntry}`);
+					});
 
 					break;
 				}
 				default: {
-					matchString = objectEntry[objectField.name].toString();
+					matchString =
+						objectEntryValues.objectEntry[
+							objectField.name
+						].toString();
 				}
 			}
 
