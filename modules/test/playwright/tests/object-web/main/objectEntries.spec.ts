@@ -618,6 +618,8 @@ test.describe('Manage object entries through Page Templates', () => {
 
 			await page.getByText('Heading Example', {exact: true}).click();
 
+			console.log('entry in loop:', objectEntryValues.objectEntry);
+
 			await pageEditorPage.setMappingConfiguration({
 				mapping: {
 					entity: objectDefinitionLabel,
