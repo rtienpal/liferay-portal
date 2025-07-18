@@ -577,6 +577,8 @@ test.describe('Manage object entries through Page Templates', () => {
 				titleObjectFieldName: objectDefinitionName,
 			});
 
+		console.log('objectDefinitionName:', objectDefinitionName);
+
 		apiHelpers.data.push({
 			id: objectDefinition.id,
 			type: 'objectDefinition',
@@ -621,7 +623,7 @@ test.describe('Manage object entries through Page Templates', () => {
 			await pageEditorPage.setMappingConfiguration({
 				mapping: {
 					entity: objectDefinitionLabel,
-					entry: objectEntryValues.objectEntry[objectField.name],
+					entry: objectDefinitionName,
 					field: objectField.label['en_US'],
 				},
 				source: 'content',

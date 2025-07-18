@@ -101,7 +101,6 @@ export async function generateObjectEntryValues({
 	objectEntryFormat?: 'API' | 'UI';
 	objectFields: ObjectField[];
 }) {
-	console.log('objectFields', objectFields);
 	const objectEntry: {
 		[objectFieldName: string]: boolean | string | string[] | {key: string};
 	} = {};
