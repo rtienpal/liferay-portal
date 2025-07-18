@@ -45,7 +45,7 @@ function generateObjectEntryValue({
 		case 'Boolean':
 			return Math.random() < 0.5;
 		case 'Date':
-			return getRandomDate(objectEntryFormat);
+			return new Date(Date.parse(getRandomDate(objectEntryFormat)));
 		case 'Decimal':
 			return parseFloat(Math.random().toFixed(10)).toString();
 		case 'Encrypted':

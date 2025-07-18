@@ -548,11 +548,8 @@ test.describe('Manage object entries through Page Templates', () => {
 			objectFieldBusinessTypes: [
 				'AutoIncrement',
 				'Decimal',
-
-				// 'Date',
-
+				'Date',
 				'Boolean',
-
 				'Encrypted',
 				'Integer',
 				'LongInteger',
@@ -647,7 +644,9 @@ test.describe('Manage object entries through Page Templates', () => {
 			await pageEditorPage.setMappingConfiguration({
 				mapping: {
 					entity: objectDefinitionLabel,
-					entry: objectEntryValues.objectEntry[objectFields[1].name],
+					entry: objectEntryValues.objectEntry[
+						objectFields[1].name
+					] as string,
 					field: objectField.label['en_US'],
 				},
 				source: 'content',
