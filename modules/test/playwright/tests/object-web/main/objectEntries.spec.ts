@@ -545,7 +545,24 @@ test.describe('Manage object entries through Page Templates', () => {
 		const objectFields: Partial<ObjectField>[] = generateObjectFields({
 			listTypeDefinitionExternalReferenceCode:
 				listTypeDefinition.externalReferenceCode,
-			objectFieldBusinessTypes: ['Text'],
+			objectFieldBusinessTypes: [
+				'AutoIncrement',
+				'Decimal',
+
+				// 'Date',
+
+				'Boolean',
+
+				'Encrypted',
+				'Integer',
+				'LongInteger',
+				'LongText',
+				'MultiselectPicklist',
+				'Picklist',
+				'PrecisionDecimal',
+				'RichText',
+				'Text',
+			],
 		});
 
 		apiHelpers.data.push({
@@ -559,11 +576,11 @@ test.describe('Manage object entries through Page Templates', () => {
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
 				active: true,
-				externalReferenceCode: getRandomString(),
+				externalReferenceCode: objectDefinitionLabel,
 				label: {
-					en_US: getRandomString(),
+					en_US: objectDefinitionLabel,
 				},
-				name: 'ObjectDefinitionName' + getRandomInt(),
+				name: objectDefinitionName,
 				objectFields,
 				panelCategoryKey: 'control_panel.object',
 				pluralLabel: {
@@ -574,10 +591,8 @@ test.describe('Manage object entries through Page Templates', () => {
 				status: {
 					code: 0,
 				},
-				titleObjectFieldName: objectDefinitionName,
+				titleObjectFieldName: objectFields[1].name,
 			});
-
-		console.log('objectDefinitionName:', objectDefinitionName);
 
 		apiHelpers.data.push({
 			id: objectDefinition.id,
@@ -592,6 +607,8 @@ test.describe('Manage object entries through Page Templates', () => {
 			objectFields,
 		});
 
+		console.log('objectEntryValues:', objectEntryValues);
+
 		const applicationName =
 			'c/' + objectDefinition.name.toLowerCase() + 's';
 
@@ -599,6 +616,8 @@ test.describe('Manage object entries through Page Templates', () => {
 			objectEntryValues.objectEntry,
 			applicationName
 		);
+
+		console.log('hello');
 
 		await displayPageTemplatesPage.goto();
 
@@ -610,6 +629,11 @@ test.describe('Manage object entries through Page Templates', () => {
 		});
 
 		await page.getByTitle(displayPageTemplateName).click();
+
+		console.log(
+			'objectEntryValues.objectEntry',
+			objectEntryValues.objectEntry
+		);
 
 		overloop: for (const [_, objectField] of objectDefinition.objectFields
 			.filter((objectField) => !objectField.system)
@@ -623,7 +647,7 @@ test.describe('Manage object entries through Page Templates', () => {
 			await pageEditorPage.setMappingConfiguration({
 				mapping: {
 					entity: objectDefinitionLabel,
-					entry: objectDefinitionName,
+					entry: objectEntryValues.objectEntry[objectFields[1].name],
 					field: objectField.label['en_US'],
 				},
 				source: 'content',
