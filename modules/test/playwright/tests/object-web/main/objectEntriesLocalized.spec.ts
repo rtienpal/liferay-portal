@@ -6,7 +6,6 @@
 import {
 	ObjectDefinitionAPI,
 	ObjectField,
-	ObjectFieldAPI,
 	ObjectRelationshipAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
@@ -27,7 +26,7 @@ import {getRandomDouble} from '../../../utils/getRandomDouble';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
 import {journalPagesTest} from '../../journal-web/main/fixtures/journalPagesTest';
-import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFieldsObjectEntryValues';
+import {generateObjectFields} from './utils/generateObjectFields';
 import {postListTypeDefinitionListTypeEntries} from './utils/postListTypeDefinitionListTypeEntries';
 
 export const test = mergeTests(
@@ -68,15 +67,24 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
-			objectFieldBusinessTypes: ['Attachment', 'Attachment'],
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Attachment',
+					localized: true,
+				},
+				{
+					businessType: 'Attachment',
+					localized: true,
+				},
+			],
 		});
 
 		const localizedObjectFields = objectFields.map((objectField) => {
 			return {
 				...objectField,
-				localized: true
-			}
+				localized: true,
+			};
 		});
 
 		const objectDefinitionAPIClient =
@@ -85,7 +93,6 @@ test.describe('Localized object entries are saved correctly', () => {
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
 				active: true,
-				enableLocalization: true,
 				label: {
 					en_US: objectDefinitionLabel,
 				},
@@ -246,15 +253,24 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
-			objectFieldBusinessTypes: ['Boolean', 'Boolean'],
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Boolean',
+					localized: true,
+				},
+				{
+					businessType: 'Boolean',
+					localized: true,
+				},
+			],
 		});
 
 		const localizedObjectFields = objectFields.map((objectField) => {
 			return {
 				...objectField,
-				localized: true
-			}
+				localized: true,
+			};
 		});
 
 		const objectDefinitionAPIClient =
@@ -391,15 +407,24 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
-			objectFieldBusinessTypes: ['Date', 'DateTime'],
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Date',
+					localized: true,
+				},
+				{
+					businessType: 'DateTime',
+					localized: true,
+				},
+			],
 		});
 
 		const localizedObjectFields = objectFields.map((objectField) => {
 			return {
 				...objectField,
-				localized: true
-			}
+				localized: true,
+			};
 		});
 
 		const objectDefinitionAPIClient =
@@ -537,20 +562,25 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {listTypeDefinition} = await postListTypeDefinitionListTypeEntries({apiHelpers, locale: 'ca_ES'});
+		const {listTypeDefinition, listTypeDefinitionListTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+				locale: 'ca_ES',
+			});
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
 			objectFieldBusinessTypes: [
-				'MultiselectPicklist',
-				'MultiselectPicklist',
+				{
+					businessType: 'MultiselectPicklist',
+					localized: true,
+				},
+				{
+					businessType: 'MultiselectPicklist',
+					localized: true,
+				},
 			],
-		});
-
-		const localizedObjectFields = objectFields.map((objectField) => {
-			return {
-				...objectField,
-				localized: true
-			}
 		});
 
 		const objectDefinitionAPIClient =
@@ -564,7 +594,7 @@ test.describe('Localized object entries are saved correctly', () => {
 					en_US: objectDefinitionLabel,
 				},
 				name: objectDefinitionName,
-				objectFields: localizedObjectFields,
+				objectFields,
 				pluralLabel: {
 					en_US: objectDefinitionLabel,
 				},
@@ -584,9 +614,15 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		await viewObjectEntriesPage.addObjectEntryButton.click();
 
-		for (const listTypeEntry of listTypeDefinition.listTypeEntries) {
-			await formFieldsPage.addSelectItem(listTypeEntry.name_i18n['en_US'], 0);
-			await formFieldsPage.addSelectItem(listTypeEntry.name_i18n['en_US'], 1);
+		for (const listTypeEntry of listTypeDefinitionListTypeEntries) {
+			await formFieldsPage.addSelectItem(
+				listTypeEntry.name_i18n['en-US'],
+				0
+			);
+			await formFieldsPage.addSelectItem(
+				listTypeEntry.name_i18n['en-US'],
+				1
+			);
 		}
 
 		const responsePromise = page.waitForResponse(
@@ -613,13 +649,21 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		// expect saved entry to have all added items
 
-		for (const listTypeEntry of listTypeDefinition.listTypeEntries) {
+		for (const listTypeEntry of listTypeDefinitionListTypeEntries) {
 			await expect(
-				page.getByRole('row', {name: `Remove ${listTypeEntry.name_i18n['en_US']}`}).first()
+				page
+					.getByRole('row', {
+						name: `Remove ${listTypeEntry.name_i18n['en-US']}`,
+					})
+					.first()
 			).toBeVisible();
 
 			await expect(
-				page.getByRole('row', {name: `Remove ${listTypeEntry.name_i18n['en_US']}`}).nth(1)
+				page
+					.getByRole('row', {
+						name: `Remove ${listTypeEntry.name_i18n['en-US']}`,
+					})
+					.nth(1)
 			).toBeVisible();
 		}
 
@@ -634,17 +678,19 @@ test.describe('Localized object entries are saved correctly', () => {
 		// remove the first item from the first field
 		// so expect this locator to only be found once after save
 
-		const listTypeDefinitionEntry = listTypeDefinition.listTypeEntries[0];
+		const listTypeDefinitionEntry = listTypeDefinitionListTypeEntries[0];
 
 		await formFieldsPage.removeMultipleSelectItem(
-			listTypeDefinitionEntry.name_i18n['en_US'],
+			listTypeDefinitionEntry.name_i18n['en-US'],
 			0
 		);
 
 		await viewObjectEntriesPage.saveObjectEntryButton.click();
 
 		const itemLocators = formFieldsPage.getMultipleSelectItemsLocators(
-			listTypeDefinition.listTypeEntries.map((listTypeEntry) => listTypeEntry.name_i18n['en_US'])
+			listTypeDefinitionListTypeEntries.map(
+				(listTypeEntry) => listTypeEntry.name_i18n['en-US']
+			)
 		);
 
 		async function expectFinalEnglishState() {
@@ -673,8 +719,11 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		await catalanOption.first().click();
 
-		const catalanItemLocators = listTypeDefinition.listTypeEntries.map(
-			(listTypeEntry) => page.getByRole('row', {name: `Remove ${listTypeEntry.name_i18n['ca_ES']}`})
+		const catalanItemLocators = listTypeDefinitionListTypeEntries.map(
+			(listTypeEntry) =>
+				page.getByRole('row', {
+					name: `Remove ${listTypeEntry.name_i18n['ca-ES']}`,
+				})
 		);
 
 		expect(catalanItemLocators[0]).toHaveCount(1);
@@ -687,20 +736,22 @@ test.describe('Localized object entries are saved correctly', () => {
 		// remove some of the items from catalan entry
 
 		await formFieldsPage.removeMultipleSelectItem(
-			listTypeDefinition.listTypeEntries[0].name_i18n['ca_ES'],
+			listTypeDefinitionListTypeEntries[0].name_i18n['en-US'],
 			0
 		);
 
 		await formFieldsPage.removeMultipleSelectItem(
-			listTypeDefinition.listTypeEntries[1].name_i18n['ca_ES'],
+			listTypeDefinitionListTypeEntries[1].name_i18n['en-US'],
 			1
 		);
 
 		// expect only the remaining to be visible
 
 		async function expectFinalCatalanState() {
-			await expect(catalanItemLocators[2]).toBeVisible();
-			await expect(catalanItemLocators[3]).toBeVisible();
+			await expect(catalanItemLocators[2].nth(0)).toBeVisible();
+			await expect(catalanItemLocators[2].nth(1)).toBeVisible();
+			await expect(catalanItemLocators[3].nth(0)).toBeVisible();
+			await expect(catalanItemLocators[3].nth(1)).toBeVisible();
 		}
 
 		await expectFinalCatalanState();
@@ -732,8 +783,21 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
-			objectFieldBusinessTypes: ['Encrypted', 'Text'],
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Encrypted',
+					localized: false,
+				},
+				{
+					businessType: 'Text',
+					localized: false,
+				},
+				{
+					businessType: 'Integer',
+					localized: true,
+				},
+			],
 		});
 
 		const objectDefinitionAPIClient =
@@ -762,28 +826,6 @@ test.describe('Localized object entries are saved correctly', () => {
 			id: objectDefinition.id,
 			type: 'objectDefinition',
 		});
-
-		const objectFieldApiClient =
-			await apiHelpers.buildRestClient(ObjectFieldAPI);
-
-		const integerLocalizedObjectField: ObjectField = {
-			DBType: 'Integer',
-			label: {
-				en_US: 'Integer Localized Field',
-			},
-			localized: true,
-			name: 'integerField',
-			objectFieldSettings: [],
-			readOnly: 'false',
-			required: false,
-			state: false,
-			system: false,
-		};
-
-		await objectFieldApiClient.postObjectDefinitionByExternalReferenceCodeObjectField(
-			objectDefinition.externalReferenceCode,
-			integerLocalizedObjectField
-		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -850,20 +892,25 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
 			objectFieldBusinessTypes: [
-				'Decimal',
-				'Integer',
-				'LongInteger',
-				'PrecisionDecimal',
+				{
+					businessType: 'Decimal',
+					localized: true,
+				},
+				{
+					businessType: 'Integer',
+					localized: true,
+				},
+				{
+					businessType: 'LongInteger',
+					localized: true,
+				},
+				{
+					businessType: 'PrecisionDecimal',
+					localized: true,
+				},
 			],
-		});
-
-		const localizedObjectFields = objectFields.map((objectField) => {
-			return {
-				...objectField,
-				localized: true
-			}
 		});
 
 		const objectDefinitionAPIClient =
@@ -877,7 +924,7 @@ test.describe('Localized object entries are saved correctly', () => {
 					en_US: objectDefinitionLabel,
 				},
 				name: objectDefinitionName,
-				objectFields: localizedObjectFields,
+				objectFields,
 				pluralLabel: {
 					en_US: objectDefinitionLabel,
 				},
@@ -1024,18 +1071,25 @@ test.describe('Localized object entries are saved correctly', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const {listTypeDefinition} = await postListTypeDefinitionListTypeEntries({apiHelpers, locale: 'ca_ES'});
+		const {listTypeDefinition, listTypeDefinitionListTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+				locale: 'ca_ES',
+			});
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
-			listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
-			objectFieldBusinessTypes: ['Picklist', 'Picklist'],
-		});
-
-		const localizedObjectFields = objectFields.map((objectField) => {
-			return {
-				...objectField,
-				localized: true
-			}
+		const objectFields = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Picklist',
+					localized: true,
+				},
+				{
+					businessType: 'Picklist',
+					localized: true,
+				},
+			],
 		});
 
 		const objectDefinitionAPIClient =
@@ -1049,7 +1103,7 @@ test.describe('Localized object entries are saved correctly', () => {
 					en_US: objectDefinitionLabel,
 				},
 				name: objectDefinitionName,
-				objectFields: localizedObjectFields,
+				objectFields,
 				pluralLabel: {
 					en_US: objectDefinitionLabel,
 				},
@@ -1069,8 +1123,14 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		await viewObjectEntriesPage.addObjectEntryButton.click();
 
-		await formFieldsPage.addSelectItem(listTypeDefinition.listTypeEntries[0].name_i18n['en_US'], 0);
-		await formFieldsPage.addSelectItem(listTypeDefinition.listTypeEntries[1].name_i18n['en_US'], 1);
+		await formFieldsPage.addSelectItem(
+			listTypeDefinitionListTypeEntries[0].name_i18n['en-US'],
+			0
+		);
+		await formFieldsPage.addSelectItem(
+			listTypeDefinitionListTypeEntries[1].name_i18n['en-US'],
+			1
+		);
 
 		const responsePromise = page.waitForResponse(
 			`**${objectDefinition.restContextPath}`
@@ -1096,8 +1156,11 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		// expect saved entry to have all added items
 
-		const englishItemLocators = listTypeDefinition.listTypeEntries.map((item) =>
-			page.getByRole('combobox').filter({hasText: item})
+		const englishItemLocators = listTypeDefinitionListTypeEntries.map(
+			(item) =>
+				page
+					.getByRole('combobox')
+					.filter({hasText: item.name_i18n['en-US']})
 		);
 
 		async function expectFinalEnglishState() {
@@ -1130,8 +1193,11 @@ test.describe('Localized object entries are saved correctly', () => {
 
 		await catalanOption.first().click();
 
-		const catalanItemLocators = translatedListTypeDefinitionItems.map(
-			(item) => page.getByRole('combobox').filter({hasText: item})
+		const catalanItemLocators = listTypeDefinitionListTypeEntries.map(
+			(listTypeEntry) =>
+				page.getByRole('combobox').filter({
+					hasText: listTypeEntry.name_i18n['ca-ES'],
+				})
 		);
 
 		async function expectFinalCatalanState() {
@@ -1170,38 +1236,28 @@ test.describe('Manage object entries through Page Templates', () => {
 		page,
 		viewObjectEntriesPage,
 	}) => {
-		const objectFields: ObjectField[] = [
-			{
-				DBType: 'Boolean',
-				businessType: 'Boolean',
-				externalReferenceCode: 'booleanField',
-				indexed: true,
-				indexedAsKeyword: false,
-				indexedLanguageId: '',
-				label: {en_US: 'booleanField'},
-				listTypeDefinitionId: 0,
-				localized: true,
-				name: 'booleanField',
-				required: false,
-				system: false,
-				type: 'Boolean',
-			},
-			{
-				DBType: 'String',
-				businessType: 'Text',
-				externalReferenceCode: 'textField',
-				indexed: true,
-				indexedAsKeyword: false,
-				indexedLanguageId: '',
-				label: {en_US: 'textField'},
-				listTypeDefinitionId: 0,
-				localized: true,
-				name: 'textField',
-				required: false,
-				system: false,
-				type: 'String',
-			},
-		];
+		const objectFields: ObjectField[] = generateObjectFields({
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Boolean',
+					indexedAsKeyword: false,
+					indexedLanguageId: '',
+					localized: true,
+					name: 'booleanField',
+					required: false,
+					system: false,
+				},
+				{
+					businessType: 'Text',
+					indexedAsKeyword: false,
+					indexedLanguageId: '',
+					localized: true,
+					name: 'textField',
+					required: false,
+					system: false,
+				},
+			],
+		});
 
 		const objectDefinitionExternalReferenceCode =
 			'ObjectDefinition' + getRandomInt();
@@ -1348,18 +1404,15 @@ test.describe('Required localized object fields', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const objectFields = createObjectFields(
-			'Boolean',
-			[
+		const objectFields = generateObjectFields({
+			objectFieldBusinessTypes: [
 				{
-					label: 'booleanField',
-					name: 'booleanField',
+					businessType: 'Boolean',
+					localized: true,
+					required: true,
 				},
 			],
-			{required: true},
-			true
-		);
-
+		});
 		const objectDefinitionAPIClient =
 			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
@@ -1439,18 +1492,16 @@ test.describe('Required localized object fields', () => {
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
-		const objectFields = createObjectFields(
-			'Text',
-			[
+		const objectFields = generateObjectFields({
+			objectFieldBusinessTypes: [
 				{
-					label: 'textField',
+					businessType: 'Text',
+					localized: true,
 					name: 'textField',
+					required: true,
 				},
 			],
-			{required: true},
-			true
-		);
-
+		});
 		const objectDefinitionAPIClient =
 			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
@@ -1546,15 +1597,27 @@ test.describe('Required localized object fields', () => {
 		page,
 		viewObjectEntriesPage,
 	}) => {
-		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
-		const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
-
-		const {listTypeDefinitionItems, objectFields, titleObjectFieldName} =
-			await mockObjectFields({
+		const {listTypeDefinition, listTypeDefinitionListTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
 				apiHelpers,
-				localizeAllLocalizable: true,
-				objectFieldBusinessTypes: ['Picklist', 'MultiselectPicklist'],
 			});
+
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Picklist',
+					localized: true,
+					required: true,
+				},
+				{
+					businessType: 'MultiselectPicklist',
+					localized: true,
+					required: true,
+				},
+			],
+		});
 
 		const objectDefinitionAPIClient =
 			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
@@ -1562,21 +1625,21 @@ test.describe('Required localized object fields', () => {
 		const {body: objectDefinition} =
 			await objectDefinitionAPIClient.postObjectDefinition({
 				active: true,
-				enableLocalization: true,
+				externalReferenceCode: getRandomString(),
 				label: {
-					en_US: objectDefinitionLabel,
+					en_US: getRandomString(),
 				},
-				name: objectDefinitionName,
+				name: 'ObjectDefinitionName' + getRandomInt(),
 				objectFields,
+				panelCategoryKey: 'control_panel.object',
 				pluralLabel: {
-					en_US: objectDefinitionLabel,
+					en_US: 'NewObject',
 				},
 				portlet: true,
 				scope: 'company',
 				status: {
 					code: 0,
 				},
-				titleObjectFieldName,
 			});
 
 		apiHelpers.data.push({
@@ -1592,9 +1655,15 @@ test.describe('Required localized object fields', () => {
 			page.getByRole('button', {name: 'en-us'}).first()
 		).toBeVisible();
 
-		await formFieldsPage.addSelectItem(listTypeDefinitionItems[0], 0);
+		await formFieldsPage.addSelectItem(
+			listTypeDefinitionListTypeEntries[0].name,
+			0
+		);
 
-		await formFieldsPage.addSelectItem(listTypeDefinitionItems[0], 1);
+		await formFieldsPage.addSelectItem(
+			listTypeDefinitionListTypeEntries[0].name,
+			1
+		);
 
 		await expect(
 			page.getByText('This field is required.', {exact: true})
@@ -1603,14 +1672,14 @@ test.describe('Required localized object fields', () => {
 		await expect(
 			page.getByRole('gridcell', {
 				exact: true,
-				name: listTypeDefinitionItems[0],
+				name: listTypeDefinitionListTypeEntries[0].name,
 			})
 		).toBeVisible();
 
 		await page.getByRole('combobox').nth(1).click();
 
-		listTypeDefinitionItems.forEach((item) => {
-			expect(page.getByRole('option', {name: item})).toBeVisible();
+		listTypeDefinitionListTypeEntries.forEach((item) => {
+			expect(page.getByRole('option', {name: item.name})).toBeVisible();
 		});
 	});
 });

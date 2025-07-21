@@ -6,6 +6,7 @@
 import {
 	ObjectDefinition,
 	ObjectDefinitionAPI,
+	ObjectField,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
@@ -19,7 +20,7 @@ import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {siteSettingsPagesTest} from '../../../fixtures/siteSettingsPagesTest';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import {waitForAlert} from '../../../utils/waitForAlert';
-import {generateObjectFieldsObjectEntryValues} from './utils/generateObjectFieldsObjectEntryValues';
+import {generateObjectFields} from './utils/generateObjectFields';
 import {postListTypeDefinitionListTypeEntries} from './utils/postListTypeDefinitionListTypeEntries';
 
 export const test = mergeTests(
@@ -253,10 +254,16 @@ test.describe('ensure picklist translation', () => {
 		page,
 		viewObjectEntriesPage,
 	}) => {
-		const {listTypeDefinition} = await postListTypeDefinitionListTypeEntries({apiHelpers, listTypeDefinitionEntriesLength: 4, locale: 'pt_BR'});
+		const {listTypeDefinition, listTypeDefinitionListTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+				listTypeDefinitionEntriesLength: 4,
+				locale: 'pt_BR',
+			});
 
-		const {objectFields} = await generateObjectFieldsObjectEntryValues({
-			listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
+		const objectFields: Partial<ObjectField>[] = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
 			objectFieldBusinessTypes: ['MultiselectPicklist'],
 		});
 
@@ -280,7 +287,7 @@ test.describe('ensure picklist translation', () => {
 				status: {
 					code: 0,
 				},
-				titleObjectFieldName: objectFields[0].name,
+				titleObjectFieldName: listTypeDefinitionListTypeEntries[0].name,
 			});
 
 		apiHelpers.data.push({
@@ -293,7 +300,7 @@ test.describe('ensure picklist translation', () => {
 		await viewObjectEntriesPage.addObjectEntryButton.click();
 
 		await formFieldsPage.addSelectItem(
-			listTypeDefinition.listTypeEntries[0].name_i18n.pt_BR
+			listTypeDefinitionListTypeEntries[0].name_i18n['pt-BR']
 		);
 
 		await expect(page.getByTitle('Remover Tudo')).toBeVisible();
@@ -409,8 +416,9 @@ test.describe('ensure picklist translation', () => {
 
 		await apiHelpers.listTypeAdmin.postListTypeEntry({
 			key: listTypeEntryName,
-			listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
-			name_i18n: {en_US: listTypeEntryName}
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			name_i18n: {en_US: listTypeEntryName},
 		});
 
 		// Translate picklist item

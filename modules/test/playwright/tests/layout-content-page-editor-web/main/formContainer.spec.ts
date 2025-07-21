@@ -2013,10 +2013,13 @@ testWithCKEditor4.describe('Form Localization with CKEditor 4', () => {
 				await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
 			for (const option of ['Spain', 'Italy']) {
-				await apiHelpers.listTypeAdmin.postListTypeEntry(
-					listTypeDefinition.externalReferenceCode,
-					option
-				);
+				await apiHelpers.listTypeAdmin.postListTypeEntry({
+					listTypeDefinitionExternalReferenceCode:
+						listTypeDefinition.externalReferenceCode,
+					name_i18n: {
+						en_US: option,
+					},
+				});
 			}
 
 			const objectDefinitionAPIClient =
@@ -2344,7 +2347,9 @@ testWithCKEditor4.describe('Form Localization with CKEditor 4', () => {
 			await expect(page.getByText('Select File')).toBeDisabled();
 
 			await expect(
-				page.getByRole('spinbutton', {name: 'Ideal Temperature (ºC)'})
+				page.getByRole('spinbutton', {
+					name: 'Ideal Temperature (ºC)',
+				})
 			).toBeDisabled();
 
 			await expect(
@@ -2818,10 +2823,13 @@ testWithCKEditor4.describe('Form Localization with CKEditor 4', () => {
 				await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
 			for (const option of ['Spain', 'Italy']) {
-				await apiHelpers.listTypeAdmin.postListTypeEntry(
-					listTypeDefinition.externalReferenceCode,
-					option
-				);
+				await apiHelpers.listTypeAdmin.postListTypeEntry({
+					listTypeDefinitionExternalReferenceCode:
+						listTypeDefinition.externalReferenceCode,
+					name_i18n: {
+						en_US: option,
+					},
+				});
 			}
 
 			const objectFields: ObjectField[] = [
