@@ -57,8 +57,9 @@ export class AccountInstanceSettingsAccountAddressSubtypePage {
 		const billingListTypeEntry =
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'billing1',
-				listTypeDefinitionExternalReferenceCode: billingListTypeDefinition.externalReferenceCode,
-				name_i18n: {en_US: 'Billing1'}
+				listTypeDefinitionExternalReferenceCode:
+					billingListTypeDefinition.externalReferenceCode,
+				name_i18n: {en_US: 'Billing1'},
 			});
 
 		const billingAndShippingListTypeDefinition =
@@ -72,8 +73,9 @@ export class AccountInstanceSettingsAccountAddressSubtypePage {
 		const billingAndShippingListTypeEntry =
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'billingAndShipping1',
-				listTypeDefinitionExternalReferenceCode: billingAndShippingListTypeDefinition.externalReferenceCode,
-				name_i18n: {en_US: 'BillingAndShipping1'}
+				listTypeDefinitionExternalReferenceCode:
+					billingAndShippingListTypeDefinition.externalReferenceCode,
+				name_i18n: {en_US: 'BillingAndShipping1'},
 			});
 
 		const shippingListTypeDefinition =
@@ -87,8 +89,9 @@ export class AccountInstanceSettingsAccountAddressSubtypePage {
 		const shippingListTypeEntry =
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'shipping1',
-				listTypeDefinitionExternalReferenceCode: shippingListTypeDefinition.externalReferenceCode,
-				name_i18n: {en_US: 'Shipping1'}
+				listTypeDefinitionExternalReferenceCode:
+					shippingListTypeDefinition.externalReferenceCode,
+				name_i18n: {en_US: 'Shipping1'},
 			});
 
 		return {

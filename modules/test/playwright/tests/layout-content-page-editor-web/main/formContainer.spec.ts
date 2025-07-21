@@ -3593,8 +3593,9 @@ test.describe('Form Localization', () => {
 			for (const option of options) {
 				await apiHelpers.listTypeAdmin.postListTypeEntry({
 					key: option.toLocaleLowerCase(),
-					listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
-					name_i18n: {en_US: option}
+					listTypeDefinitionExternalReferenceCode:
+						listTypeDefinition.externalReferenceCode,
+					name_i18n: {en_US: option},
 				});
 			}
 
@@ -3746,8 +3747,9 @@ test.describe('Form Localization', () => {
 			for (const option of ['Spain', 'Italy', 'Germany']) {
 				await apiHelpers.listTypeAdmin.postListTypeEntry({
 					key: option.toLocaleLowerCase(),
-					listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
-					name_i18n: {en_US: option}
+					listTypeDefinitionExternalReferenceCode:
+						listTypeDefinition.externalReferenceCode,
+					name_i18n: {en_US: option},
 				});
 			}
 
@@ -4790,8 +4792,9 @@ test.describe('Form Localization', () => {
 			for (const option of ['Spain', 'Italy']) {
 				await apiHelpers.listTypeAdmin.postListTypeEntry({
 					key: option.toLocaleLowerCase(),
-					listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
-					name_i18n: {en_US: option}
+					listTypeDefinitionExternalReferenceCode:
+						listTypeDefinition.externalReferenceCode,
+					name_i18n: {en_US: option},
 				});
 			}
 
@@ -5583,8 +5586,9 @@ test.describe('Form Localization', () => {
 			for (const option of ['Spain', 'Italy']) {
 				await apiHelpers.listTypeAdmin.postListTypeEntry({
 					key: option.toLocaleLowerCase(),
-					listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
-					name_i18n: {en_US: option}
+					listTypeDefinitionExternalReferenceCode:
+						listTypeDefinition.externalReferenceCode,
+					name_i18n: {en_US: option},
 				});
 			}
 
@@ -6961,8 +6965,9 @@ test.describe('Picklist input field', () => {
 			for (const country of countries) {
 				await apiHelpers.listTypeAdmin.postListTypeEntry({
 					key: country.toLocaleLowerCase(),
-					listTypeDefinitionExternalReferenceCode: listTypeDefinition.externalReferenceCode,
-					name_i18n: {en_US: country}
+					listTypeDefinitionExternalReferenceCode:
+						listTypeDefinition.externalReferenceCode,
+					name_i18n: {en_US: country},
 				});
 			}
 

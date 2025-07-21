@@ -52,8 +52,9 @@ test(
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'item1',
-				listTypeDefinitionExternalReferenceCode: picklist.externalReferenceCode,
-				name_i18n: {en_US: 'item1'}
+				listTypeDefinitionExternalReferenceCode:
+					picklist.externalReferenceCode,
+				name_i18n: {en_US: 'item1'},
 			});
 
 			await apiHelpers.headlessCommerceAdminCatalog.patchSpecification(
@@ -75,8 +76,9 @@ test(
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'item2',
-				listTypeDefinitionExternalReferenceCode: picklist.externalReferenceCode,
-				name_i18n: {en_US: 'item2'}
+				listTypeDefinitionExternalReferenceCode:
+					picklist.externalReferenceCode,
+				name_i18n: {en_US: 'item2'},
 			});
 
 			await commerceAdminProductDetailsPage.editOrDeleteProductSpecification(
@@ -152,14 +154,16 @@ test(
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'item1',
-				listTypeDefinitionExternalReferenceCode: picklist1.externalReferenceCode,
-				name_i18n: {en_US: 'item1'}
+				listTypeDefinitionExternalReferenceCode:
+					picklist1.externalReferenceCode,
+				name_i18n: {en_US: 'item1'},
 			});
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'item2',
-				listTypeDefinitionExternalReferenceCode: picklist2.externalReferenceCode,
-				name_i18n: {en_US: 'item2'}
+				listTypeDefinitionExternalReferenceCode:
+					picklist2.externalReferenceCode,
+				name_i18n: {en_US: 'item2'},
 			});
 
 			await apiHelpers.headlessCommerceAdminCatalog.patchSpecification(
@@ -238,8 +242,9 @@ test(
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'item1',
-				listTypeDefinitionExternalReferenceCode: picklist.externalReferenceCode,
-				name_i18n: {en_US: 'item1'}
+				listTypeDefinitionExternalReferenceCode:
+					picklist.externalReferenceCode,
+				name_i18n: {en_US: 'item1'},
 			});
 
 			await apiHelpers.headlessCommerceAdminCatalog.patchSpecification(

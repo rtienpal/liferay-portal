@@ -245,8 +245,8 @@ test('assert that the user is able to use the ERC field in Sort, on the Custom V
 	const objectDefinitionName = 'ObjectDefinitionName' + getRandomInt();
 
 	const objectFields: Partial<ObjectField>[] = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
+		objectFieldBusinessTypes: ['Text'],
+	});
 
 	const objectDefinitionAPIClient =
 		await apiHelpers.buildRestClient(ObjectDefinitionAPI);

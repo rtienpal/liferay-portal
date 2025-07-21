@@ -110,8 +110,9 @@ test(
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'item1',
-				listTypeDefinitionExternalReferenceCode: picklist.externalReferenceCode,
-				name_i18n: {en_US: 'item1'}
+				listTypeDefinitionExternalReferenceCode:
+					picklist.externalReferenceCode,
+				name_i18n: {en_US: 'item1'},
 			});
 
 			const catalog =

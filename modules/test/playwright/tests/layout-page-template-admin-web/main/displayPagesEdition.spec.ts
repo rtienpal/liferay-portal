@@ -1443,20 +1443,23 @@ test.describe('Object Display page', () => {
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'horror',
-				listTypeDefinitionExternalReferenceCode: genrePicklist.externalReferenceCode,
-				name_i18n: {en_US: 'horror'}
+				listTypeDefinitionExternalReferenceCode:
+					genrePicklist.externalReferenceCode,
+				name_i18n: {en_US: 'horror'},
 			});
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'musical',
-				listTypeDefinitionExternalReferenceCode: genrePicklist.externalReferenceCode,
-				name_i18n: {en_US: 'musical'}
+				listTypeDefinitionExternalReferenceCode:
+					genrePicklist.externalReferenceCode,
+				name_i18n: {en_US: 'musical'},
 			});
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'thriller',
-				listTypeDefinitionExternalReferenceCode: genrePicklist.externalReferenceCode,
-				name_i18n: {en_US: 'thriller'}
+				listTypeDefinitionExternalReferenceCode:
+					genrePicklist.externalReferenceCode,
+				name_i18n: {en_US: 'thriller'},
 			});
 
 			apiHelpers.data.push({
@@ -1469,14 +1472,16 @@ test.describe('Object Display page', () => {
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'hollywood',
-				listTypeDefinitionExternalReferenceCode: originPicklist.externalReferenceCode,
-				name_i18n: {en_US: 'hollywood'}   
+				listTypeDefinitionExternalReferenceCode:
+					originPicklist.externalReferenceCode,
+				name_i18n: {en_US: 'hollywood'},
 			});
 
 			await apiHelpers.listTypeAdmin.postListTypeEntry({
 				key: 'bollywood',
-				listTypeDefinitionExternalReferenceCode: originPicklist.externalReferenceCode,
-				name_i18n: {en_US: 'bollywood'}   
+				listTypeDefinitionExternalReferenceCode:
+					originPicklist.externalReferenceCode,
+				name_i18n: {en_US: 'bollywood'},
 			});
 
 			apiHelpers.data.push({
