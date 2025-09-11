@@ -2787,6 +2787,104 @@ test.describe('Manage object entries through Workflow', () => {
 			).toHaveValue('10/05/2025 09:00 AM');
 		}
 	);
+
+	test(
+		'Different versions of Commerce Products have same input values when used as relationship of an object entry',
+		{tag: '@LPD-65249'},
+		async ({
+			apiHelpers,
+			commerceCatalogSystemSettingsPage,
+			page,
+			viewObjectEntriesPage,
+		}) => {
+			await commerceCatalogSystemSettingsPage.toggleProductVersioning();
+
+			const objectDefinitionLabel =
+				'ObjectDefinitionLabel' + getRandomInt();
+
+			const objectDefinitionName =
+				'ObjectDefinitionName' + getRandomInt();
+
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
+			});
+
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+			const {body: objectDefinition} =
+				await objectDefinitionAPIClient.postObjectDefinition({
+					active: true,
+					label: {
+						en_US: objectDefinitionLabel,
+					},
+					name: objectDefinitionName,
+					objectFields,
+					pluralLabel: {
+						en_US: objectDefinitionLabel,
+					},
+					portlet: true,
+					scope: 'company',
+					status: {
+						code: 0,
+					},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			const objectRelationshipLabel =
+				'objectRelationshipLabel' + getRandomInt();
+
+			const objectRelationshipAPIClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+				'L_COMMERCE_PRODUCT_DEFINITION',
+				{
+					label: {
+						en_US: objectRelationshipLabel,
+					},
+					name: 'objectRelationshipName',
+					objectDefinitionExternalReferenceCode1:
+						'L_COMMERCE_PRODUCT_DEFINITION',
+					objectDefinitionExternalReferenceCode2:
+						objectDefinition.externalReferenceCode,
+					type: 'oneToMany',
+				}
+			);
+
+			const catalog =
+				await apiHelpers.headlessCommerceAdminCatalog.postCatalog({
+					name: 'Product Catalog',
+				});
+
+			for (let i = 1; i <= 3; i++) {
+				await apiHelpers.headlessCommerceAdminCatalog.postProduct({
+					catalogId: catalog.id,
+					name: {en_US: `product-${i}`},
+				});
+			}
+
+			await viewObjectEntriesPage.goto(objectDefinition.className);
+
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				objectDefinition.label['en_US']
+			);
+
+			await viewObjectEntriesPage.selectDropdownItemWithSearch(
+				'product-1'
+			);
+
+			await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+			await expect(viewObjectEntriesPage.successMessage).toBeVisible();
+
+			await page.waitForTimeout(20000);
+		}
+	);
 });
 
 scheduleTest.describe('Manage object entries schedule properties', () => {
