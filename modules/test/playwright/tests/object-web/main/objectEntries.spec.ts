@@ -19,6 +19,7 @@ import {accountSettingsPagesTest} from '../../../fixtures/accountSettingsPagesTe
 import {apiHelpersTest} from '../../../fixtures/apiHelpersTest';
 import {applicationsMenuPageTest} from '../../../fixtures/applicationsMenuPageTest';
 import {collectionsPagesTest} from '../../../fixtures/collectionsPagesTest';
+import {commercePagesTest} from '../../../fixtures/commercePagesTest';
 import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
 import {editObjectDefinitionPagesTest} from '../../../fixtures/editObjectDefinitionPagesTest';
 import {featureFlagsTest} from '../../../fixtures/featureFlagsTest';
@@ -55,6 +56,7 @@ const test = mergeTests(
 	applicationsMenuPageTest,
 	apiHelpersTest,
 	collectionsPagesTest,
+	commercePagesTest,
 	dataApiHelpersTest,
 	isolatedSiteTest,
 	editObjectDefinitionPagesTest,
@@ -2785,6 +2787,124 @@ test.describe('Manage object entries through Workflow', () => {
 					'input[placeholder="__/__/____ __:__ _"][value="10/05/2025 09:00 AM"]'
 				)
 			).toHaveValue('10/05/2025 09:00 AM');
+		}
+	);
+
+	test(
+		'Different versions of Commerce Products have same input values when used as relationship of an object entry',
+		{tag: '@LPD-65249'},
+		async ({
+			apiHelpers,
+			commerceCatalogSystemSettingsPage,
+			page,
+
+			viewObjectEntriesPage,
+		}) => {
+			const objectDefinitionLabel =
+				'ObjectDefinitionLabel' + getRandomInt();
+
+			const objectDefinitionName =
+				'ObjectDefinitionName' + getRandomInt();
+
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
+			});
+
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+			const {body: objectDefinition} =
+				await objectDefinitionAPIClient.postObjectDefinition({
+					active: true,
+					label: {
+						en_US: objectDefinitionLabel,
+					},
+					name: objectDefinitionName,
+					objectFields,
+					pluralLabel: {
+						en_US: objectDefinitionLabel,
+					},
+					portlet: true,
+					scope: 'company',
+					status: {
+						code: 0,
+					},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			const objectRelationshipLabel =
+				'objectRelationshipLabel' + getRandomInt();
+
+			const objectRelationshipAPIClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+				'L_COMMERCE_PRODUCT_DEFINITION',
+				{
+					label: {
+						en_US: objectRelationshipLabel,
+					},
+					name: 'objectRelationshipName',
+					objectDefinitionExternalReferenceCode1:
+						'L_COMMERCE_PRODUCT_DEFINITION',
+					objectDefinitionExternalReferenceCode2:
+						objectDefinition.externalReferenceCode,
+					type: 'oneToMany',
+				}
+			);
+
+			const catalog =
+				await apiHelpers.headlessCommerceAdminCatalog.postCatalog();
+
+			const productVersion1 =
+				await apiHelpers.headlessCommerceAdminCatalog.postProduct({
+					catalogId: catalog.id,
+				});
+
+			await commerceCatalogSystemSettingsPage.toggleProductVersioning();
+
+			await apiHelpers.headlessCommerceAdminCatalog.patchProduct(
+				productVersion1.productId.toString()
+			);
+
+			// await apiHelpers.headlessCommerceAdminCatalog.patchProduct(
+			// 	productVersion2.productId,
+			// 	{status: 0}
+			// );
+
+			await viewObjectEntriesPage.goto(objectDefinition.className);
+
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				objectDefinition.label['en_US']
+			);
+
+			console.log('productVersion1.name:', productVersion1.name['en_US']);
+
+			await viewObjectEntriesPage.selectDropdownItemWithSearch(
+				productVersion1.name['en_US']
+			);
+
+			await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+			await expect(viewObjectEntriesPage.successMessage).toBeVisible();
+
+			await page.waitForTimeout(30000);
+
+			// await apiHelpers.headlessCommerceAdminCatalog.deleteProductByVersion(
+			// 	productVersion1.productId,
+			// 	2
+			// );
+
+			// await apiHelpers.headlessCommerceAdminCatalog.deleteProductByVersion(
+			// 	productVersion1.productId,
+			// 	1
+			// );
+
+			await commerceCatalogSystemSettingsPage.toggleProductVersioning();
 		}
 	);
 });
