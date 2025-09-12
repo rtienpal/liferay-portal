@@ -66,3 +66,40 @@ test('LPD-3272 Enable product versioning and verify a new product version is cre
 
 	await commerceCatalogSystemSettingsPage.toggleProductVersioning();
 });
+
+test('LPD-65249 Enable product versioning and verify a new product has same Id of original product', async ({
+	apiHelpers,
+	commerceCatalogSystemSettingsPage,
+}) => {
+	const catalog = await apiHelpers.headlessCommerceAdminCatalog.postCatalog();
+
+	const product1 = await apiHelpers.headlessCommerceAdminCatalog.postProduct({
+		catalogId: catalog.id,
+	});
+
+	await commerceCatalogSystemSettingsPage.toggleProductVersioning();
+
+	await apiHelpers.headlessCommerceAdminCatalog.patchProduct(
+		product1.productId.toString()
+	);
+
+	const product2 =
+		await apiHelpers.headlessCommerceAdminCatalog.getProductByVersion(
+			product1.productId,
+			2
+		);
+
+	expect(product1.id).toEqual(product2.id);
+
+	await apiHelpers.headlessCommerceAdminCatalog.deleteProductByVersion(
+		product2.productId,
+		2
+	);
+
+	await apiHelpers.headlessCommerceAdminCatalog.deleteProductByVersion(
+		product1.productId,
+		1
+	);
+
+	await commerceCatalogSystemSettingsPage.toggleProductVersioning();
+});
