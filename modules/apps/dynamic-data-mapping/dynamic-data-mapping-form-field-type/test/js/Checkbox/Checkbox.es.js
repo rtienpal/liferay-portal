@@ -126,6 +126,14 @@ describe('Field Checkbox', () => {
 		expect(onChange).toHaveBeenLastCalledWith({target: {value: false}});
 	});
 
+	it('does not have aria-invalid attribute on first render when it is required', () => {
+		const {container} = render(<Checkbox required={true} />);
+
+		const input = container.querySelector('input[aria-required="true"]');
+
+		expect(input.hasAttribute('aria-invalid')).toBe(false);
+	});
+
 	it('has a helptext', () => {
 		const {container} = render(<Checkbox id="ID" tip="Type something" />);
 
