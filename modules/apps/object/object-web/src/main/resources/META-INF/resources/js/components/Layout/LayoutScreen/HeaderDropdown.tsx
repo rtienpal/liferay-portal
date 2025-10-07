@@ -11,12 +11,14 @@ import {useLayoutContext} from '../objectLayoutContext';
 
 interface HeaderDropdownProps {
 	addCategorization?: MouseEventHandler;
+	addSeo?: MouseEventHandler;
 	deleteElement: MouseEventHandler;
 	disabled?: boolean;
 }
 
 export function HeaderDropdown({
 	addCategorization,
+	addSeo,
 	deleteElement,
 	disabled,
 }: HeaderDropdownProps) {
@@ -24,6 +26,7 @@ export function HeaderDropdown({
 	const [
 		{
 			enableCategorization,
+			enableSeo,
 			isViewOnly,
 			objectLayout: {objectLayoutTabs},
 		},
@@ -66,6 +69,15 @@ export function HeaderDropdown({
 						onClick={() => handleOnClick(addCategorization)}
 					>
 						{Liferay.Language.get('add-categorization')}
+					</ClayDropDown.Item>
+				)}
+
+				{addSeo && (
+					<ClayDropDown.Item
+						disabled={isThereFramework('seo') || !enableSeo}
+						onClick={() => handleOnClick(addSeo)}
+					>
+						{Liferay.Language.get('add-seo')}
 					</ClayDropDown.Item>
 				)}
 

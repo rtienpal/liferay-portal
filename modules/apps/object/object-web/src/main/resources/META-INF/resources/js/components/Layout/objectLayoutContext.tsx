@@ -21,6 +21,7 @@ import {
 type TState = {
 	creationLanguageId: Liferay.Language.Locale;
 	enableCategorization: boolean;
+	enableSeo: boolean;
 	isViewOnly: boolean;
 	objectFieldBusinessTypes: ObjectFieldBusinessType[];
 	objectFields: TObjectField[];
