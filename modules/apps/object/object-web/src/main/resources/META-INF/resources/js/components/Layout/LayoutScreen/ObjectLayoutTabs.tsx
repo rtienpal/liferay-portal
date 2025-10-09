@@ -96,6 +96,21 @@ const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 													type: TYPES.ADD_OBJECT_LAYOUT_BOX,
 												});
 											}}
+											addSeo={() => {
+												dispatch({
+													payload: {
+														name: {
+															[defaultLanguageId]:
+																Liferay.Language.get(
+																	'seo'
+																),
+														},
+														tabIndex,
+														type: 'seo',
+													},
+													type: TYPES.ADD_OBJECT_LAYOUT_BOX,
+												});
+											}}
 											deleteElement={() => {
 												dispatch({
 													payload: {
