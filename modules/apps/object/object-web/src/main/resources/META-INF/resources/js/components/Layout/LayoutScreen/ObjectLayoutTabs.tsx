@@ -31,6 +31,22 @@ const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 		onClose: () => setVisibleModal(false),
 	});
 
+	const handleAddLayoutBox = (
+		boxType: 'categorization' | 'seo',
+		tabIndex: number
+	) => {
+		dispatch({
+			payload: {
+				name: {
+					[defaultLanguageId]: Liferay.Language.get(boxType),
+				},
+				tabIndex,
+				type: boxType,
+			},
+			type: TYPES.ADD_OBJECT_LAYOUT_BOX,
+		});
+	};
+
 	return (
 		<>
 			{objectLayout?.objectLayoutTabs?.map(
@@ -81,21 +97,18 @@ const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 										)}
 
 										<HeaderDropdown
-											addCategorization={() => {
-												dispatch({
-													payload: {
-														name: {
-															[defaultLanguageId]:
-																Liferay.Language.get(
-																	'categorization'
-																),
-														},
-														tabIndex,
-														type: 'categorization',
-													},
-													type: TYPES.ADD_OBJECT_LAYOUT_BOX,
-												});
-											}}
+											addCategorization={() =>
+												handleAddLayoutBox(
+													'categorization',
+													tabIndex
+												)
+											}
+											addSeo={() =>
+												handleAddLayoutBox(
+													'seo',
+													tabIndex
+												)
+											}
 											deleteElement={() => {
 												dispatch({
 													payload: {
