@@ -74,7 +74,10 @@ export function HeaderDropdown({
 
 				{addSeo && (
 					<ClayDropDown.Item
-						disabled={isThereFramework('seo') || !enableFriendlyURLCustomization}
+						disabled={
+							isThereFramework('seo') ||
+							!enableFriendlyURLCustomization
+						}
 						onClick={() => handleOnClick(addSeo)}
 					>
 						{Liferay.Language.get('add-seo')}
