@@ -18,7 +18,7 @@ import {
 	TObjectRelationship,
 } from './types';
 
-type TState = {
+export type TState = {
 	creationLanguageId: Liferay.Language.Locale;
 	enableCategorization: boolean;
 	enableFriendlyURLCustomization: boolean;
@@ -30,7 +30,7 @@ type TState = {
 	objectRelationships: TObjectRelationship[];
 };
 
-type TAction =
+export type TAction =
 	| {
 			payload: {
 				creationLanguageId: Liferay.Language.Locale;
@@ -139,7 +139,7 @@ const initialState = {
 	objectRelationships: [] as TObjectRelationship[],
 } as TState;
 
-const layoutReducer = (state: TState, action: TAction) => {
+export function layoutReducer(state: TState, action: TAction) {
 	switch (action.type) {
 		case TYPES.ADD_OBJECT_LAYOUT: {
 			const {
@@ -442,7 +442,7 @@ const layoutReducer = (state: TState, action: TAction) => {
 		default:
 			return state;
 	}
-};
+}
 
 interface ILayoutContextProviderProps
 	extends React.HTMLAttributes<HTMLElement> {
