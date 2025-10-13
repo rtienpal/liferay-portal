@@ -8,12 +8,15 @@ import {FrameLocator, Locator, Page} from '@playwright/test';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 
 export class ObjectLayoutsPage {
-	readonly addBlock: Locator;
+	readonly addCategorization: Locator;
 	readonly addField: Locator;
 	readonly addObjectLayoutButton: Locator;
+	readonly addRegularBlock: Locator;
+	readonly addSeo: Locator;
 	readonly addTab: Locator;
 	readonly fieldList: Locator;
 	readonly fieldSelect: Locator;
+	readonly headerDropdown: Locator;
 	readonly iframeLocator: FrameLocator;
 	readonly labelInput: Locator;
 	readonly layoutNameInput: Locator;
@@ -32,18 +35,27 @@ export class ObjectLayoutsPage {
 
 	constructor(page: Page) {
 		this.iframeLocator = page.frameLocator('iframe');
-		this.addBlock = this.iframeLocator.getByRole('button', {
-			name: 'Add Block',
+		this.addCategorization = this.iframeLocator.getByRole('menuitem', {
+			name: 'Add Categorization',
 		});
 		this.addField = this.iframeLocator.getByRole('button', {
 			name: 'Add Field',
 		});
 		this.addObjectLayoutButton = page.getByLabel('Add Object Layout');
+		this.addRegularBlock = this.iframeLocator.getByRole('button', {
+			name: 'Add Block',
+		});
+		this.addSeo = this.iframeLocator.getByRole('menuitem', {
+			name: 'Add SEO',
+		});
 		this.addTab = this.iframeLocator.getByRole('button', {name: 'Add Tab'});
 		this.fieldList = this.iframeLocator.getByRole('combobox', {
 			name: 'Relationship',
 		});
 		this.fieldSelect = this.iframeLocator.getByText('Select an Option');
+		this.headerDropdown = this.iframeLocator
+			.getByLabel('More Actions')
+			.nth(0);
 		this.labelInput = this.iframeLocator.getByLabel('Label');
 		this.layoutNameInput = page.getByLabel('Name');
 		this.layoutsTabItem = page.getByRole('link', {name: 'Layouts'});
@@ -73,6 +85,26 @@ export class ObjectLayoutsPage {
 		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
 	}
 
+	async addBlock(option: 'categorization' | 'seo') {
+		await this.headerDropdown.click();
+
+		if (
+			option === 'categorization' &&
+			!(await this.addCategorization.isDisabled())
+		) {
+			await this.addCategorization.click();
+
+			return;
+		}
+		else if (option === 'seo' && !(await this.addSeo.isDisabled())) {
+			await this.addSeo.click();
+
+			return;
+		}
+
+		await this.headerDropdown.click();
+	}
+
 	async addObjectLayoutObjectField(option: string) {
 		await this.fieldSelect.waitFor({state: 'visible'});
 		await this.iframeLocator
@@ -90,7 +122,7 @@ export class ObjectLayoutsPage {
 	}
 
 	async createObjectLayoutBlock(objectLayoutBlockName: string) {
-		await this.addBlock.click();
+		await this.addRegularBlock.click();
 		await this.labelInput.fill(objectLayoutBlockName);
 		await this.saveBlockButton.click();
 	}
@@ -119,16 +151,26 @@ export class ObjectLayoutsPage {
 	}
 
 	async createObjectLayoutContent({
+		addCategorization,
+		addSeo,
 		objectLayoutBlockName,
 		objectLayoutName,
 		objectLayoutTabName,
 	}: {
+		addCategorization?: boolean;
+		addSeo?: boolean;
 		objectLayoutBlockName: string;
 		objectLayoutName: string;
 		objectLayoutTabName: string;
 	}) {
 		await this.openObjectLayoutConfiguration(objectLayoutName);
 		await this.createObjectLayoutTab(objectLayoutTabName);
+		if (addCategorization) {
+			await this.addBlock('categorization');
+		}
+		if (addSeo) {
+			await this.addBlock('seo');
+		}
 		await this.createObjectLayoutBlock(objectLayoutBlockName);
 		await this.openObjectLayoutObjectField();
 	}
@@ -156,5 +198,14 @@ export class ObjectLayoutsPage {
 	async setObjectLayoutAsDefault() {
 		await this.iframeLocator.getByRole('tab', {name: 'Info'}).click();
 		await this.iframeLocator.getByLabel('Mark as Default').click();
+	}
+
+	async toggleCollapsible(blockLabel: string) {
+		const blockToggle = this.page
+			.locator('.object-admin-panel')
+			.filter({has: this.page.getByRole('heading', {name: blockLabel})})
+			.getByRole('switch', {name: 'Collapsible'});
+
+		await blockToggle.click();
 	}
 }
