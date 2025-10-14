@@ -80,7 +80,6 @@ export class ObjectLayoutsPage {
 			.filter({hasText: option})
 			.click();
 		await this.saveAddFieldButton.click();
-		await this.setObjectLayoutAsDefault();
 	}
 
 	async createObjectLayout(objectLayoutName: string) {
@@ -119,10 +118,12 @@ export class ObjectLayoutsPage {
 	}
 
 	async createObjectLayoutContent({
+		objectFieldsName,
 		objectLayoutBlockName,
 		objectLayoutName,
 		objectLayoutTabName,
 	}: {
+		objectFieldsName: string[];
 		objectLayoutBlockName: string;
 		objectLayoutName: string;
 		objectLayoutTabName: string;
@@ -130,7 +131,11 @@ export class ObjectLayoutsPage {
 		await this.openObjectLayoutConfiguration(objectLayoutName);
 		await this.createObjectLayoutTab(objectLayoutTabName);
 		await this.createObjectLayoutBlock(objectLayoutBlockName);
-		await this.openObjectLayoutObjectField();
+
+		for (const fieldName of objectFieldsName) {
+			await this.openObjectLayoutObjectField();
+			await this.addObjectLayoutObjectField(fieldName);
+		}
 	}
 
 	async goto(objectDefinitionLabel: string) {
