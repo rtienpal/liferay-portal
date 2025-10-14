@@ -165,6 +165,10 @@ export class ViewObjectEntriesPage {
 		await this.editObjectEntryForm.waitFor({state: 'visible'});
 	}
 
+	async fillFriendlyUrl(objectFieldValue: string) {
+		await this.page.getByLabel('Friendly URL').fill(objectFieldValue);
+	}
+
 	async fillObjectEntry({
 		objectFieldBusinessType,
 		objectFieldLabel,

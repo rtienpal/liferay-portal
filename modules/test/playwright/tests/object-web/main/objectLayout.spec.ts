@@ -31,6 +31,71 @@ export const test = mergeTests(
 );
 
 test.describe('manage Object Layouts through the Object Layout tab', () => {
+	test('can add seo block when creating its layout', async ({
+		apiHelpers,
+		objectLayoutsPage,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				enableFriendlyURLCustomization: true,
+				status: {code: 0},
+				titleObjectFieldName: 'textField',
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const iframe = page.frameLocator('iframe');
+
+		const blockName = getRandomString();
+
+		await test.step('create layout with SEO block and set it as default', async () => {
+			await objectLayoutsPage.goto(objectDefinition.name);
+
+			const objectLayoutName = getRandomString();
+
+			await objectLayoutsPage.createObjectLayout(objectLayoutName);
+
+			await objectLayoutsPage.createObjectLayoutContent({
+				addSeoBlock: true,
+				objectFieldsName: ['textField'],
+				objectLayoutBlockName: blockName,
+				objectLayoutName,
+				objectLayoutTabName: getRandomString(),
+			});
+
+			await objectLayoutsPage.setObjectLayoutAsDefault();
+
+			await iframe.getByRole('button', {name: 'Save'}).first().click();
+		});
+
+		await test.step('add object entry with ', async () => {
+			await viewObjectEntriesPage.goto(objectDefinition.className);
+
+			await viewObjectEntriesPage.clickAddObjectEntry();
+
+			await viewObjectEntriesPage.fillObjectEntry({
+				objectFieldBusinessType: 'Text',
+				objectFieldLabel: 'textField',
+				objectFieldValue: 'Entry A',
+			});
+
+			await viewObjectEntriesPage.fillFriendlyUrl('Entry A friendlyURL');
+
+			await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+			await waitForAlert(page);
+
+			await expect(page.getByLabel('Friendly URL')).toHaveValue(
+				'entry-a-friendlyurl'
+			);
+		});
+	});
+
 	test('can view all fields of an object when creating its layout', async ({
 		apiHelpers,
 		objectLayoutsPage,
@@ -341,5 +406,59 @@ test.describe('manage Object Layouts through the Object Layout tab', () => {
 		await expect(page.getByRole('textbox').last()).toHaveValue(
 			objectChildEnty
 		);
+	});
+
+	test('seo block can be collapsed', async ({
+		apiHelpers,
+		objectLayoutsPage,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				enableFriendlyURLCustomization: true,
+				status: {code: 0},
+				titleObjectFieldName: 'textField',
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const iframe = page.frameLocator('iframe');
+
+		const blockName = getRandomString();
+
+		await test.step('create layout with SEO collapsible block and set it as default', async () => {
+			await objectLayoutsPage.goto(objectDefinition.name);
+
+			const objectLayoutName = getRandomString();
+
+			await objectLayoutsPage.createObjectLayout(objectLayoutName);
+
+			await objectLayoutsPage.createObjectLayoutContent({
+				addCategorizationBlock: true,
+				addSeoBlock: true,
+				objectFieldsName: ['textField'],
+				objectLayoutBlockName: blockName,
+				objectLayoutName,
+				objectLayoutTabName: getRandomString(),
+			});
+
+			await objectLayoutsPage.toggleCollapsible('SEO');
+
+			await objectLayoutsPage.setObjectLayoutAsDefault();
+
+			await iframe.getByRole('button', {name: 'Save'}).first().click();
+		});
+
+		await test.step('verify SEO block is collapsible', async () => {
+			await viewObjectEntriesPage.goto(objectDefinition.className);
+
+			await viewObjectEntriesPage.clickAddObjectEntry();
+
+			expect(page.getByRole('button', {name: 'SEO'})).toBeVisible();
+		});
 	});
 });
