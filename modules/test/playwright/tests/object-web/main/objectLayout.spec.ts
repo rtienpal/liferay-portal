@@ -52,11 +52,13 @@ test.describe('manage Object Layouts through the Object Layout tab', () => {
 
 		await objectLayoutsPage.createObjectLayout(objectLayoutName);
 
-		await objectLayoutsPage.createObjectLayoutContent({
-			objectLayoutBlockName: getRandomString(),
-			objectLayoutName,
-			objectLayoutTabName: getRandomString(),
-		});
+		await objectLayoutsPage.openObjectLayoutConfiguration(objectLayoutName);
+
+		await objectLayoutsPage.createObjectLayoutTab(getRandomString());
+
+		await objectLayoutsPage.createObjectLayoutBlock(getRandomString());
+
+		await objectLayoutsPage.openObjectLayoutObjectField();
 
 		objectFields.forEach(({label}) => {
 			expect(
@@ -105,12 +107,13 @@ test.describe('manage Object Layouts through the Object Layout tab', () => {
 			await objectLayoutsPage.createObjectLayout(objectLayoutName);
 
 			await objectLayoutsPage.createObjectLayoutContent({
+				objectFieldsName: ['textField'],
 				objectLayoutBlockName: blockName,
 				objectLayoutName,
 				objectLayoutTabName: getRandomString(),
 			});
 
-			await objectLayoutsPage.addObjectLayoutObjectField('textField');
+			await objectLayoutsPage.setObjectLayoutAsDefault();
 
 			await iframe.getByRole('button', {name: 'Save'}).first().click();
 		});
@@ -283,14 +286,13 @@ test.describe('manage Object Layouts through the Object Layout tab', () => {
 		await objectLayoutsPage.createObjectLayout(objectLayoutName);
 
 		await objectLayoutsPage.createObjectLayoutContent({
+			objectFieldsName: [objectFields1[0].label.en_US],
 			objectLayoutBlockName: getRandomString(),
 			objectLayoutName,
 			objectLayoutTabName: getRandomString(),
 		});
 
-		await objectLayoutsPage.addObjectLayoutObjectField(
-			objectFields1[0].label.en_US
-		);
+		await objectLayoutsPage.setObjectLayoutAsDefault();
 
 		const objectLayoutRelTabName = getRandomString();
 

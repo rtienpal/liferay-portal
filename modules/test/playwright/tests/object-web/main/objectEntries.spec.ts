@@ -1836,24 +1836,11 @@ test.describe('Manage object entries through View Object Entries', () => {
 		await objectLayoutsPage.markAsDefaultButton.check();
 
 		await objectLayoutsPage.createObjectLayoutContent({
+			objectFieldsName: ['Custom Field', 'Relationship'],
 			objectLayoutBlockName: 'Block 1',
 			objectLayoutName,
 			objectLayoutTabName: 'Field Tab',
 		});
-
-		await objectLayoutsPage.iframeLocator
-			.getByRole('option', {name: 'Custom Field Optional'})
-			.click();
-
-		await objectLayoutsPage.saveAddFieldButton.click();
-
-		await objectLayoutsPage.openObjectLayoutObjectField();
-
-		await objectLayoutsPage.iframeLocator
-			.getByRole('option', {name: 'Relationship Optional'})
-			.click();
-
-		await objectLayoutsPage.saveAddFieldButton.click();
 
 		await objectLayoutsPage.createObjectRelationshipTab(
 			objectLayoutName,
@@ -2128,14 +2115,11 @@ test.describe('Manage object entries through View Object Entries', () => {
 		await objectLayoutsPage.createObjectLayout(objectLayoutName);
 
 		await objectLayoutsPage.createObjectLayoutContent({
+			objectFieldsName: [objectField.label['en_US']],
 			objectLayoutBlockName: getRandomString(),
 			objectLayoutName,
 			objectLayoutTabName: getRandomString(),
 		});
-
-		await objectLayoutsPage.addObjectLayoutObjectField(
-			objectField.label['en_US']
-		);
 
 		const objectEntry2 = await apiHelpers.objectEntry.postObjectEntry(
 			{
