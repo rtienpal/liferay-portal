@@ -8,12 +8,14 @@ import {FrameLocator, Locator, Page} from '@playwright/test';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 
 export class ObjectLayoutsPage {
-	readonly addBlock: Locator;
+	readonly addCategorization: Locator;
 	readonly addField: Locator;
 	readonly addObjectLayoutButton: Locator;
+	readonly addRegularBlock: Locator;
 	readonly addTab: Locator;
 	readonly fieldList: Locator;
 	readonly fieldSelect: Locator;
+	readonly headerDropdown: Locator;
 	readonly iframeLocator: FrameLocator;
 	readonly labelInput: Locator;
 	readonly layoutNameInput: Locator;
@@ -32,18 +34,25 @@ export class ObjectLayoutsPage {
 
 	constructor(page: Page) {
 		this.iframeLocator = page.frameLocator('iframe');
-		this.addBlock = this.iframeLocator.getByRole('button', {
-			name: 'Add Block',
+		this.addCategorization = this.iframeLocator.getByRole('menuitem', {
+			name: 'Add Categorization',
 		});
 		this.addField = this.iframeLocator.getByRole('button', {
 			name: 'Add Field',
 		});
 		this.addObjectLayoutButton = page.getByLabel('Add Object Layout');
+		this.addRegularBlock = this.iframeLocator.getByRole('button', {
+			name: 'Add Block',
+		});
+
 		this.addTab = this.iframeLocator.getByRole('button', {name: 'Add Tab'});
 		this.fieldList = this.iframeLocator.getByRole('combobox', {
 			name: 'Relationship',
 		});
 		this.fieldSelect = this.iframeLocator.getByText('Select an Option');
+		this.headerDropdown = this.iframeLocator
+			.getByLabel('More Actions')
+			.nth(0);
 		this.labelInput = this.iframeLocator.getByLabel('Label');
 		this.layoutNameInput = page.getByLabel('Name');
 		this.layoutsTabItem = page.getByRole('link', {name: 'Layouts'});
@@ -73,6 +82,21 @@ export class ObjectLayoutsPage {
 		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
 	}
 
+	async addBlock(option: 'categorization') {
+		await this.headerDropdown.click();
+
+		if (
+			option === 'categorization' &&
+			!(await this.addCategorization.isDisabled())
+		) {
+			await this.addCategorization.click();
+
+			return;
+		}
+
+		await this.headerDropdown.click();
+	}
+
 	async addObjectLayoutObjectField(option: string) {
 		await this.fieldSelect.waitFor({state: 'visible'});
 		await this.iframeLocator
@@ -80,7 +104,6 @@ export class ObjectLayoutsPage {
 			.filter({hasText: option})
 			.click();
 		await this.saveAddFieldButton.click();
-		await this.setObjectLayoutAsDefault();
 	}
 
 	async createObjectLayout(objectLayoutName: string) {
@@ -89,9 +112,21 @@ export class ObjectLayoutsPage {
 		await this.saveAddLayoutButton.click();
 	}
 
-	async createObjectLayoutBlock(objectLayoutBlockName: string) {
-		await this.addBlock.click();
-		await this.labelInput.fill(objectLayoutBlockName);
+	async createObjectLayoutBlock({
+		hasCategorizationBlock,
+		objectLayoutRegularBlockName,
+	}: {
+		hasCategorizationBlock?: boolean;
+		objectLayoutRegularBlockName: string;
+	}) {
+		if (hasCategorizationBlock) {
+			await this.addBlock('categorization');
+		}
+
+		await this.addRegularBlock.click();
+
+		await this.labelInput.fill(objectLayoutRegularBlockName);
+
 		await this.saveBlockButton.click();
 	}
 
@@ -119,18 +154,29 @@ export class ObjectLayoutsPage {
 	}
 
 	async createObjectLayoutContent({
-		objectLayoutBlockName,
+		hasCategorizationBlock,
+		objectFieldNames,
 		objectLayoutName,
+		objectLayoutRegularBlockName,
 		objectLayoutTabName,
 	}: {
-		objectLayoutBlockName: string;
+		hasCategorizationBlock?: boolean;
+		objectFieldNames: string[];
 		objectLayoutName: string;
+		objectLayoutRegularBlockName: string;
 		objectLayoutTabName: string;
 	}) {
 		await this.openObjectLayoutConfiguration(objectLayoutName);
 		await this.createObjectLayoutTab(objectLayoutTabName);
-		await this.createObjectLayoutBlock(objectLayoutBlockName);
-		await this.openObjectLayoutObjectField();
+		await this.createObjectLayoutBlock({
+			hasCategorizationBlock,
+			objectLayoutRegularBlockName,
+		});
+
+		for (const fieldName of objectFieldNames) {
+			await this.openObjectLayoutObjectField();
+			await this.addObjectLayoutObjectField(fieldName);
+		}
 	}
 
 	async goto(objectDefinitionLabel: string) {
