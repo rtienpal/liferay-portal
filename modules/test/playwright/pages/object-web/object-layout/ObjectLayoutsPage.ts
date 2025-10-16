@@ -12,6 +12,7 @@ export class ObjectLayoutsPage {
 	readonly addField: Locator;
 	readonly addObjectLayoutButton: Locator;
 	readonly addRegularBlock: Locator;
+	readonly addSeo: Locator;
 	readonly addTab: Locator;
 	readonly fieldList: Locator;
 	readonly fieldSelect: Locator;
@@ -44,7 +45,9 @@ export class ObjectLayoutsPage {
 		this.addRegularBlock = this.iframeLocator.getByRole('button', {
 			name: 'Add Block',
 		});
-
+		this.addSeo = this.iframeLocator.getByRole('menuitem', {
+			name: 'Add SEO',
+		});
 		this.addTab = this.iframeLocator.getByRole('button', {name: 'Add Tab'});
 		this.fieldList = this.iframeLocator.getByRole('combobox', {
 			name: 'Relationship',
@@ -82,7 +85,7 @@ export class ObjectLayoutsPage {
 		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
 	}
 
-	async addBlock(option: 'categorization') {
+	async addBlock(option: 'categorization' | 'seo') {
 		await this.headerDropdown.click();
 
 		if (
@@ -90,6 +93,11 @@ export class ObjectLayoutsPage {
 			!(await this.addCategorization.isDisabled())
 		) {
 			await this.addCategorization.click();
+
+			return;
+		}
+		else if (option === 'seo' && !(await this.addSeo.isDisabled())) {
+			await this.addSeo.click();
 
 			return;
 		}
@@ -114,13 +122,18 @@ export class ObjectLayoutsPage {
 
 	async createObjectLayoutBlock({
 		hasCategorizationBlock,
+		hasSeoBlock,
 		objectLayoutRegularBlockName,
 	}: {
 		hasCategorizationBlock?: boolean;
+		hasSeoBlock?: boolean;
 		objectLayoutRegularBlockName: string;
 	}) {
 		if (hasCategorizationBlock) {
 			await this.addBlock('categorization');
+		}
+		if (hasSeoBlock) {
+			await this.addBlock('seo');
 		}
 
 		await this.addRegularBlock.click();
@@ -155,12 +168,14 @@ export class ObjectLayoutsPage {
 
 	async createObjectLayoutContent({
 		hasCategorizationBlock,
+		hasSeoBlock,
 		objectFieldNames,
 		objectLayoutName,
 		objectLayoutRegularBlockName,
 		objectLayoutTabName,
 	}: {
 		hasCategorizationBlock?: boolean;
+		hasSeoBlock?: boolean;
 		objectFieldNames: string[];
 		objectLayoutName: string;
 		objectLayoutRegularBlockName: string;
@@ -170,6 +185,7 @@ export class ObjectLayoutsPage {
 		await this.createObjectLayoutTab(objectLayoutTabName);
 		await this.createObjectLayoutBlock({
 			hasCategorizationBlock,
+			hasSeoBlock,
 			objectLayoutRegularBlockName,
 		});
 
@@ -202,5 +218,13 @@ export class ObjectLayoutsPage {
 	async setObjectLayoutAsDefault() {
 		await this.iframeLocator.getByRole('tab', {name: 'Info'}).click();
 		await this.iframeLocator.getByLabel('Mark as Default').click();
+	}
+
+	async toggleCollapsible(blockLabel: string) {
+		const blockToggle = this.iframeLocator
+			.getByText(`${blockLabel}Collapsible`)
+			.getByRole('switch', {name: 'Collapsible'});
+
+		await blockToggle.click();
 	}
 }
