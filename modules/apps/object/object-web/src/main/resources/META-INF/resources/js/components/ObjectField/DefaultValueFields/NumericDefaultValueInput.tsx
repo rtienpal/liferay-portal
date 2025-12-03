@@ -75,7 +75,7 @@ const NumericDefaultValueInput: React.FC<
 			error={error}
 			label={label}
 			onChange={handleChangeInput}
-			placeholder={Liferay.Language.get('choose-an-option')}
+			placeholder={Liferay.Language.get('enter-a-default-value')}
 			required={required}
 			value={value}
 		/>
