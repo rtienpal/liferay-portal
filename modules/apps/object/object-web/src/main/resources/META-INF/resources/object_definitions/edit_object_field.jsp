@@ -8,6 +8,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+DecimalFormat decimalFormat = NumericDDMFormFieldUtil.getDecimalFormat(locale);
+DecimalFormatSymbols decimalFormatSymbols = decimalFormat.getDecimalFormatSymbols();
 ObjectDefinition objectDefinition = (ObjectDefinition)request.getAttribute(ObjectWebKeys.OBJECT_DEFINITION);
 ObjectDefinitionsFieldsDisplayContext objectDefinitionsFieldsDisplayContext = (ObjectDefinitionsFieldsDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 ObjectField objectField = (ObjectField)request.getAttribute(ObjectWebKeys.OBJECT_FIELD);
@@ -24,6 +26,8 @@ ObjectField objectField = (ObjectField)request.getAttribute(ObjectWebKeys.OBJECT
 			"ckEditor5Config", objectDefinitionsFieldsDisplayContext.getEditorConfig()
 		).put(
 			"creationLanguageId", objectDefinition.getDefaultLanguageId()
+		).put(
+			"decimalSymbol", String.valueOf(decimalFormatSymbols.getDecimalSeparator())
 		).put(
 			"filterOperators", LocalizedJSONArrayUtil.getFilterOperatorsJSONObject(locale)
 		).put(
@@ -44,6 +48,8 @@ ObjectField objectField = (ObjectField)request.getAttribute(ObjectWebKeys.OBJECT
 			"objectFieldId", objectField.getObjectFieldId()
 		).put(
 			"readOnly", !objectDefinitionsFieldsDisplayContext.hasUpdateObjectDefinitionPermission()
+		).put(
+			"thousandsSeparator", String.valueOf(decimalFormatSymbols.getGroupingSeparator())
 		).put(
 			"workflowStatuses", LocalizedJSONArrayUtil.getWorkflowStatusJSONArray(locale)
 		).build()
