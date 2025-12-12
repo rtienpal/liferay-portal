@@ -4,6 +4,7 @@
  */
 
 import * as FormSupport from '../../utils/FormSupport.es';
+import {updateFieldsetReferences} from '../../utils/fieldSets';
 import {
 	addFieldToPage,
 	createField,
@@ -17,6 +18,8 @@ import {
 	updateField,
 	updateFieldName,
 	updateFieldReference,
+	updateFieldsetRowsReferences,
+	updateNameReferencesInNestedFields,
 } from '../../utils/settingsContext';
 import {PagesVisitor} from '../../utils/visitors.es';
 import {EVENT_TYPES} from '../actions/eventTypes.es';
@@ -466,6 +469,65 @@ export default function fieldEditableReducer(state, action, config) {
 								generateFieldNameUsingFieldLabel,
 								repeatableFieldName: newFocusedField.fieldName,
 							});
+						}
+
+						if (
+							propertyName === 'name' &&
+							field.type === 'fieldset'
+						) {
+							let updatedFieldsetReferences =
+								updateFieldsetReferences(
+									field,
+									focusedField.fieldName,
+									propertyValue
+								);
+
+							// console.log(
+							// 	'nestedFields[0].settingsContext.pages[1].rows[0].columns[0].fields[1].value BEFORE: ',
+							// 	updatedFieldsetReferences.nestedFields[0]
+							// 		.settingsContext.pages[1].rows[0].columns[0]
+							// 		.fields[1].value
+							// );
+
+							updatedFieldsetReferences =
+								updateNameReferencesInNestedFields(
+									updatedFieldsetReferences,
+									focusedField.fieldName,
+									propertyValue
+								);
+
+							// updatedFieldsetReferences.nestedFields[0].settingsContext.pages[1].rows[0].columns[0].fields[1].value =
+							// 	propertyValue;
+
+							// console.log(
+							// 	'nestedFields[0].settingsContext.pages[1].rows[0].columns[0].fields[1].value AFTER: ',
+							// 	updatedFieldsetReferences.nestedFields[0]
+							// 		.settingsContext.pages[1].rows[0].columns[0]
+							// 		.fields[1].value
+							// );
+
+							console.log(
+								'updatedFieldsetReferences.settingsContext.pages[0].rows[0].columns[0].fields[5].value: ',
+								updatedFieldsetReferences.settingsContext
+									.pages[0].rows[0].columns[0].fields[5].value
+							);
+
+							updatedFieldsetReferences.settingsContext =
+								updateFieldsetRowsReferences(
+									updatedFieldsetReferences.settingsContext,
+									focusedField.fieldName,
+									propertyValue
+								);
+
+							// updatedFieldsetReferences.settingsContext.pages[0].rows[0].columns[0].fields[5].value = `[{"columns":[{"size":12,"fields":["${propertyValue}"]}]}]`;
+
+							console.log(
+								'updatedFieldsetReferences.settingsContext.pages[0].rows[0].columns[0].fields[5].value: ',
+								updatedFieldsetReferences.settingsContext
+									.pages[0].rows[0].columns[0].fields[5].value
+							);
+
+							return updatedFieldsetReferences;
 						}
 
 						return field;

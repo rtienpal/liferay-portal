@@ -87,3 +87,42 @@ export function createFieldSet(
 		props,
 	});
 }
+
+export function updateFieldsetReferences(fieldset, oldName, newName) {
+	if (!fieldset.rows) {
+		return fieldset;
+	}
+
+	let pages = [{rows: fieldset.rows}];
+
+	const visitor = new PagesVisitor(pages);
+
+	pages = visitor.mapColumns((column) => {
+		const fields = column.fields.map((fieldName) =>
+			fieldName === oldName ? newName : fieldName
+		);
+
+		return {
+			...column,
+			fields,
+		};
+	});
+
+	const nestedFields =
+		fieldset.nestedFields?.map((nestedField) => {
+			if (nestedField.fieldName === oldName) {
+				return {
+					...nestedField,
+					fieldName: newName,
+				};
+			}
+
+			return nestedField;
+		}) ?? fieldset.nestedFields;
+
+	return {
+		...fieldset,
+		nestedFields,
+		rows: pages[0].rows,
+	};
+}

@@ -441,3 +441,121 @@ export function updateField(
 
 	return field;
 }
+
+export function updateNameReferencesInSettingsContext(
+	settingsContext,
+	oldFieldName,
+	newFieldName
+) {
+	const visitor = new PagesVisitor(settingsContext.pages);
+
+	const newPages = visitor.mapFields((field) => {
+		if (field.fieldName === 'name' && field.value === oldFieldName) {
+			return {
+				...field,
+				value: newFieldName,
+			};
+		}
+
+		return field;
+	});
+
+	return {
+		...settingsContext,
+		pages: newPages,
+	};
+}
+
+export function updateNameReferencesInNestedFields(fieldset, oldName, newName) {
+	if (!fieldset.nestedFields) {
+		return fieldset;
+	}
+
+	const newNestedFields = fieldset.nestedFields.map((nestedField) => {
+		let updated = {...nestedField};
+
+		if (updated.settingsContext) {
+			updated.settingsContext = updateNameReferencesInSettingsContext(
+				updated.settingsContext,
+				oldName,
+				newName
+			);
+		}
+
+		// If nested field is itself a fieldset, recurse
+
+		if (updated.type === 'fieldset') {
+			updated = updateNameReferencesInNestedFields(
+				updated,
+				oldName,
+				newName
+			);
+		}
+
+		return updated;
+	});
+
+	return {
+		...fieldset,
+		nestedFields: newNestedFields,
+	};
+}
+
+export function updateFieldsetRowsReferences(
+	settingsContext,
+	oldFieldName,
+	newFieldName
+) {
+	const visitor = new PagesVisitor(settingsContext.pages);
+
+	const updatedPages = visitor.mapFields((field) => {
+
+		// We only modify the "rows" setting field
+
+		if (field.fieldName !== 'rows') {
+			return field;
+		}
+
+		let updatedValue = field.value;
+
+		try {
+
+			// rows JSON is stored as a string → parse it
+
+			const rowsArray = JSON.parse(field.value);
+
+			const newRowsArray = rowsArray.map((row) => {
+				return {
+					...row,
+					columns: row.columns.map((column) => {
+						return {
+							...column,
+							fields: column.fields.map((name) =>
+								name === oldFieldName ? newFieldName : name
+							),
+						};
+					}),
+				};
+			});
+
+			updatedValue = JSON.stringify(newRowsArray);
+		}
+		catch (err) {
+			console.warn(
+				'Failed to parse fieldset rows JSON for field:',
+				field.fieldName,
+				err
+			);
+		}
+
+		return {
+			...field,
+			value: updatedValue,
+		};
+	});
+
+	return {
+		...settingsContext,
+		pages: updatedPages,
+	};
+}
