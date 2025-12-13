@@ -510,47 +510,56 @@ export function updateFieldsetRowsReferences(
 
 	const updatedPages = visitor.mapFields((field) => {
 
-		// We only modify the "rows" setting field
+		// Only update the "rows" setting
 
 		if (field.fieldName !== 'rows') {
 			return field;
 		}
 
-		let updatedValue = field.value;
+		let rowsArray;
+		let shouldStringify = false;
 
-		try {
+		// Normalize value → array
 
-			// rows JSON is stored as a string → parse it
-
-			const rowsArray = JSON.parse(field.value);
-
-			const newRowsArray = rowsArray.map((row) => {
-				return {
-					...row,
-					columns: row.columns.map((column) => {
-						return {
-							...column,
-							fields: column.fields.map((name) =>
-								name === oldFieldName ? newFieldName : name
-							),
-						};
-					}),
-				};
-			});
-
-			updatedValue = JSON.stringify(newRowsArray);
+		if (Array.isArray(field.value)) {
+			rowsArray = field.value;
 		}
-		catch (err) {
-			console.warn(
-				'Failed to parse fieldset rows JSON for field:',
-				field.fieldName,
-				err
-			);
+		else if (typeof field.value === 'string') {
+			try {
+				rowsArray = JSON.parse(field.value);
+				shouldStringify = true;
+			}
+			catch (err) {
+				console.warn(
+					'Failed to parse fieldset rows JSON for field:',
+					field.fieldName,
+					err
+				);
+				return field;
+			}
 		}
+		else {
+
+			// Unknown format, do nothing
+
+			return field;
+		}
+
+		const newRowsArray = rowsArray.map((row) => ({
+			...row,
+			columns: row.columns.map((column) => ({
+				...column,
+				fields: column.fields.map((name) =>
+					name === oldFieldName ? newFieldName : name
+				),
+			})),
+		}));
 
 		return {
 			...field,
-			value: updatedValue,
+			value: shouldStringify
+				? JSON.stringify(newRowsArray)
+				: newRowsArray,
 		};
 	});
 
@@ -559,3 +568,62 @@ export function updateFieldsetRowsReferences(
 		pages: updatedPages,
 	};
 }
+
+// export function updateFieldsetRowsReferences(
+// 	settingsContext,
+// 	oldFieldName,
+// 	newFieldName
+// ) {
+// 	const visitor = new PagesVisitor(settingsContext.pages);
+
+// 	const updatedPages = visitor.mapFields((field) => {
+
+// 		// We only modify the "rows" setting field
+
+// 		if (field.fieldName !== 'rows') {
+// 			return field;
+// 		}
+
+// 		let updatedValue = field.value;
+
+// 		try {
+
+// 			// rows JSON is stored as a string → parse it
+
+// 			const rowsArray = JSON.parse(field.value);
+
+// 			const newRowsArray = rowsArray.map((row) => {
+// 				return {
+// 					...row,
+// 					columns: row.columns.map((column) => {
+// 						return {
+// 							...column,
+// 							fields: column.fields.map((name) =>
+// 								name === oldFieldName ? newFieldName : name
+// 							),
+// 						};
+// 					}),
+// 				};
+// 			});
+
+// 			updatedValue = JSON.stringify(newRowsArray);
+// 		}
+// 		catch (err) {
+// 			console.warn(
+// 				'Failed to parse fieldset rows JSON for field:',
+// 				field.fieldName,
+// 				err
+// 			);
+// 		}
+
+// 		return {
+// 			...field,
+// 			value: updatedValue,
+// 		};
+// 	});
+
+// 	return {
+// 		...settingsContext,
+// 		pages: updatedPages,
+// 	};
+// }

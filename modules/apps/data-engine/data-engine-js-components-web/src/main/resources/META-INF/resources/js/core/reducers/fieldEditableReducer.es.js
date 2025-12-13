@@ -482,13 +482,6 @@ export default function fieldEditableReducer(state, action, config) {
 									propertyValue
 								);
 
-							// console.log(
-							// 	'nestedFields[0].settingsContext.pages[1].rows[0].columns[0].fields[1].value BEFORE: ',
-							// 	updatedFieldsetReferences.nestedFields[0]
-							// 		.settingsContext.pages[1].rows[0].columns[0]
-							// 		.fields[1].value
-							// );
-
 							updatedFieldsetReferences =
 								updateNameReferencesInNestedFields(
 									updatedFieldsetReferences,
@@ -496,20 +489,10 @@ export default function fieldEditableReducer(state, action, config) {
 									propertyValue
 								);
 
-							// updatedFieldsetReferences.nestedFields[0].settingsContext.pages[1].rows[0].columns[0].fields[1].value =
-							// 	propertyValue;
-
-							// console.log(
-							// 	'nestedFields[0].settingsContext.pages[1].rows[0].columns[0].fields[1].value AFTER: ',
-							// 	updatedFieldsetReferences.nestedFields[0]
-							// 		.settingsContext.pages[1].rows[0].columns[0]
-							// 		.fields[1].value
-							// );
-
 							console.log(
-								'updatedFieldsetReferences.settingsContext.pages[0].rows[0].columns[0].fields[5].value: ',
+								'BEFORE updatedFieldsetReferences.settingsContext.pages[0].rows[0].columns[0].fields[5].value: ',
 								updatedFieldsetReferences.settingsContext
-									.pages[0].rows[0].columns[0].fields[5].value
+									.pages[0].rows[0].columns[0].fields
 							);
 
 							updatedFieldsetReferences.settingsContext =
@@ -519,12 +502,10 @@ export default function fieldEditableReducer(state, action, config) {
 									propertyValue
 								);
 
-							// updatedFieldsetReferences.settingsContext.pages[0].rows[0].columns[0].fields[5].value = `[{"columns":[{"size":12,"fields":["${propertyValue}"]}]}]`;
-
 							console.log(
-								'updatedFieldsetReferences.settingsContext.pages[0].rows[0].columns[0].fields[5].value: ',
+								'AFTER updatedFieldsetReferences.settingsContext.pages[0].rows[0].columns[0].fields[5].value: ',
 								updatedFieldsetReferences.settingsContext
-									.pages[0].rows[0].columns[0].fields[5].value
+									.pages[0].rows[0].columns[0].fields
 							);
 
 							return updatedFieldsetReferences;
