@@ -44,6 +44,12 @@ ObjectDefinition objectDefinition = viewObjectEntriesDisplayContext.getObjectDef
 				%>'
 			/>
 		</div>
+		
+		<div>
+			<react:component
+				module="{ModalBulkDeleteObjectEntries} from object-web"
+			/>
+		</div>
 	</c:when>
 	<c:otherwise>
 		<clay:alert
