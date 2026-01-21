@@ -1335,6 +1335,14 @@ public abstract class BaseBulkActionResourceTestCase {
 				return bulkAction;
 			},
 			() -> {
+				DeleteBulkAction bulkAction = new DeleteBulkAction();
+
+				bulkAction.setType(
+					BulkAction.Type.create("DeleteObjectEntryBulkAction"));
+
+				return bulkAction;
+			},
+			() -> {
 				KeywordBulkAction bulkAction = new KeywordBulkAction();
 
 				bulkAction.setAppend(RandomTestUtil.randomBoolean());
