@@ -139,7 +139,7 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 
 		BulkAction.Type type = bulkAction.getType();
 
-		BulkActionTask bulkActionTask = _addBulkActionTask(type);
+		BulkActionTask bulkActionTask = _addBulkActionTask(scope, type);
 
 		_bulkSelectionRunner.run(
 			contextUser, bulkSelection, _getBulkSelectionAction(type),
@@ -225,8 +225,13 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 			filter, pagination, search, sorts[0]);
 	}
 
-	private BulkActionTask _addBulkActionTask(BulkAction.Type type)
+	private BulkActionTask _addBulkActionTask(
+			String scope, BulkAction.Type type)
 		throws Exception {
+
+		if (scope != null) {
+			return new BulkActionTask();
+		}
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.
@@ -399,6 +404,9 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 		else if (BulkAction.Type.DELETE_BULK_ACTION.equals(type)) {
 			return _deleteObjectBulkSelectionAction;
 		}
+		else if (BulkAction.Type.DELETE_OBJECT_ENTRY_BULK_ACTION.equals(type)) {
+			return _deleteObjectEntryBulkSelectionAction;
+		}
 		else if (BulkAction.Type.KEYWORD_BULK_ACTION.equals(type)) {
 			return _editObjectTagsBulkSelectionAction;
 		}
@@ -424,8 +432,9 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 	}
 
 	private Map<String, Serializable> _getInputMap(
-		BulkAction bulkAction, BulkActionTask bulkActionTask,
-		BulkAction.Type type) {
+			BulkAction bulkAction, BulkActionTask bulkActionTask,
+			BulkAction.Type type)
+		throws Exception {
 
 		HashMapBuilder.HashMapWrapper<String, Serializable> hashMapWrapper =
 			HashMapBuilder.<String, Serializable>put(
@@ -444,6 +453,11 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 		}
 		else if (BulkAction.Type.DELETE_BULK_ACTION.equals(type)) {
 			return hashMapWrapper.build();
+		}
+		else if (BulkAction.Type.DELETE_OBJECT_ENTRY_BULK_ACTION.equals(type)) {
+			return hashMapWrapper.put(
+				"objectDefinitionId", _getObjectDefinitionId(bulkAction)
+			).build();
 		}
 		else if (BulkAction.Type.KEYWORD_BULK_ACTION.equals(type)) {
 			KeywordBulkAction keywordBulkAction = (KeywordBulkAction)bulkAction;
@@ -528,6 +542,19 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 		}
 
 		return "custom-structure";
+	}
+
+	private long _getObjectDefinitionId(BulkAction bulkAction)
+		throws Exception {
+
+		BulkActionItem[] bulkActionItems = bulkAction.getBulkActionItems();
+
+		long objectEntryId = bulkActionItems[0].getClassPK();
+
+		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
+			objectEntryId);
+
+		return objectEntry.getObjectDefinitionId();
 	}
 
 	private List<BulkActionItem> _getObjectEntryFolderBulkActionItems(
@@ -816,6 +843,9 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 
 	@Reference(target = "(bulk.selection.action.key=delete.object)")
 	private BulkSelectionAction<Object> _deleteObjectBulkSelectionAction;
+
+	@Reference(target = "(bulk.selection.action.key=delete.object.entry)")
+	private BulkSelectionAction<Object> _deleteObjectEntryBulkSelectionAction;
 
 	@Reference
 	private DLMimeTypeDisplayContext _dlMimeTypeDisplayContext;
