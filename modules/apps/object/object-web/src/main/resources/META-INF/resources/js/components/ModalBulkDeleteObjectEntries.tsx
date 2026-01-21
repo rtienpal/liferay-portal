@@ -10,19 +10,30 @@ import React, {useEffect, useState} from 'react';
 
 import AssetBulkActionTaskService from '../common/services/AssetBulkActionTaskService';
 
+interface ModalBulkDeleteObjectEntriesProps {
+	namespace: string;
+	objectDefinition: any;
+}
+
 interface ModalBulkDeleteObjectEntriesState {
 	deletionErrorMessage: string | null;
 	selectedData: any | null;
 	visible: boolean;
 }
 
-export default function ModalBulkDeleteObjectEntries() {
+export default function ModalBulkDeleteObjectEntries({
+	namespace,
+	objectDefinition,
+}: ModalBulkDeleteObjectEntriesProps) {
+	console.log('objectDefinition: ', objectDefinition);
 	const [modalDeleteObjectsEntriesState, setModalDeleteObjectsEntriesState] =
 		useState<ModalBulkDeleteObjectEntriesState>({
 			deletionErrorMessage: null,
 			selectedData: null,
 			visible: false,
 		});
+
+	const bulkStatusComponent = Liferay.component(`${namespace}BulkStatus`);
 
 	const [deleteButtonDisabled, setDeleteButtonDisabled] =
 		useState<boolean>(false);
@@ -66,7 +77,11 @@ export default function ModalBulkDeleteObjectEntries() {
 					type: 'DeleteBulkAction',
 				},
 				url.toString()
-			);
+			).then(() => {
+				if (bulkStatusComponent) {
+					bulkStatusComponent.startWatch();
+				}
+			});
 
 			openToast({
 				message: Liferay.Language.get(
@@ -76,8 +91,6 @@ export default function ModalBulkDeleteObjectEntries() {
 			});
 
 			onClose();
-
-			setTimeout(() => window.location.reload(), 1000);
 		}
 		catch (error) {
 			setModalDeleteObjectsEntriesState((prevState) => ({
