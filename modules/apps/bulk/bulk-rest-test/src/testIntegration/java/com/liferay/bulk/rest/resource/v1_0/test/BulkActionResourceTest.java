@@ -39,6 +39,7 @@ import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFolderConstants;
 import com.liferay.object.definition.setting.builder.ObjectDefinitionSettingBuilder;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -161,6 +162,7 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 		_testPostBulkActionWithTypeDefaultPermission();
 		_testPostBulkActionWithTypeDefaultPermissionSingleRole();
 		_testPostBulkActionWithTypeDelete();
+		_testPostBulkActionWithTypeDeleteObjectEntry();
 		_testPostBulkActionWithTypeKeyword();
 		_testPostBulkActionWithTypePermission();
 		_testPostBulkActionWithTypePermissionSingleRole();
@@ -896,7 +898,9 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 			_depotEntry2.getGroupId(), _cmsBasicWebContentObjectDefinition,
 			_getObjectEntryValues());
 
-		bulkAction.setBulkActionItems(_toBulkActionItems(objectEntry));
+		bulkAction.setBulkActionItems(
+			_toBulkActionItems(
+				_cmsBasicWebContentObjectDefinition, objectEntry));
 
 		selectionScope.setSelectAll(false);
 
@@ -909,6 +913,99 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 				objectEntry.getObjectEntryId()));
 	}
 
+	private void _testPostBulkActionWithTypeDeleteObjectEntry()
+		throws Exception {
+
+		BulkAction bulkAction = new DeleteBulkAction();
+
+		bulkAction.setType(BulkAction.Type.DELETE_OBJECT_ENTRY_BULK_ACTION);
+
+		BulkActionTask bulkActionTask = bulkActionResource.postBulkAction(
+			null, null, null, "0", null, null, null, null, bulkAction);
+
+		Assert.assertNull(bulkActionTask.getId());
+
+		SelectionScope selectionScope = new SelectionScope();
+
+		selectionScope.setSelectAll(true);
+
+		bulkAction.setSelectionScope(selectionScope);
+
+		try {
+			bulkActionResource.postBulkAction(
+				null, null, "", "0", null, null, null, null, bulkAction);
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+			Assert.assertEquals("Filter is null", problem.getTitle());
+		}
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(
+				0, "A" + RandomTestUtil.randomString(),
+				List.of(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						RandomTestUtil.randomLocaleStringMap()
+					).name(
+						StringUtil.randomId()
+					).build()));
+
+		objectDefinition =
+			_objectDefinitionLocalService.publishCustomObjectDefinition(
+				TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId());
+
+		ObjectEntry objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinition, _getObjectEntryValues());
+
+		ObjectEntry objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinition, _getObjectEntryValues());
+
+		bulkAction.setBulkActionItems(
+			_toBulkActionItems(objectDefinition, objectEntry1));
+
+		selectionScope.setSelectAll(false);
+
+		bulkAction.setSelectionScope(selectionScope);
+
+		bulkActionResource.postBulkAction(
+			null, null, null, "0", null, null, null, null, bulkAction);
+
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				objectEntry1.getObjectEntryId()));
+
+		Assert.assertNotNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				objectEntry2.getObjectEntryId()));
+
+		objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinition, _getObjectEntryValues());
+
+		selectionScope.setSelectAll(true);
+
+		bulkAction.setSelectionScope(selectionScope);
+
+		bulkAction.setBulkActionItems(
+			_toBulkActionItems(objectDefinition, objectEntry1));
+
+		bulkActionResource.postBulkAction(
+			null, true, null, "0", null,
+			"(objectDefinitionId eq " +
+				objectDefinition.getObjectDefinitionId() + ")",
+			null, null, bulkAction);
+
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				objectEntry1.getObjectEntryId()));
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				objectEntry2.getObjectEntryId()));
+	}
+
 	private void _testPostBulkActionWithTypeKeyword() throws Exception {
 		KeywordBulkAction keywordBulkAction = new KeywordBulkAction();
 
@@ -916,7 +1013,9 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 			_depotEntry2.getGroupId(), _cmsBasicWebContentObjectDefinition,
 			_getObjectEntryValues());
 
-		keywordBulkAction.setBulkActionItems(_toBulkActionItems(objectEntry));
+		keywordBulkAction.setBulkActionItems(
+			_toBulkActionItems(
+				_cmsBasicWebContentObjectDefinition, objectEntry));
 
 		String[] keywords = {
 			RandomTestUtil.randomString(), RandomTestUtil.randomString()
@@ -1011,7 +1110,9 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 			ServiceContextTestUtil.getServiceContext());
 
 		permissionBulkAction.setBulkActionItems(
-			_toBulkActionItems(objectEntry1, objectEntry2));
+			_toBulkActionItems(
+				_cmsBulkActionTaskObjectDefinition, objectEntry1,
+				objectEntry2));
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject();
 
@@ -1469,7 +1570,8 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 			_getObjectEntryValues());
 
 		taxonomyCategoryBulkAction.setBulkActionItems(
-			_toBulkActionItems(objectEntry));
+			_toBulkActionItems(
+				_cmsBasicWebContentObjectDefinition, objectEntry));
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(testGroup.getGroupId());
@@ -1536,7 +1638,8 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 		};
 	}
 
-	private BulkActionItem[] _toBulkActionItems(ObjectEntry... objectEntries)
+	private BulkActionItem[] _toBulkActionItems(
+			ObjectDefinition objectDefinition, ObjectEntry... objectEntries)
 		throws Exception {
 
 		return TransformUtil.transform(
@@ -1545,9 +1648,7 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 				{
 					setClassExternalReferenceCode(
 						objectEntry::getExternalReferenceCode);
-					setClassName(
-						() ->
-							_cmsBasicWebContentObjectDefinition.getClassName());
+					setClassName(objectDefinition::getClassName);
 					setClassPK(objectEntry::getObjectEntryId);
 					setName(objectEntry::getTitleValue);
 				}
