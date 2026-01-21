@@ -13,6 +13,7 @@ components:
                 mapping:
                     DefaultPermissionBulkAction: "#/components/schemas/DefaultPermissionBulkAction"
                     DeleteBulkAction: "#/components/schemas/DeleteBulkAction"
+                    DeleteObjectEntryBulkAction: "#/components/schemas/DeleteBulkAction"
                     KeywordBulkAction: "#/components/schemas/KeywordBulkAction"
                     MoveBulkAction: "#/components/schemas/MoveBulkAction"
                     PermissionBulkAction: "#/components/schemas/PermissionBulkAction"
@@ -31,6 +32,7 @@ components:
                     enum:
                         -   DefaultPermissionBulkAction
                         -   DeleteBulkAction
+                        -   DeleteObjectEntryBulkAction
                         -   KeywordBulkAction
                         -   MoveBulkAction
                         -   PermissionBulkAction
@@ -246,7 +248,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.bulk.rest.client', and version '3.0.35'."
+        'com.liferay.bulk.rest.client', and version '3.0.37'."
     license:
         name: Apache 2.0
         url: http://www.apache.org/licenses/LICENSE-2.0.html
