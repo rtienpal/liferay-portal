@@ -6,9 +6,12 @@
 import ClayButton from '@clayui/button';
 import ClayModal, {useModal} from '@clayui/modal';
 import {openToast} from '@liferay/object-js-components-web';
+import {sub} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
 import AssetBulkActionTaskService from '../common/services/AssetBulkActionTaskService';
+
+import './ModalBulkDeleteObjectEntries.scss';
 
 interface ModalBulkDeleteObjectEntriesProps {
 	namespace: string;
@@ -140,7 +143,11 @@ export default function ModalBulkDeleteObjectEntries({
 
 			<ClayModal.Body>
 				{modalDeleteObjectsEntriesState.deletionErrorMessage ??
-					Liferay.Language.get('delete-entries-confirmation')}
+					sub(Liferay.Language.get('delete-entries-confirmation'), [
+						<span key="count">
+							{`${modalDeleteObjectsEntriesState.selectedData?.items?.length || 0} ${Liferay.Language.get('entries')}`.toLocaleLowerCase()}
+						</span>,
+					])}
 			</ClayModal.Body>
 
 			<ClayModal.Footer
