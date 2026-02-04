@@ -19,7 +19,6 @@ export default function pageValidationReducer(state, action) {
 
 			let firstInvalidFieldLabel = null;
 			let firstInvalidFieldInput = null;
-			let firstInvalidFieldName;
 
 			const pages = visitor.mapFields(
 				(
@@ -43,7 +42,6 @@ export default function pageValidationReducer(state, action) {
 						firstInvalidFieldInput = document.querySelector(
 							`[name='${field.name}']`
 						);
-						firstInvalidFieldName = field.name;
 					}
 
 					return {
@@ -57,18 +55,23 @@ export default function pageValidationReducer(state, action) {
 			);
 
 			if (firstInvalidFieldInput) {
-				if (firstInvalidFieldInput.type !== 'hidden') {
-					firstInvalidFieldInput.focus();
-				}
-				else {
-					if (
-						document.getElementsByName(firstInvalidFieldName)[0] &&
-						document.getElementsByName(firstInvalidFieldName)[0]
-							.parentElement
-					) {
-						document
-							.getElementsByName(firstInvalidFieldName)[0]
-							.parentElement.scrollIntoView();
+				const fieldContainer =
+					firstInvalidFieldInput.closest('.ddm-field') ||
+					firstInvalidFieldInput.parentElement;
+
+				if (fieldContainer) {
+					const richTextHiddenInput = fieldContainer.querySelector(
+						'input.ddm-form-field-type__richtext-input--hidden'
+					);
+
+					if (richTextHiddenInput) {
+						richTextHiddenInput.focus();
+					}
+					else if (firstInvalidFieldInput.focus) {
+						firstInvalidFieldInput.focus();
+					}
+					else {
+						fieldContainer.scrollIntoView();
 					}
 				}
 			}

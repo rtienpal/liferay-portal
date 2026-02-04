@@ -24,6 +24,8 @@ import {
 } from '../util/localizable/transform.es';
 import {sanitizeHTML} from '../util/sanitize.ts';
 
+import './RichText.scss';
+
 const INITIAL_DEFAULT_LOCALE = {
 	icon: themeDisplay.getDefaultLanguageId(),
 	localeId: themeDisplay.getDefaultLanguageId(),
@@ -67,6 +69,8 @@ const RichText = ({
 	...otherProps
 }) => {
 	const {availableLocales, editingLanguageId} = useFormState();
+
+	const ckEditor5InstanceRef = useRef(null);
 
 	const editorRef = useRef();
 
@@ -284,6 +288,8 @@ const RichText = ({
 	};
 
 	const onReady = (editor) => {
+		ckEditor5InstanceRef.current = editor;
+		
 		const sourceEditingPlugin = editor.plugins.get('SourceEditing');
 
 		if (!sourceEditingPlugin) {
@@ -442,9 +448,20 @@ const RichText = ({
 				</ClayInput.GroupItem>
 
 				<input
+					className="ddm-form-field-type__richtext-input--hidden"
 					id={id}
 					name={name}
-					type="hidden"
+					onFocus={() => {
+						if (Liferay.FeatureFlags['LPD-11235']) {
+							ckEditor5InstanceRef.current?.editing.view.focus();
+						}
+						else {
+							const editorInstance = editorRef.current?.editor;
+							if (editorInstance) {
+								editorInstance.focus();
+							}
+						}
+					}}
 					value={
 						localizedObjectField
 							? currentValue || ''
