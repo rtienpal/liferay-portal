@@ -335,7 +335,7 @@ bulkTest.describe('can use bulk on object entries', () => {
 
 			await viewObjectEntriesPage.deleteConfirmationModal.click();
 
-			await page.waitForLoadState('networkidle');
+			await waitForAlert(page, 'Deletion process has been finished.');
 
 			await page.reload();
 
@@ -357,7 +357,7 @@ bulkTest.describe('can use bulk on object entries', () => {
 
 			await viewObjectEntriesPage.deleteAllConfirmationModal.click();
 
-			await page.waitForLoadState('networkidle');
+			await waitForAlert(page, 'Deletion process has been finished.');
 
 			await page.reload();
 
