@@ -13,6 +13,7 @@ import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {pageEditorPagesTest} from '../../../fixtures/pageEditorPagesTest';
 import {pagesAdminPagesTest} from '../../../fixtures/pagesAdminPagesTest';
 import getRandomString from '../../../utils/getRandomString';
+import getFormContainerDefinition from '../../layout-content-page-editor-web/main/utils/getFormContainerDefinition';
 import getPageDefinition from '../../layout-content-page-editor-web/main/utils/getPageDefinition';
 import {generateObjectFields} from './utils/generateObjectFields';
 
@@ -32,12 +33,11 @@ test(
 	'LPD-78504 Can search for object entry on search experience in collection providers',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, pageEditorPage, site}) => {
+
 		// Corresponds to Poshi test: CanSearchForObjectEntryOnSearchExperience
 
 		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: [
-				{businessType: 'Text', indexed: true},
-			],
+			objectFieldBusinessTypes: [{businessType: 'Text', indexed: true}],
 		});
 
 		const objectDefinition =
@@ -66,8 +66,12 @@ test(
 		}
 
 		const layout = await apiHelpers.headlessDelivery.createSitePage({
-			pageDefinition: getPageDefinition(),
-			siteId: site.id,
+			pageDefinition: getPageDefinition([
+				getFormContainerDefinition({
+					id: getRandomString(),
+				}),
+			]),
+			siteId: String(site.id),
 			title: getRandomString(),
 		});
 
@@ -118,9 +122,7 @@ test(
 
 			await page.getByLabel('Select', {exact: true}).click();
 
-			await page
-				.getByLabel(objectDefinition.label['en_US'])
-				.check();
+			await page.getByLabel(objectDefinition.label['en_US']).check();
 
 			await page
 				.getByLabel('Filter', {exact: true})
@@ -136,18 +138,18 @@ test(
 				`/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`
 			);
 
-			const collectionTable = page.locator(
-				'.lfr-layout-structure-item-collection'
-			).first();
+			const collectionTable = page
+				.locator('.lfr-layout-structure-item-collection')
+				.first();
 
 			await expect(collectionTable.getByText(entryValueA)).toBeVisible();
 			await expect(collectionTable.getByText(entryValueB)).toBeVisible();
 		});
 
 		await test.step('Search for entry A and verify entry B is filtered out', async () => {
-			const collectionTable = page.locator(
-				'.lfr-layout-structure-item-collection'
-			).first();
+			const collectionTable = page
+				.locator('.lfr-layout-structure-item-collection')
+				.first();
 
 			await expect(async () => {
 				const searchInput = page

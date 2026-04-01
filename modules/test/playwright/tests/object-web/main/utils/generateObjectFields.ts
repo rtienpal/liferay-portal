@@ -8,6 +8,7 @@ import {ObjectField} from '@liferay/object-admin-rest-client-js';
 import {getRandomInt} from '../../../../utils/getRandomInt';
 
 type objectFieldBaseProperties = {
+	indexed: boolean;
 	indexedAsKeyword: boolean;
 	indexedLanguageId: string;
 	label: LocalizedValue<string>;
