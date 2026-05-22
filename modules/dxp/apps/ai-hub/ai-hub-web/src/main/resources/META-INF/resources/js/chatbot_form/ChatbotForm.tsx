@@ -348,14 +348,26 @@ export default function ChatbotForm({
 	useEffect(() => {
 		async function fetchFormData() {
 			if (!externalReferenceCode) {
+				const defaultLanguageId =
+					Liferay.ThemeDisplay.getDefaultLanguageId();
+
 				setFormData({
 					active: false,
 					companyLogo: undefined,
 					description: '',
+					disclaimerMessage_i18n: {
+						[defaultLanguageId]: Liferay.Language.get(
+							'ai-generated-responses-may-be-inaccurate-please-review-carefully'
+						),
+					},
 					externalReferenceCode: '',
 					introMessage_i18n: {},
 					notificationMessage_i18n: {},
 					placeholderMessage_i18n: {},
+					privacyPolicyURL_i18n: {
+						[defaultLanguageId]:
+							'https://www.liferay.com/privacy-policy',
+					},
 					r_accountToAIHubChatbots_accountEntryERC:
 						accountEntryExternalReferenceCode,
 					showCompanyLogo: true,
@@ -385,10 +397,13 @@ export default function ChatbotForm({
 						: chatbot.companyLogo,
 					companyLogoFileName: companyLogoAttachment?.name,
 					description: chatbot.description,
+					disclaimerMessage_i18n:
+						chatbot.disclaimerMessage_i18n ?? {},
 					externalReferenceCode: chatbot.externalReferenceCode,
 					introMessage_i18n: chatbot.introMessage_i18n,
 					notificationMessage_i18n: chatbot.notificationMessage_i18n,
 					placeholderMessage_i18n: chatbot.placeholderMessage_i18n,
+					privacyPolicyURL_i18n: chatbot.privacyPolicyURL_i18n ?? {},
 					r_accountToAIHubChatbots_accountEntryERC:
 						chatbot.r_accountToAIHubChatbots_accountEntryERC,
 					showCompanyLogo: chatbot.showCompanyLogo,
