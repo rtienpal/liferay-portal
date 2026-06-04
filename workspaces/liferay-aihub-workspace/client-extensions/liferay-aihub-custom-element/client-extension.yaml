@@ -6,7 +6,7 @@ liferay-ai-hub-custom-element:
         -   index.css
     friendlyURLMapping: liferay-ai-hub-custom-element
     htmlAttributes:
-        ai-hub-url: https://ai.hub.liferay.com
+        ai-hub-url: https://ai-uat.liferay.net
         chatbot-external-reference-code: CHATBOT-ERC
         id: aihub-chatbot-widget-script
     htmlElementName: liferay-ai-hub-custom-element

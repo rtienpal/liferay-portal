@@ -6,7 +6,7 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 
-import {setURLs} from './api';
+import {setStandalone, setURLs} from './api';
 import ChatbotWidget from './components/ChatbotWidget';
 import {WidgetConfiguration} from './types';
 
@@ -28,6 +28,7 @@ if (!document.getElementById(CHATBOT_WIDGET_ID)) {
 			chatbotExternalReferenceCode:
 				scriptTag.getAttribute('chatbot-external-reference-code') || '',
 			liferayDXPURL: scriptTag.getAttribute('liferay-dxp-url') || '',
+			standalone: scriptTag.getAttribute('standalone') === 'true',
 		};
 
 		const element = document.createElement('div');
@@ -40,6 +41,8 @@ if (!document.getElementById(CHATBOT_WIDGET_ID)) {
 			widgetConfiguration.aiHubURL,
 			widgetConfiguration.liferayDXPURL
 		);
+
+		setStandalone(widgetConfiguration.standalone);
 
 		createRoot(element).render(
 			<ChatbotWidget widgetConfiguration={widgetConfiguration} />

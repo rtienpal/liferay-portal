@@ -11,10 +11,15 @@ const AI_HUB_ENDPOINT = '/o/ai-hub/v1.0';
 
 let aiHubURL = '';
 let liferayDXPURL = '';
+let standalone = false;
 
 export function setURLs(aiHub: string, liferayDXP: string) {
 	aiHubURL = aiHub;
 	liferayDXPURL = liferayDXP;
+}
+
+export function setStandalone(value: boolean) {
+	standalone = value;
 }
 
 async function postAuthorizationToken(): Promise<AuthorizationToken | null> {
@@ -84,7 +89,7 @@ export async function getChatbotConfiguration(
 export async function createEventSource(): Promise<EventSource | null> {
 	const headers = new Headers({Accept: 'text/event-stream'});
 
-	if ((window as any).Liferay) {
+	if (!standalone && (window as any).Liferay) {
 		const authorizationToken = await postAuthorizationToken();
 
 		if (!authorizationToken) {
@@ -117,7 +122,7 @@ export async function postChatMessage(
 		'Content-Type': 'application/json',
 	});
 
-	if ((window as any).Liferay) {
+	if (!standalone && (window as any).Liferay) {
 		const authorizationToken = await postAuthorizationToken();
 
 		if (!authorizationToken) {

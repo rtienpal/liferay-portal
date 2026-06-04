@@ -32,4 +32,5 @@ export interface WidgetConfiguration {
 	aiHubURL: string;
 	chatbotExternalReferenceCode: string;
 	liferayDXPURL: string;
+	standalone: boolean;
 }
