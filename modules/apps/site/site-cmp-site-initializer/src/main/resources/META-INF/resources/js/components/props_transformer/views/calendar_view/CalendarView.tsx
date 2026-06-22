@@ -10,6 +10,7 @@ import ClayLayout from '@clayui/layout';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import FullCalendar from '@fullcalendar/react';
 import {FrontendDataSetContext} from '@liferay/frontend-data-set-web';
+import {useBrowserTabVisibility} from '@liferay/frontend-js-react-web';
 import {useLiferayState} from '@liferay/frontend-js-state-web/react';
 import classNames from 'classnames';
 import {dateUtils, sub} from 'frontend-js-web';
@@ -36,7 +37,9 @@ interface MoreLinkPopover {
 }
 
 export default function CalendarView({items}: CalendarViewProps) {
-	const {onInfoPanelToggleButtonClick} = useContext(FrontendDataSetContext);
+	const {loadData, onInfoPanelToggleButtonClick} = useContext(
+		FrontendDataSetContext
+	);
 
 	const calendarRef = useRef<FullCalendar>(null);
 	const calendarViewRef = useRef<HTMLDivElement>(null);
@@ -89,6 +92,21 @@ export default function CalendarView({items}: CalendarViewProps) {
 	// not show a stale list after switching to another view.
 
 	useEffect(() => () => setUnscheduledTasks([]), [setUnscheduledTasks]);
+
+	const isBrowserTabVisible = useBrowserTabVisibility();
+	const isMountedRef = useRef(false);
+
+	useEffect(() => {
+		if (!isMountedRef.current) {
+			isMountedRef.current = true;
+
+			return;
+		}
+
+		if (isBrowserTabVisible) {
+			loadData();
+		}
+	}, [isBrowserTabVisible, loadData]);
 
 	const currentYear = new Date().getFullYear();
 	const locale = Liferay.ThemeDisplay.getBCP47LanguageId();
