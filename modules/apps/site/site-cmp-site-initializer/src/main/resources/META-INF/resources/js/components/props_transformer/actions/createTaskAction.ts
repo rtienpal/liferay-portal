@@ -5,6 +5,7 @@
 
 import {navigate} from 'frontend-js-web';
 
+import getURLWithCurrentRedirect from '../../../utils/getURLWithCurrentRedirect';
 import {openCMPModal} from '../../../utils/openCMPModal';
 import SelectProjectModalContent from '../../modal/SelectProjectModalContent';
 
@@ -20,9 +21,7 @@ export default function createTaskAction({
 	redirect?: string;
 }) {
 	if (redirect) {
-		const url = new URL(redirect);
-
-		navigate(url.pathname + url.search);
+		navigate(getURLWithCurrentRedirect(redirect));
 
 		return;
 	}

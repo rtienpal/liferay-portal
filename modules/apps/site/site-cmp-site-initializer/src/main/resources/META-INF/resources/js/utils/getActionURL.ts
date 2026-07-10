@@ -10,6 +10,7 @@ import {
 } from '@liferay/frontend-data-set-web';
 import {Immutable} from '@liferay/frontend-js-state-web';
 
+import getURLWithCurrentRedirect from './getURLWithCurrentRedirect';
 import {ITaskObjectEntry} from './types';
 
 /**
@@ -21,6 +22,9 @@ import {ITaskObjectEntry} from './types';
  *
  * For example, an `href` of `/tasks/{embedded.id}/edit` with a `task` whose
  * `embedded.id` is 42 becomes `/tasks/42/edit`.
+ *
+ * The action's `redirect` parameter is repointed to the current browser
+ * location so that navigating back after the action preserves the active view.
  */
 export default function getActionURL({
 	actionId,
@@ -31,5 +35,7 @@ export default function getActionURL({
 	itemsActions: IItemsActions[];
 	task: {embedded: Immutable<ITaskObjectEntry> | ITaskObjectEntry};
 }) {
-	return replaceTokens(findAction(itemsActions, actionId)?.href, task);
+	const url = replaceTokens(findAction(itemsActions, actionId)?.href, task);
+
+	return url ? getURLWithCurrentRedirect(url) : url;
 }
