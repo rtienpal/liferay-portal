@@ -6,9 +6,28 @@
 import {CategorizeEventPayload} from '../Categorization/events';
 import {ContentType} from './components/ContentTypeSelectorMessageBalloon';
 
+export interface ContentGapCategory {
+	id: number | string;
+	name: string;
+}
+
+export interface ContentGapTask {
+	id: string;
+	name: string;
+}
+
+export interface ContentGapCategoriesRequest {
+	agentInstanceId: string;
+	funnelStages: ContentGapCategory[];
+	personas: ContentGapCategory[];
+	requestTask: boolean;
+	tasks: ContentGapTask[];
+}
+
 export interface Message {
 	agentDefinitionExternalReferenceCodes?: string[];
 	categorization?: CategorizeEventPayload;
+	contentGapCategoriesRequest?: ContentGapCategoriesRequest;
 	contentTypes?: ContentType[];
 	error?: boolean;
 	images?: string[];

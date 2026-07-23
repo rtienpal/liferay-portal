@@ -4,3 +4,5 @@
  */
 
 export const CONTENT_GAP_ANALYSIS_ERC = 'L_CONTENT_GAP_ANALYSIS';
+
+export const CONTENT_GAP_CATEGORIES_ACTION = 'requestContentGapCategories';
