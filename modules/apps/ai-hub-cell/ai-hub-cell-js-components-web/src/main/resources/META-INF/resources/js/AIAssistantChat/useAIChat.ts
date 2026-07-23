@@ -18,7 +18,9 @@ import {
 	ChatContext,
 	createEventSource,
 	postChatByExternalReferenceCodeMessage,
+	putAgentInstanceResume,
 } from './api';
+import {ContentGapCategoriesSelection} from './components/ContentGapCategoriesMessageBalloon';
 import {ContentType} from './components/ContentTypeSelectorMessageBalloon';
 import {ChatMessageSentData, Message} from './types';
 import buildAssistantMessage from './utils/buildAssistantMessage';
@@ -40,6 +42,10 @@ export interface AIChat {
 	messages: Message[];
 	messagesEndRef: React.RefObject<HTMLDivElement>;
 	reportContext: AIChatReportContext | null;
+	resumeAgentInstance: (
+		agentInstanceId: string,
+		selection: ContentGapCategoriesSelection
+	) => Promise<boolean>;
 	runtimeContextRef: React.MutableRefObject<ChatContext>;
 	sendMessage: (text: string) => void;
 	setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>;
@@ -243,6 +249,41 @@ export default function useAIChat({
 			[index]: true,
 		}));
 	}, []);
+
+	const resumeAgentInstance = useCallback(
+		async (
+			agentInstanceId: string,
+			selection: ContentGapCategoriesSelection
+		): Promise<boolean> => {
+			setIsGenerating(true);
+
+			try {
+				await putAgentInstanceResume({
+					agentInstanceId,
+					context: selection,
+				});
+
+				return true;
+			}
+			catch {
+				setIsGenerating(false);
+
+				setMessages((previousMessages) => [
+					...previousMessages,
+					{
+						error: true,
+						sender: 'assistant',
+						text: Liferay.Language.get(
+							'your-request-failed-to-complete'
+						),
+					},
+				]);
+
+				return false;
+			}
+		},
+		[]
+	);
 
 	const openAIAssistantChatConnection = useCallback(() => {
 		createEventSource().then((eventSource) => {
@@ -453,6 +494,7 @@ export default function useAIChat({
 		messages,
 		messagesEndRef,
 		reportContext,
+		resumeAgentInstance,
 		runtimeContextRef,
 		sendMessage,
 		setIsGenerating,
