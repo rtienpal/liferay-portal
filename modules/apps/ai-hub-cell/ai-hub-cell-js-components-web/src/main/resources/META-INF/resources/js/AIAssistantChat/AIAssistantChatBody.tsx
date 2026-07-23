@@ -13,6 +13,7 @@ import React, {useEffect, useRef} from 'react';
 import AIAssistantFooterDisclaimer from './components/AIAssistantFooterDisclaimer';
 import AIAssistantMessageBalloon from './components/AIAssistantMessageBalloon';
 import CategorizationMessageBalloon from './components/CategorizationMessageBalloon';
+import ContentGapCategoriesMessageBalloon from './components/ContentGapCategoriesMessageBalloon';
 import ContentTypeSelectorMessageBalloon from './components/ContentTypeSelectorMessageBalloon';
 import ContentsMessageBalloon from './components/ContentsMessageBalloon';
 import FieldValueMessageBalloon from './components/FieldValueMessageBalloon';
@@ -52,6 +53,7 @@ const AIAssistantChatBody: React.FC<AIAssistantChatBodyProps> = ({
 		message,
 		messages,
 		messagesEndRef,
+		resumeAgentInstance,
 		runtimeContextRef,
 		sendMessage,
 		setIsGenerating,
@@ -171,6 +173,33 @@ const AIAssistantChatBody: React.FC<AIAssistantChatBodyProps> = ({
 								key={index}
 								message={item.text}
 								sendMessage={sendMessage}
+							/>
+						);
+					}
+
+					if (item.contentGapCategoriesRequest) {
+						const {
+							agentInstanceId,
+							funnelStages,
+							personas,
+							requestTask,
+							tasks,
+						} = item.contentGapCategoriesRequest;
+
+						return (
+							<ContentGapCategoriesMessageBalloon
+								funnelStages={funnelStages}
+								key={index}
+								message={item.text}
+								onSubmit={(selection) =>
+									resumeAgentInstance(
+										agentInstanceId,
+										selection
+									)
+								}
+								personas={personas}
+								requestTask={requestTask}
+								tasks={tasks}
 							/>
 						);
 					}

@@ -11,6 +11,7 @@ import {
 	waitFor,
 	within,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import '@testing-library/jest-dom';
@@ -20,6 +21,7 @@ import AIAssistantTriggerButton from '../../../src/main/resources/META-INF/resou
 import {
 	createEventSource,
 	postChatByExternalReferenceCodeMessage,
+	putAgentInstanceResume,
 } from '../../../src/main/resources/META-INF/resources/js/AIAssistantChat/api';
 import {CATEGORIZE_EVENT} from '../../../src/main/resources/META-INF/resources/js/Categorization/events';
 import {classifyCategorizationIntent} from '../../../src/main/resources/META-INF/resources/js/Categorization/services/classifyCategorizationIntent';
@@ -33,6 +35,7 @@ jest.mock(
 		postChatByExternalReferenceCodeMessage: jest.fn(() =>
 			Promise.resolve()
 		),
+		putAgentInstanceResume: jest.fn(() => Promise.resolve()),
 	})
 );
 
@@ -65,6 +68,10 @@ const mockPostChat =
 const mockPostAIIssueReport = postAIIssueReport as jest.MockedFunction<
 	typeof postAIIssueReport
 >;
+const mockPutAgentInstanceResume =
+	putAgentInstanceResume as jest.MockedFunction<
+		typeof putAgentInstanceResume
+	>;
 
 const HOST_CONTAINER_ID = 'ai-assistant-host-root';
 
@@ -176,6 +183,8 @@ describe('AIAssistantHost', () => {
 		mockPostChat.mockResolvedValue(undefined);
 		mockPostAIIssueReport.mockReset();
 		mockPostAIIssueReport.mockResolvedValue({id: 'report-1'});
+		mockPutAgentInstanceResume.mockReset();
+		mockPutAgentInstanceResume.mockResolvedValue(undefined);
 
 		global.Liferay = {
 			...global.Liferay,
@@ -807,5 +816,206 @@ describe('AIAssistantHost', () => {
 		expect(
 			screen.getByText('ai-generated-responses-may-be-inaccurate')
 		).toBeInTheDocument();
+	});
+
+	describe('content gap categories request', () => {
+		const PERSONAS = [{id: 39697, name: 'Decision Maker'}];
+		const FUNNEL_STAGES = [{id: 39681, name: 'Awareness'}];
+		const TASKS = [{id: 'L_CMP_TASK_1955591569', name: 'Task 1'}];
+
+		function envelope(overrides = {}) {
+			return JSON.stringify({
+				data: JSON.stringify({
+					action: 'requestContentGapCategories',
+					agentInstanceId: '41070',
+					funnelStages: FUNNEL_STAGES,
+					personas: PERSONAS,
+					projectId: '40551',
+					requestTask: false,
+					...overrides,
+				}),
+			});
+		}
+
+		async function emitActionRequest(
+			fakeEventSource: ReturnType<typeof createFakeEventSource>,
+			overrides = {}
+		) {
+			await act(async () => {
+				fakeEventSource.emit('Chat Message Sent', envelope(overrides));
+			});
+
+			await screen.findByLabelText('persona');
+		}
+
+		it('stops generating and renders the category pickers on the action event', async () => {
+			const fakeEventSource = createFakeEventSource();
+
+			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
+
+			await renderAndOpen();
+
+			await act(async () => {
+				fakeEventSource.emit('Subscribe', 'ref-code');
+			});
+
+			const textArea = screen.getByPlaceholderText('Ask me anything...');
+
+			await act(async () => {
+				fireEvent.change(textArea, {
+					target: {value: 'Find matching assets'},
+				});
+			});
+
+			await act(async () => {
+				fireEvent.submit(textArea.closest('form') as HTMLFormElement);
+			});
+
+			expect(screen.getByText('generating')).toBeInTheDocument();
+
+			await emitActionRequest(fakeEventSource);
+
+			expect(
+				screen.getByText(
+					'select-a-persona-and-a-funnel-stage-to-find-matching-assets'
+				)
+			).toBeInTheDocument();
+			expect(screen.queryByLabelText('task')).not.toBeInTheDocument();
+			expect(screen.queryByText('generating')).not.toBeInTheDocument();
+		});
+
+		it('resumes the paused agent instance with the selected categories', async () => {
+			const fakeEventSource = createFakeEventSource();
+
+			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
+
+			await renderAndOpen();
+
+			await emitActionRequest(fakeEventSource);
+
+			await userEvent.selectOptions(
+				screen.getByLabelText('persona'),
+				'39697'
+			);
+			await userEvent.selectOptions(
+				screen.getByLabelText('funnel-stage'),
+				'39681'
+			);
+			await userEvent.click(
+				screen.getByRole('button', {name: 'confirm'})
+			);
+
+			expect(mockPutAgentInstanceResume).toHaveBeenCalledWith({
+				agentInstanceId: '41070',
+				context: {funnelStageId: '39681', personaId: '39697'},
+			});
+
+			expect(screen.getByText('generating')).toBeInTheDocument();
+
+			await act(async () => {
+				fakeEventSource.emit(
+					'Chat Message Sent',
+					JSON.stringify({data: 'Here are the matching assets.'})
+				);
+			});
+
+			expect(
+				screen.getByText('Here are the matching assets.')
+			).toBeInTheDocument();
+			expect(screen.queryByText('generating')).not.toBeInTheDocument();
+		});
+
+		it('resumes with a task for the generate flow (three dropdowns)', async () => {
+			const fakeEventSource = createFakeEventSource();
+
+			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
+
+			await renderAndOpen();
+
+			await emitActionRequest(fakeEventSource, {
+				agentInstanceId: '41055',
+				requestTask: true,
+				tasks: TASKS,
+			});
+
+			await userEvent.selectOptions(
+				screen.getByLabelText('persona'),
+				'39697'
+			);
+			await userEvent.selectOptions(
+				screen.getByLabelText('funnel-stage'),
+				'39681'
+			);
+			await userEvent.selectOptions(
+				screen.getByLabelText('task'),
+				'L_CMP_TASK_1955591569'
+			);
+			await userEvent.click(
+				screen.getByRole('button', {name: 'confirm'})
+			);
+
+			expect(mockPutAgentInstanceResume).toHaveBeenCalledWith({
+				agentInstanceId: '41055',
+				context: {
+					funnelStageId: '39681',
+					personaId: '39697',
+					task: 'L_CMP_TASK_1955591569',
+				},
+			});
+		});
+
+		it('shows an error balloon and unlocks the pickers when the resume fails', async () => {
+			const fakeEventSource = createFakeEventSource();
+
+			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
+			mockPutAgentInstanceResume.mockRejectedValue(new Error('failed'));
+
+			await renderAndOpen();
+
+			await emitActionRequest(fakeEventSource);
+
+			await userEvent.selectOptions(
+				screen.getByLabelText('persona'),
+				'39697'
+			);
+			await userEvent.selectOptions(
+				screen.getByLabelText('funnel-stage'),
+				'39681'
+			);
+			await userEvent.click(
+				screen.getByRole('button', {name: 'confirm'})
+			);
+
+			expect(
+				await screen.findByText('your-request-failed-to-complete')
+			).toBeInTheDocument();
+			expect(screen.queryByText('generating')).not.toBeInTheDocument();
+			expect(screen.getByRole('button', {name: 'confirm'})).toBeEnabled();
+		});
+
+		it('renders an incomplete action payload as plain text', async () => {
+			const fakeEventSource = createFakeEventSource();
+
+			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
+
+			await renderAndOpen();
+
+			await act(async () => {
+				fakeEventSource.emit(
+					'Chat Message Sent',
+					JSON.stringify({
+						data: JSON.stringify({
+							action: 'requestContentGapCategories',
+							projectId: '34213',
+						}),
+					})
+				);
+			});
+
+			expect(screen.queryByLabelText('persona')).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole('button', {name: 'confirm'})
+			).not.toBeInTheDocument();
+		});
 	});
 });
