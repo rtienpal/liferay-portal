@@ -80,6 +80,47 @@ async function postAuthorizationToken() {
 	}
 }
 
+export interface AgentInstanceResumeContext {
+	funnelStageId: string;
+	personaId: string;
+	task?: string;
+}
+
+export async function putAgentInstanceResume({
+	agentInstanceId,
+	context,
+}: {
+	agentInstanceId: string;
+	context: AgentInstanceResumeContext;
+}): Promise<void> {
+	const authorizationToken = await postAuthorizationToken();
+
+	if (!authorizationToken) {
+		throw new Error('Unable to generate authorization token.');
+	}
+
+	const response = await fetch(
+		`${authorizationToken.serviceURL}${AI_HUB_ENDPOINT}/agent-instances/${agentInstanceId}/resume`,
+		{
+			body: JSON.stringify({context}),
+			headers: new Headers({
+				'Accept': 'application/json',
+				'Authorization': `Bearer ${authorizationToken.accessToken}`,
+				'Content-Type': 'application/json',
+				'Liferay-AI-Hub-Cell-On-Behalf-Of':
+					authorizationToken.userToken,
+			}),
+			method: 'PUT',
+		}
+	);
+
+	if (!response.ok) {
+		throw new Error(
+			`Unable to resume agent instance: ${response.statusText}`
+		);
+	}
+}
+
 export async function postChatByExternalReferenceCodeMessage({
 	chatContext,
 	eventSourceReference,
