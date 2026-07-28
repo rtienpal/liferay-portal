@@ -6,6 +6,7 @@
 import {
 	CONTENT_GAP_ANALYSIS_ACTION,
 	CONTENT_GAP_CATEGORIES_ACTION,
+	FIND_MATCHING_ASSETS_ACTION,
 } from '../../../../src/main/resources/META-INF/resources/js/AIAssistantChat/constants';
 import buildAssistantMessage from '../../../../src/main/resources/META-INF/resources/js/AIAssistantChat/utils/buildAssistantMessage';
 
@@ -101,6 +102,57 @@ describe('buildAssistantMessage', () => {
 				sender: 'assistant',
 				text: data,
 			});
+		});
+	});
+
+	describe('find matching assets action', () => {
+		const RESULTS = [
+			{
+				funnelStage: 'Awareness',
+				id: 101,
+				persona: 'Procurement',
+				reasoning: 'Covers the same buying stage.',
+				status: 'Approved',
+				title: 'Vendor evaluation checklist',
+			},
+		];
+
+		it('extracts the matched assets', () => {
+			expect(
+				buildAssistantMessage({
+					data: JSON.stringify({
+						action: FIND_MATCHING_ASSETS_ACTION,
+						results: RESULTS,
+					}),
+				})
+			).toEqual({
+				agentDefinitionExternalReferenceCodes: [],
+				matchingAssets: RESULTS,
+				sender: 'assistant',
+				text: '',
+			});
+		});
+
+		it('keeps an empty results array so the balloon renders the zero state', () => {
+			expect(
+				buildAssistantMessage({
+					data: JSON.stringify({
+						action: FIND_MATCHING_ASSETS_ACTION,
+						results: [],
+					}),
+				}).matchingAssets
+			).toEqual([]);
+		});
+
+		it('falls back to a text message when the results are not an array', () => {
+			expect(
+				buildAssistantMessage({
+					data: JSON.stringify({
+						action: FIND_MATCHING_ASSETS_ACTION,
+						results: 'none',
+					}),
+				}).matchingAssets
+			).toBeUndefined();
 		});
 	});
 

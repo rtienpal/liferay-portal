@@ -19,6 +19,7 @@ import ContentTypeSelectorMessageBalloon from './components/ContentTypeSelectorM
 import ContentsMessageBalloon from './components/ContentsMessageBalloon';
 import FieldValueMessageBalloon from './components/FieldValueMessageBalloon';
 import ImageMessageBalloon from './components/ImageMessageBalloon';
+import MatchingAssetsMessageBalloon from './components/MatchingAssetsMessageBalloon';
 import TranslateContentMessageBalloon from './components/TranslateContentMessageBalloon';
 import UserMessageBalloon from './components/UserMessageBalloon';
 import {
@@ -248,6 +249,17 @@ const AIAssistantChatBody: React.FC<AIAssistantChatBodyProps> = ({
 									})
 								}
 								onThumbsUp={() => giveThumbsUp(index, item)}
+							/>
+						);
+					}
+
+					if (item.matchingAssets) {
+						return (
+							<MatchingAssetsMessageBalloon
+								assets={item.matchingAssets}
+								disabled={isGenerating}
+								key={index}
+								sendMessage={sendMessage}
 							/>
 						);
 					}
