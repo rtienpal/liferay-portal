@@ -4,36 +4,22 @@
  */
 
 import {
-	CONTENT_GAP_ANALYSIS_ERC,
+	CONTENT_GAP_ANALYSIS_ACTION,
 	CONTENT_GAP_CATEGORIES_ACTION,
 } from '../../../../src/main/resources/META-INF/resources/js/AIAssistantChat/constants';
 import buildAssistantMessage from '../../../../src/main/resources/META-INF/resources/js/AIAssistantChat/utils/buildAssistantMessage';
-
-const GAP_ANSWER = JSON.stringify({
-	gaps: [
-		{
-			funnelStageName: 'Awareness',
-			personaName: 'Decision Maker',
-			reason: 'No content yet.',
-			severity: 'high',
-		},
-	],
-	summary: {overview: 'One gap to address.'},
-});
 
 describe('buildAssistantMessage', () => {
 	it('builds an image message with a base64 data URI', () => {
 		expect(
 			buildAssistantMessage({
-				agentDefinitionExternalReferenceCodes: [
-					CONTENT_GAP_ANALYSIS_ERC,
-				],
+				agentDefinitionExternalReferenceCodes: ['L_GENERATE_IMAGE'],
 				data: 'iVBORw0KGgo=',
 				mimeType: 'image/jpeg',
 				type: 'image',
 			})
 		).toEqual({
-			agentDefinitionExternalReferenceCodes: [CONTENT_GAP_ANALYSIS_ERC],
+			agentDefinitionExternalReferenceCodes: ['L_GENERATE_IMAGE'],
 			images: ['data:image/jpeg;base64,iVBORw0KGgo='],
 			sender: 'assistant',
 			text: '',
@@ -57,42 +43,65 @@ describe('buildAssistantMessage', () => {
 		).toEqual(['data:image/png;base64,iVBORw0KGgo=']);
 	});
 
-	it('formats a Content Gap Analysis text answer into bulleted markdown', () => {
-		expect(
-			buildAssistantMessage({
-				agentDefinitionExternalReferenceCodes: [
-					CONTENT_GAP_ANALYSIS_ERC,
-				],
-				data: GAP_ANSWER,
-				type: 'text',
-			})
-		).toEqual({
-			agentDefinitionExternalReferenceCodes: [CONTENT_GAP_ANALYSIS_ERC],
-			sender: 'assistant',
-			text:
-				'One gap to address.\n\n' +
-				'- **Decision Maker / Awareness** (high) — No content yet.',
-		});
-	});
-
-	it('formats when the answer omits the type (defaults to text)', () => {
-		expect(
-			buildAssistantMessage({
-				agentDefinitionExternalReferenceCodes: [
-					CONTENT_GAP_ANALYSIS_ERC,
-				],
-				data: GAP_ANSWER,
-			}).text
-		).toContain('- **Decision Maker / Awareness** (high)');
-	});
-
-	it('passes through text answers from agents without a formatter', () => {
+	it('passes through plain text answers', () => {
 		expect(
 			buildAssistantMessage({
 				agentDefinitionExternalReferenceCodes: ['L_SOMETHING_ELSE'],
 				data: 'Plain answer.',
 			}).text
 		).toBe('Plain answer.');
+	});
+
+	describe('content gap analysis action', () => {
+		const GAP_ANALYSIS_ANSWER = JSON.stringify({
+			action: CONTENT_GAP_ANALYSIS_ACTION,
+			gaps: [{funnelStageId: '39681', personaId: '39697'}],
+			result: '**Summary:** One gap to address.',
+		});
+
+		it('extracts the gaps and renders the result as the message text', () => {
+			expect(buildAssistantMessage({data: GAP_ANALYSIS_ANSWER})).toEqual({
+				agentDefinitionExternalReferenceCodes: [],
+				contentGapAnalysis: {
+					gaps: [{funnelStageId: '39681', personaId: '39697'}],
+					result: '**Summary:** One gap to address.',
+				},
+				sender: 'assistant',
+				text: '**Summary:** One gap to address.',
+			});
+		});
+
+		it('defaults missing gaps to an empty array', () => {
+			expect(
+				buildAssistantMessage({
+					data: JSON.stringify({
+						action: CONTENT_GAP_ANALYSIS_ACTION,
+						result: 'No gaps.',
+					}),
+				}).contentGapAnalysis?.gaps
+			).toEqual([]);
+		});
+
+		it('parses an answer wrapped in a markdown code fence', () => {
+			expect(
+				buildAssistantMessage({
+					data: `\`\`\`json\n${GAP_ANALYSIS_ANSWER}\n\`\`\``,
+				}).contentGapAnalysis
+			).toBeTruthy();
+		});
+
+		it('falls back to a text message when the result is missing', () => {
+			const data = JSON.stringify({
+				action: CONTENT_GAP_ANALYSIS_ACTION,
+				gaps: [],
+			});
+
+			expect(buildAssistantMessage({data})).toEqual({
+				agentDefinitionExternalReferenceCodes: [],
+				sender: 'assistant',
+				text: data,
+			});
+		});
 	});
 
 	it('builds a content gap categories request message from the find-matching payload', () => {

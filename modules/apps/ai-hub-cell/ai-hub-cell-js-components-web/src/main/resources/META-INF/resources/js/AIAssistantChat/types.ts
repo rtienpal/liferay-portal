@@ -16,6 +16,11 @@ export interface ContentGapTask {
 	name: string;
 }
 
+export interface ContentGapAnalysis {
+	gaps: unknown[];
+	result: string;
+}
+
 export interface ContentGapCategoriesRequest {
 	agentInstanceId: string;
 	funnelStages: ContentGapCategory[];
@@ -27,6 +32,7 @@ export interface ContentGapCategoriesRequest {
 export interface Message {
 	agentDefinitionExternalReferenceCodes?: string[];
 	categorization?: CategorizeEventPayload;
+	contentGapAnalysis?: ContentGapAnalysis;
 	contentGapCategoriesRequest?: ContentGapCategoriesRequest;
 	contentTypes?: ContentType[];
 	error?: boolean;

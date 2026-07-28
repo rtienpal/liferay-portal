@@ -4,59 +4,66 @@
  */
 
 import {
-	CONTENT_GAP_ANALYSIS_ERC,
+	CONTENT_GAP_ANALYSIS_ACTION,
 	CONTENT_GAP_CATEGORIES_ACTION,
 } from '../constants';
 import {
 	ChatMessageSentData,
+	ContentGapAnalysis,
 	ContentGapCategoriesRequest,
 	Message,
 } from '../types';
-import formatContentGapAnalysis from './formatContentGapAnalysis';
 
-const TEXT_ANSWER_FORMATTERS: Record<string, (data: string) => string | null> =
-	{
-		[CONTENT_GAP_ANALYSIS_ERC]: formatContentGapAnalysis,
-	};
-
-function formatTextAnswer(
-	data: string,
-	agentDefinitionExternalReferenceCodes: string[]
-): string {
-	for (const agentDefinitionExternalReferenceCode of agentDefinitionExternalReferenceCodes) {
-		const formatter =
-			TEXT_ANSWER_FORMATTERS[agentDefinitionExternalReferenceCode];
-
-		if (formatter) {
-			return formatter(data) ?? data;
-		}
-	}
-
-	return data;
-}
-
-function parseContentGapCategoriesRequest(
-	data: string
-): ContentGapCategoriesRequest | null {
-	if (!data.includes(`"${CONTENT_GAP_CATEGORIES_ACTION}"`)) {
+function parseActionJSONObject(action: string, data: string) {
+	if (!data.includes(`"${action}"`)) {
 		return null;
 	}
 
 	let parsed;
 
 	try {
-		parsed = JSON.parse(data);
+		parsed = JSON.parse(
+			data
+				.trim()
+				.replace(/^```(?:json)?/i, '')
+				.replace(/```$/, '')
+				.trim()
+		);
 	}
 	catch {
 		return null;
 	}
 
+	if (parsed?.action !== action) {
+		return null;
+	}
+
+	return parsed;
+}
+
+function parseContentGapAnalysis(data: string): ContentGapAnalysis | null {
+	const parsed = parseActionJSONObject(CONTENT_GAP_ANALYSIS_ACTION, data);
+
+	if (!parsed || typeof parsed.result !== 'string') {
+		return null;
+	}
+
+	return {
+		gaps: Array.isArray(parsed.gaps) ? parsed.gaps : [],
+		result: parsed.result,
+	};
+}
+
+function parseContentGapCategoriesRequest(
+	data: string
+): ContentGapCategoriesRequest | null {
+	const parsed = parseActionJSONObject(CONTENT_GAP_CATEGORIES_ACTION, data);
+
 	const agentInstanceId = parsed?.agentInstanceId;
 
 	if (
-		parsed?.action !== CONTENT_GAP_CATEGORIES_ACTION ||
-		(typeof agentInstanceId !== 'string' &&
-			typeof agentInstanceId !== 'number')
+		typeof agentInstanceId !== 'string' &&
+		typeof agentInstanceId !== 'number'
 	) {
 		return null;
 	}
@@ -89,6 +96,17 @@ export default function buildAssistantMessage(
 		};
 	}
 
+	const contentGapAnalysis = parseContentGapAnalysis(data);
+
+	if (contentGapAnalysis) {
+		return {
+			agentDefinitionExternalReferenceCodes,
+			contentGapAnalysis,
+			sender: 'assistant',
+			text: contentGapAnalysis.result,
+		};
+	}
+
 	const contentGapCategoriesRequest = parseContentGapCategoriesRequest(data);
 
 	if (contentGapCategoriesRequest) {
@@ -109,6 +127,6 @@ export default function buildAssistantMessage(
 	return {
 		agentDefinitionExternalReferenceCodes,
 		sender: 'assistant',
-		text: formatTextAnswer(data, agentDefinitionExternalReferenceCodes),
+		text: data,
 	};
 }
