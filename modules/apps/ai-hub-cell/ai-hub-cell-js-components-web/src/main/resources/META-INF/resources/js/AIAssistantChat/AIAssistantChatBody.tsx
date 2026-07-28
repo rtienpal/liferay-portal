@@ -13,6 +13,7 @@ import React, {useEffect, useRef} from 'react';
 import AIAssistantFooterDisclaimer from './components/AIAssistantFooterDisclaimer';
 import AIAssistantMessageBalloon from './components/AIAssistantMessageBalloon';
 import CategorizationMessageBalloon from './components/CategorizationMessageBalloon';
+import ContentGapAnalysisMessageBalloon from './components/ContentGapAnalysisMessageBalloon';
 import ContentGapCategoriesMessageBalloon from './components/ContentGapCategoriesMessageBalloon';
 import ContentTypeSelectorMessageBalloon from './components/ContentTypeSelectorMessageBalloon';
 import ContentsMessageBalloon from './components/ContentsMessageBalloon';
@@ -200,6 +201,53 @@ const AIAssistantChatBody: React.FC<AIAssistantChatBodyProps> = ({
 								personas={personas}
 								requestTask={requestTask}
 								tasks={tasks}
+							/>
+						);
+					}
+
+					if (item.contentGapAnalysis) {
+						const {gaps} = item.contentGapAnalysis;
+
+						const sendMessageWithGaps = (text: string) => {
+
+							// eslint-disable-next-line react-compiler/react-compiler
+							runtimeContextRef.current = {
+								...runtimeContextRef.current,
+								gaps: JSON.stringify(gaps),
+							};
+
+							sendMessage(text);
+						};
+
+						return (
+							<ContentGapAnalysisMessageBalloon
+								disabled={isGenerating}
+								feedbackGiven={Boolean(feedbackGiven[index])}
+								key={index}
+								message={item.text}
+								onFindMatchingAssets={() =>
+									sendMessageWithGaps(
+										Liferay.Language.get(
+											'find-matching-assets-in-cms'
+										)
+									)
+								}
+								onGenerateContent={() =>
+									sendMessageWithGaps(
+										Liferay.Language.get(
+											'generate-content-for-gaps'
+										)
+									)
+								}
+								onReport={() =>
+									setReportContext({
+										agentDefinitionExternalReferenceCodes:
+											item.agentDefinitionExternalReferenceCodes ??
+											[],
+										index,
+									})
+								}
+								onThumbsUp={() => giveThumbsUp(index, item)}
 							/>
 						);
 					}

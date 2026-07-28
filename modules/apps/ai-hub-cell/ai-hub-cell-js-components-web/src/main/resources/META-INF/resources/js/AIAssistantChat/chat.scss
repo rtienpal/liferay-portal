@@ -220,6 +220,29 @@ html#{$cadmin-selector} .cadmin {
 			}
 		}
 
+		.ai-assistant-chat__content-gap-analysis-actions {
+			display: flex;
+			flex-direction: column;
+			margin-bottom: 1rem;
+			margin-left: 0.5rem;
+
+			&-title {
+				color: $cadmin-secondary;
+				font-size: 0.875em;
+				margin-bottom: 0.5rem;
+			}
+
+			&-list {
+				display: flex;
+				flex-direction: column;
+			}
+		}
+
+		.ai-assistant-chat__content-gap-analysis-action {
+			align-self: flex-start;
+			margin-bottom: 0.5rem;
+		}
+
 		.ai-assistant-chat__form {
 			@include ai-assistant-chat-gutter;
 
