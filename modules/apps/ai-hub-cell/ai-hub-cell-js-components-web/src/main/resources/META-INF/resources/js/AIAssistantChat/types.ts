@@ -29,6 +29,15 @@ export interface ContentGapCategoriesRequest {
 	tasks: ContentGapTask[];
 }
 
+export interface MatchingAsset {
+	funnelStage?: string;
+	id: number | string;
+	persona?: string;
+	reasoning?: string;
+	status?: string;
+	title: string;
+}
+
 export interface Message {
 	agentDefinitionExternalReferenceCodes?: string[];
 	categorization?: CategorizeEventPayload;
@@ -37,6 +46,7 @@ export interface Message {
 	contentTypes?: ContentType[];
 	error?: boolean;
 	images?: string[];
+	matchingAssets?: MatchingAsset[];
 	sender: string;
 	text: string;
 }

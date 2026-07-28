@@ -6,3 +6,5 @@
 export const CONTENT_GAP_ANALYSIS_ACTION = 'contentGapAnalysis';
 
 export const CONTENT_GAP_CATEGORIES_ACTION = 'requestContentGapCategories';
+
+export const FIND_MATCHING_ASSETS_ACTION = 'findMatchingAssets';

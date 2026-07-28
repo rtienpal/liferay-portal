@@ -6,11 +6,13 @@
 import {
 	CONTENT_GAP_ANALYSIS_ACTION,
 	CONTENT_GAP_CATEGORIES_ACTION,
+	FIND_MATCHING_ASSETS_ACTION,
 } from '../constants';
 import {
 	ChatMessageSentData,
 	ContentGapAnalysis,
 	ContentGapCategoriesRequest,
+	MatchingAsset,
 	Message,
 } from '../types';
 
@@ -79,6 +81,16 @@ function parseContentGapCategoriesRequest(
 	};
 }
 
+function parseMatchingAssets(data: string): MatchingAsset[] | null {
+	const parsed = parseActionJSONObject(FIND_MATCHING_ASSETS_ACTION, data);
+
+	if (!parsed || !Array.isArray(parsed.results)) {
+		return null;
+	}
+
+	return parsed.results;
+}
+
 export default function buildAssistantMessage(
 	dataJSON: ChatMessageSentData
 ): Message {
@@ -121,6 +133,17 @@ export default function buildAssistantMessage(
 				: Liferay.Language.get(
 						'select-a-persona-and-a-funnel-stage-to-find-matching-assets'
 					),
+		};
+	}
+
+	const matchingAssets = parseMatchingAssets(data);
+
+	if (matchingAssets) {
+		return {
+			agentDefinitionExternalReferenceCodes,
+			matchingAssets,
+			sender: 'assistant',
+			text: '',
 		};
 	}
 
