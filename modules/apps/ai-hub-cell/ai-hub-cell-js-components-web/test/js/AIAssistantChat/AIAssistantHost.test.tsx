@@ -818,6 +818,127 @@ describe('AIAssistantHost', () => {
 		).toBeInTheDocument();
 	});
 
+	describe('content gap analysis action', () => {
+		function emitAnalysis(
+			fakeEventSource: ReturnType<typeof createFakeEventSource>
+		) {
+			fakeEventSource.emit(
+				'Chat Message Sent',
+				JSON.stringify({
+					data: JSON.stringify({
+						action: 'contentGapAnalysis',
+						gaps: [{funnelStageId: '39681', personaId: '39697'}],
+						result: 'One gap to address.',
+					}),
+				})
+			);
+		}
+
+		it('renders the analysis with the next step actions', async () => {
+			const fakeEventSource = createFakeEventSource();
+
+			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
+
+			await renderAndOpen();
+
+			await act(async () => {
+				emitAnalysis(fakeEventSource);
+			});
+
+			expect(
+				await screen.findByText('One gap to address.')
+			).toBeInTheDocument();
+			expect(
+				screen.getByText('what-would-you-like-to-do-next')
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole('button', {
+					name: 'find-matching-assets-in-cms',
+				})
+			).toBeEnabled();
+			expect(
+				screen.getByRole('button', {name: 'generate-content-for-gaps'})
+			).toBeEnabled();
+		});
+
+		it('sends the gaps with the routing message when the user asks for matching assets', async () => {
+			const fakeEventSource = createFakeEventSource();
+
+			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
+
+			await renderAndOpen();
+
+			await act(async () => {
+				fakeEventSource.emit('Subscribe', 'ref-code');
+			});
+
+			await act(async () => {
+				emitAnalysis(fakeEventSource);
+			});
+
+			await userEvent.click(
+				await screen.findByRole('button', {
+					name: 'find-matching-assets-in-cms',
+				})
+			);
+
+			expect(mockPostChat).toHaveBeenCalledWith(
+				expect.objectContaining({
+					chatContext: expect.objectContaining({
+						gaps: JSON.stringify([
+							{funnelStageId: '39681', personaId: '39697'},
+						]),
+					}),
+					message: 'find-matching-assets-in-cms',
+				})
+			);
+		});
+	});
+
+	describe('find matching assets action', () => {
+		it('renders the matched assets with the confirmation question', async () => {
+			const fakeEventSource = createFakeEventSource();
+
+			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
+
+			await renderAndOpen();
+
+			await act(async () => {
+				fakeEventSource.emit(
+					'Chat Message Sent',
+					JSON.stringify({
+						data: JSON.stringify({
+							action: 'findMatchingAssets',
+							results: [
+								{
+									funnelStage: 'Awareness',
+									id: 101,
+									persona: 'Procurement',
+									status: 'Approved',
+									title: 'Vendor evaluation checklist',
+								},
+							],
+						}),
+					})
+				);
+			});
+
+			expect(
+				await screen.findByRole('link', {
+					name: 'Vendor evaluation checklist',
+				})
+			).toHaveAttribute(
+				'href',
+				'/c/cms/edit_content_item?objectEntryId=101'
+			);
+			expect(
+				screen.getByText(
+					'would-you-like-me-to-add-all-suggested-assets'
+				)
+			).toBeInTheDocument();
+		});
+	});
+
 	describe('content gap categories request', () => {
 		const PERSONAS = [{id: 39697, name: 'Decision Maker'}];
 		const FUNNEL_STAGES = [{id: 39681, name: 'Awareness'}];

@@ -16,19 +16,6 @@ export interface ContentGapTask {
 	name: string;
 }
 
-export interface ContentGapAnalysis {
-	gaps: unknown[];
-	result: string;
-}
-
-export interface ContentGapCategoriesRequest {
-	agentInstanceId: string;
-	funnelStages: ContentGapCategory[];
-	personas: ContentGapCategory[];
-	requestTask: boolean;
-	tasks: ContentGapTask[];
-}
-
 export interface MatchingAsset {
 	funnelStage?: string;
 	id: number | string;
@@ -41,12 +28,9 @@ export interface MatchingAsset {
 export interface Message {
 	agentDefinitionExternalReferenceCodes?: string[];
 	categorization?: CategorizeEventPayload;
-	contentGapAnalysis?: ContentGapAnalysis;
-	contentGapCategoriesRequest?: ContentGapCategoriesRequest;
 	contentTypes?: ContentType[];
 	error?: boolean;
 	images?: string[];
-	matchingAssets?: MatchingAsset[];
 	sender: string;
 	text: string;
 }
