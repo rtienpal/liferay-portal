@@ -179,91 +179,6 @@ const AIAssistantChatBody: React.FC<AIAssistantChatBodyProps> = ({
 						);
 					}
 
-					if (item.contentGapCategoriesRequest) {
-						const {
-							agentInstanceId,
-							funnelStages,
-							personas,
-							requestTask,
-							tasks,
-						} = item.contentGapCategoriesRequest;
-
-						return (
-							<ContentGapCategoriesMessageBalloon
-								funnelStages={funnelStages}
-								key={index}
-								message={item.text}
-								onSubmit={(selection) =>
-									resumeAgentInstance(
-										agentInstanceId,
-										selection
-									)
-								}
-								personas={personas}
-								requestTask={requestTask}
-								tasks={tasks}
-							/>
-						);
-					}
-
-					if (item.contentGapAnalysis) {
-						const {gaps} = item.contentGapAnalysis;
-
-						const sendMessageWithGaps = (text: string) => {
-
-							// eslint-disable-next-line react-compiler/react-compiler
-							runtimeContextRef.current = {
-								...runtimeContextRef.current,
-								gaps: JSON.stringify(gaps),
-							};
-
-							sendMessage(text);
-						};
-
-						return (
-							<ContentGapAnalysisMessageBalloon
-								disabled={isGenerating}
-								feedbackGiven={Boolean(feedbackGiven[index])}
-								key={index}
-								message={item.text}
-								onFindMatchingAssets={() =>
-									sendMessageWithGaps(
-										Liferay.Language.get(
-											'find-matching-assets-in-cms'
-										)
-									)
-								}
-								onGenerateContent={() =>
-									sendMessageWithGaps(
-										Liferay.Language.get(
-											'generate-content-for-gaps'
-										)
-									)
-								}
-								onReport={() =>
-									setReportContext({
-										agentDefinitionExternalReferenceCodes:
-											item.agentDefinitionExternalReferenceCodes ??
-											[],
-										index,
-									})
-								}
-								onThumbsUp={() => giveThumbsUp(index, item)}
-							/>
-						);
-					}
-
-					if (item.matchingAssets) {
-						return (
-							<MatchingAssetsMessageBalloon
-								assets={item.matchingAssets}
-								disabled={isGenerating}
-								key={index}
-								sendMessage={sendMessage}
-							/>
-						);
-					}
-
 					if (parseContentDraftsMessage(item.text).drafts.length) {
 						return (
 							<ContentsMessageBalloon
@@ -299,6 +214,121 @@ const AIAssistantChatBody: React.FC<AIAssistantChatBodyProps> = ({
 									results={results}
 									setIsGenerating={setIsGenerating}
 									sourceLanguageIdRef={sourceLanguageIdRef}
+								/>
+							);
+						}
+
+						if (
+							json?.action === 'requestContentGapCategories' &&
+							json.agentInstanceId != null
+						) {
+							const agentInstanceId = String(
+								json.agentInstanceId
+							);
+							const requestTask = Boolean(json.requestTask);
+
+							return (
+								<ContentGapCategoriesMessageBalloon
+									funnelStages={
+										Array.isArray(json.funnelStages)
+											? json.funnelStages
+											: []
+									}
+									key={index}
+									message={
+										requestTask
+											? Liferay.Language.get(
+													'select-a-persona-and-a-funnel-stage-to-continue'
+												)
+											: Liferay.Language.get(
+													'select-a-persona-and-a-funnel-stage-to-find-matching-assets'
+												)
+									}
+									onSubmit={(selection) =>
+										resumeAgentInstance(
+											agentInstanceId,
+											selection
+										)
+									}
+									personas={
+										Array.isArray(json.personas)
+											? json.personas
+											: []
+									}
+									requestTask={requestTask}
+									tasks={
+										Array.isArray(json.tasks)
+											? json.tasks
+											: []
+									}
+								/>
+							);
+						}
+
+						if (
+							json?.action === 'contentGapAnalysis' &&
+							typeof json.result === 'string'
+						) {
+							const gaps = Array.isArray(json.gaps)
+								? json.gaps
+								: [];
+
+							const sendMessageWithGaps = (text: string) => {
+
+								// eslint-disable-next-line react-compiler/react-compiler
+								runtimeContextRef.current = {
+									...runtimeContextRef.current,
+									gaps: JSON.stringify(gaps),
+								};
+
+								sendMessage(text);
+							};
+
+							return (
+								<ContentGapAnalysisMessageBalloon
+									disabled={isGenerating}
+									feedbackGiven={Boolean(
+										feedbackGiven[index]
+									)}
+									key={index}
+									message={json.result}
+									onFindMatchingAssets={() =>
+										sendMessageWithGaps(
+											Liferay.Language.get(
+												'find-matching-assets-in-cms'
+											)
+										)
+									}
+									onGenerateContent={() =>
+										sendMessageWithGaps(
+											Liferay.Language.get(
+												'generate-content-for-gaps'
+											)
+										)
+									}
+									onReport={() =>
+										setReportContext({
+											agentDefinitionExternalReferenceCodes:
+												item.agentDefinitionExternalReferenceCodes ??
+												[],
+											index,
+										})
+									}
+									onThumbsUp={() => giveThumbsUp(index, item)}
+								/>
+							);
+						}
+
+						if (
+							json?.action === 'findMatchingAssets' &&
+							Array.isArray(json.results)
+						) {
+							return (
+								<MatchingAssetsMessageBalloon
+									assets={json.results}
+									disabled={isGenerating}
+									key={index}
+									sendMessage={sendMessage}
 								/>
 							);
 						}

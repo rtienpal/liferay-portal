@@ -3,93 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {
-	CONTENT_GAP_ANALYSIS_ACTION,
-	CONTENT_GAP_CATEGORIES_ACTION,
-	FIND_MATCHING_ASSETS_ACTION,
-} from '../constants';
-import {
-	ChatMessageSentData,
-	ContentGapAnalysis,
-	ContentGapCategoriesRequest,
-	MatchingAsset,
-	Message,
-} from '../types';
-
-function parseActionJSONObject(action: string, data: string) {
-	if (!data.includes(`"${action}"`)) {
-		return null;
-	}
-
-	let parsed;
-
-	try {
-		parsed = JSON.parse(
-			data
-				.trim()
-				.replace(/^```(?:json)?/i, '')
-				.replace(/```$/, '')
-				.trim()
-		);
-	}
-	catch {
-		return null;
-	}
-
-	if (parsed?.action !== action) {
-		return null;
-	}
-
-	return parsed;
-}
-
-function parseContentGapAnalysis(data: string): ContentGapAnalysis | null {
-	const parsed = parseActionJSONObject(CONTENT_GAP_ANALYSIS_ACTION, data);
-
-	if (!parsed || typeof parsed.result !== 'string') {
-		return null;
-	}
-
-	return {
-		gaps: Array.isArray(parsed.gaps) ? parsed.gaps : [],
-		result: parsed.result,
-	};
-}
-
-function parseContentGapCategoriesRequest(
-	data: string
-): ContentGapCategoriesRequest | null {
-	const parsed = parseActionJSONObject(CONTENT_GAP_CATEGORIES_ACTION, data);
-
-	const agentInstanceId = parsed?.agentInstanceId;
-
-	if (
-		typeof agentInstanceId !== 'string' &&
-		typeof agentInstanceId !== 'number'
-	) {
-		return null;
-	}
-
-	return {
-		agentInstanceId: String(agentInstanceId),
-		funnelStages: Array.isArray(parsed.funnelStages)
-			? parsed.funnelStages
-			: [],
-		personas: Array.isArray(parsed.personas) ? parsed.personas : [],
-		requestTask: Boolean(parsed.requestTask),
-		tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
-	};
-}
-
-function parseMatchingAssets(data: string): MatchingAsset[] | null {
-	const parsed = parseActionJSONObject(FIND_MATCHING_ASSETS_ACTION, data);
-
-	if (!parsed || !Array.isArray(parsed.results)) {
-		return null;
-	}
-
-	return parsed.results;
-}
+import {ChatMessageSentData, Message} from '../types';
 
 export default function buildAssistantMessage(
 	dataJSON: ChatMessageSentData
@@ -103,45 +17,6 @@ export default function buildAssistantMessage(
 		return {
 			agentDefinitionExternalReferenceCodes,
 			images: [`data:${dataJSON.mimeType ?? 'image/png'};base64,${data}`],
-			sender: 'assistant',
-			text: '',
-		};
-	}
-
-	const contentGapAnalysis = parseContentGapAnalysis(data);
-
-	if (contentGapAnalysis) {
-		return {
-			agentDefinitionExternalReferenceCodes,
-			contentGapAnalysis,
-			sender: 'assistant',
-			text: contentGapAnalysis.result,
-		};
-	}
-
-	const contentGapCategoriesRequest = parseContentGapCategoriesRequest(data);
-
-	if (contentGapCategoriesRequest) {
-		return {
-			agentDefinitionExternalReferenceCodes,
-			contentGapCategoriesRequest,
-			sender: 'assistant',
-			text: contentGapCategoriesRequest.requestTask
-				? Liferay.Language.get(
-						'select-a-persona-and-a-funnel-stage-to-continue'
-					)
-				: Liferay.Language.get(
-						'select-a-persona-and-a-funnel-stage-to-find-matching-assets'
-					),
-		};
-	}
-
-	const matchingAssets = parseMatchingAssets(data);
-
-	if (matchingAssets) {
-		return {
-			agentDefinitionExternalReferenceCodes,
-			matchingAssets,
 			sender: 'assistant',
 			text: '',
 		};
