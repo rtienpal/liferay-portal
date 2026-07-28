@@ -323,12 +323,18 @@ const AIAssistantChatBody: React.FC<AIAssistantChatBodyProps> = ({
 							json?.action === 'findMatchingAssets' &&
 							Array.isArray(json.results)
 						) {
+							const context = {
+								...contextRef.current,
+								...getContextRef.current?.(),
+								...runtimeContextRef.current,
+							};
+
 							return (
 								<MatchingAssetsMessageBalloon
 									assets={json.results}
 									disabled={isGenerating}
 									key={index}
-									sendMessage={sendMessage}
+									projectId={context.projectId}
 								/>
 							);
 						}

@@ -17,7 +17,10 @@ export interface ContentGapTask {
 }
 
 export interface MatchingAsset {
+	classExternalReferenceCode?: string;
+	className?: string;
 	funnelStage?: string;
+	groupExternalReferenceCode?: string;
 	id: number | string;
 	persona?: string;
 	reasoning?: string;

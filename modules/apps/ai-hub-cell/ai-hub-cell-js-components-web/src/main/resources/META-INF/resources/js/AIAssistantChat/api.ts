@@ -12,6 +12,7 @@ export interface ChatContext {
 	fileUploadSelector?: string;
 	groupId?: number | string;
 	objectEntryFolderExternalReferenceCode?: string;
+	projectId?: number | string;
 	[key: string]: unknown;
 }
 
