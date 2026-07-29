@@ -255,12 +255,6 @@ const AIAssistantChatBody: React.FC<AIAssistantChatBodyProps> = ({
 											? json.personas
 											: []
 									}
-									requestTask={requestTask}
-									tasks={
-										Array.isArray(json.tasks)
-											? json.tasks
-											: []
-									}
 								/>
 							);
 						}

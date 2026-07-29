@@ -11,11 +11,6 @@ export interface ContentGapCategory {
 	name: string;
 }
 
-export interface ContentGapTask {
-	id: string;
-	name: string;
-}
-
 export interface MatchingAsset {
 	classExternalReferenceCode?: string;
 	className?: string;

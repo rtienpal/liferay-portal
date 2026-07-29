@@ -84,7 +84,6 @@ async function postAuthorizationToken() {
 export interface AgentInstanceResumeContext {
 	funnelStageId: string;
 	personaId: string;
-	task?: string;
 }
 
 export async function putAgentInstanceResume({

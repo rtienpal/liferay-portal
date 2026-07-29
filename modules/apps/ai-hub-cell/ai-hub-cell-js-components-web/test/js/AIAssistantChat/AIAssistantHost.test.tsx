@@ -942,7 +942,6 @@ describe('AIAssistantHost', () => {
 	describe('content gap categories request', () => {
 		const PERSONAS = [{id: 39697, name: 'Decision Maker'}];
 		const FUNNEL_STAGES = [{id: 39681, name: 'Awareness'}];
-		const TASKS = [{id: 'L_CMP_TASK_1955591569', name: 'Task 1'}];
 
 		function envelope(overrides = {}) {
 			return JSON.stringify({
@@ -1046,7 +1045,7 @@ describe('AIAssistantHost', () => {
 			expect(screen.queryByText('generating')).not.toBeInTheDocument();
 		});
 
-		it('resumes with a task for the generate flow (three dropdowns)', async () => {
+		it('resumes without a task for the generate flow', async () => {
 			const fakeEventSource = createFakeEventSource();
 
 			mockCreateEventSource.mockResolvedValue(fakeEventSource as never);
@@ -1056,8 +1055,15 @@ describe('AIAssistantHost', () => {
 			await emitActionRequest(fakeEventSource, {
 				agentInstanceId: '41055',
 				requestTask: true,
-				tasks: TASKS,
+				tasks: [{id: 'L_CMP_TASK_1955591569', name: 'Task 1'}],
 			});
+
+			expect(
+				screen.getByText(
+					'select-a-persona-and-a-funnel-stage-to-continue'
+				)
+			).toBeInTheDocument();
+			expect(screen.queryByLabelText('task')).not.toBeInTheDocument();
 
 			await userEvent.selectOptions(
 				screen.getByLabelText('persona'),
@@ -1066,10 +1072,6 @@ describe('AIAssistantHost', () => {
 			await userEvent.selectOptions(
 				screen.getByLabelText('funnel-stage'),
 				'39681'
-			);
-			await userEvent.selectOptions(
-				screen.getByLabelText('task'),
-				'L_CMP_TASK_1955591569'
 			);
 			await userEvent.click(
 				screen.getByRole('button', {name: 'confirm'})
@@ -1080,7 +1082,6 @@ describe('AIAssistantHost', () => {
 				context: {
 					funnelStageId: '39681',
 					personaId: '39697',
-					task: 'L_CMP_TASK_1955591569',
 				},
 			});
 		});
