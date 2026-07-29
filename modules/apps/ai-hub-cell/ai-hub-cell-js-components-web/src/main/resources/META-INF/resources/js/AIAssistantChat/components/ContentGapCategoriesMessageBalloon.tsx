@@ -8,14 +8,13 @@ import ClayForm, {ClaySelectWithOption} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import React, {useId, useState} from 'react';
 
-import {ContentGapCategory, ContentGapTask} from '../types';
+import {ContentGapCategory} from '../types';
 
 import '../chat.scss';
 
 export interface ContentGapCategoriesSelection {
 	funnelStageId: string;
 	personaId: string;
-	task?: string;
 }
 
 interface ContentGapCategoriesMessageBalloonProps {
@@ -23,14 +22,9 @@ interface ContentGapCategoriesMessageBalloonProps {
 	message: string;
 	onSubmit: (selection: ContentGapCategoriesSelection) => Promise<boolean>;
 	personas: ContentGapCategory[];
-	requestTask: boolean;
-	tasks: ContentGapTask[];
 }
 
-function toOptions(
-	items: Array<ContentGapCategory | ContentGapTask>,
-	placeholder: string
-) {
+function toOptions(items: ContentGapCategory[], placeholder: string) {
 	return [
 		{disabled: true, label: placeholder, value: ''},
 		...items.map((item) => ({label: item.name, value: String(item.id)})),
@@ -39,35 +33,23 @@ function toOptions(
 
 const ContentGapCategoriesMessageBalloon: React.FC<
 	ContentGapCategoriesMessageBalloonProps
-> = ({funnelStages, message, onSubmit, personas, requestTask, tasks}) => {
+> = ({funnelStages, message, onSubmit, personas}) => {
 	const [funnelStageId, setFunnelStageId] = useState('');
 	const [personaId, setPersonaId] = useState('');
 	const [submitted, setSubmitted] = useState(false);
 	const [submitting, setSubmitting] = useState(false);
-	const [task, setTask] = useState('');
 
 	const funnelStageSelectId = useId();
 	const personaSelectId = useId();
-	const taskSelectId = useId();
 
-	const missingOptions =
-		!personas.length ||
-		!funnelStages.length ||
-		(requestTask && !tasks.length);
+	const missingOptions = !personas.length || !funnelStages.length;
 
-	const complete =
-		Boolean(personaId) &&
-		Boolean(funnelStageId) &&
-		(!requestTask || Boolean(task));
+	const complete = Boolean(personaId) && Boolean(funnelStageId);
 
 	async function handleSubmit() {
 		setSubmitting(true);
 
-		const success = await onSubmit(
-			requestTask
-				? {funnelStageId, personaId, task}
-				: {funnelStageId, personaId}
-		);
+		const success = await onSubmit({funnelStageId, personaId});
 
 		setSubmitting(false);
 
@@ -130,27 +112,6 @@ const ContentGapCategoriesMessageBalloon: React.FC<
 								value={funnelStageId}
 							/>
 						</ClayForm.Group>
-
-						{requestTask && (
-							<ClayForm.Group>
-								<label htmlFor={taskSelectId}>
-									{Liferay.Language.get('task')}
-								</label>
-
-								<ClaySelectWithOption
-									disabled={submitted || submitting}
-									id={taskSelectId}
-									onChange={(event) =>
-										setTask(event.target.value)
-									}
-									options={toOptions(
-										tasks,
-										Liferay.Language.get('choose-a-task')
-									)}
-									value={task}
-								/>
-							</ClayForm.Group>
-						)}
 
 						<ClayButton
 							disabled={!complete || submitted || submitting}
